@@ -16,13 +16,10 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="100*"/>
             <ColumnDefinition Width="211*"/>
-            <ColumnDefinition Width="209"/>
-            <ColumnDefinition Width="134*"/>
-            <ColumnDefinition Width="121*"/>
-            <ColumnDefinition Width="98*"/>
-            <ColumnDefinition Width="Auto" MinWidth="83"/>
+            <ColumnDefinition Width="464"/>
+            <ColumnDefinition Width="181*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="lstviewTools" Margin="0,10,10,120" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" Grid.ColumnSpan="7" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}">
+        <ListView x:Name="lstviewTools" Margin="0,10,10,120" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" Grid.ColumnSpan="4" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}">
 
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
@@ -88,7 +85,7 @@
 
 
         </ListView>
-        <Label Content="Z Bump:" HorizontalAlignment="Center" Margin="0,490,0,0" Width="90" Grid.Column="1" Height="26" VerticalAlignment="Top"/>
+        <Label Content="Z Bump:" HorizontalAlignment="Center" Margin="0,0,0,57" Width="90" Grid.Column="1" Height="26" VerticalAlignment="Bottom"/>
         <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="0,0,0,61" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Grid.Column="2" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom">
             <TextBox.RenderTransform>
                 <TransformGroup>
@@ -100,18 +97,18 @@
             </TextBox.RenderTransform>
         </TextBox>
         <TextBox x:Name="txtBoxWaitTime" HorizontalAlignment="Left" Margin="85,0,0,4" TextWrapping="Wrap" Text="{Binding SpindleWaitTime, StringFormat=\{0:F2\}}" Width="120" Grid.Column="2" Height="18" VerticalAlignment="Bottom" />
-        <Label Content="Wait Time For Spindle to Stop:" HorizontalAlignment="Left" Margin="10,547,0,0" Width="170"  Grid.Column="1" Height="26" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnWriteChanges" Grid.Column="6" Content="Write Changes" HorizontalAlignment="Left" Margin="3,0,0,4" Width="95" IsEnabled="{Binding dirty}" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
+        <Label Content="Wait Time For Spindle to Stop:" HorizontalAlignment="Left" Margin="3,0,0,-3" Width="170"  Grid.Column="1" Height="26" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+        <Button x:Name="btnWriteChanges" Grid.Column="4" Content="Write Changes" HorizontalAlignment="Left" Margin="3,0,0,4" Width="95" IsEnabled="{Binding dirty}" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
         <Button x:Name="btnAddPocket" Content="Add Pocket" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="0,0,0,87" Width="150" Height="20" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
         <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Grid.ColumnSpan="2" Margin="70,0,0,87" Grid.Column="2" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="20" VerticalAlignment="Bottom"/>
-        <Label Grid.Column="3" Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="40,466,0,0" VerticalAlignment="Top" Height="26" Width="167"/>
-        <Button x:Name="btnAssignMachineCoordX" Grid.Column="4" Content="X" HorizontalAlignment="Left" Margin="0,469,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordX_Click"/>
-        <Button x:Name="btnAssignMachineCoordY" Grid.Column="4" Content="Y" HorizontalAlignment="Center" Margin="0,469,0,0" VerticalAlignment="Top" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
-        <Button x:Name="btnAssignMachineCoordZ" Grid.Column="4" Content="Z" HorizontalAlignment="Left" Margin="98,469,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
-        <CheckBox x:Name="chkbxTestingMode" Grid.Column="3" Content="Testing Mode" HorizontalAlignment="Left" Margin="13,504,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableTestingMode}" />
-        <Label Content="Testing Feed:" HorizontalAlignment="Left" Margin="13,520,0,0" Width="80" Grid.Column="3" Height="26" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="93,524,0,0" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="60" Grid.Column="3" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
-        <Label Content="Slide Distance:" Margin="5,520,5,27" Width="90" Grid.Column="1" Height="26"/>
+        <Label Grid.Column="3" Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="40,0,0,81" VerticalAlignment="Bottom" Height="26" Width="167"/>
+        <Button x:Name="btnAssignMachineCoordX" Grid.Column="3" Content="X" HorizontalAlignment="Left" Margin="209,0,0,84" VerticalAlignment="Bottom" Height="20" Width="35" Click="btnAssignMachineCoordX_Click"/>
+        <Button x:Name="btnAssignMachineCoordY" Grid.Column="3" Content="Y" HorizontalAlignment="Left" Margin="259,0,0,84" VerticalAlignment="Bottom" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
+        <Button x:Name="btnAssignMachineCoordZ" Grid.Column="3" Content="Z" HorizontalAlignment="Left" Margin="307,0,0,84" VerticalAlignment="Bottom" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
+        <CheckBox x:Name="chkbxTestingMode" Grid.Column="3" Content="Testing Mode" HorizontalAlignment="Left" Margin="13,0,0,54" VerticalAlignment="Bottom" IsChecked="{Binding EnableTestingMode}" />
+        <Label Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="11,0,0,27" Width="121" Grid.Column="3" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="136,0,0,32" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="60" Grid.Column="3" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"/>
+        <Label Content="Slide Distance:" Margin="5,0,5,27" Width="90" Grid.Column="1" Height="26" VerticalAlignment="Bottom"/>
         <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="0,0,0,35" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Grid.Column="2" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom">
             <TextBox.RenderTransform>
                 <TransformGroup>
@@ -122,6 +119,7 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
+        <CheckBox x:Name="chkbxCheckAirPressure" Grid.Column="3" Content="Check Air Pressure" HorizontalAlignment="Left" Margin="13,0,0,6" VerticalAlignment="Bottom" IsChecked="{Binding ShouldCheckAirPressure}" />
 
     </Grid>
 </Window>

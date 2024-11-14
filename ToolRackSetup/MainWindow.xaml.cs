@@ -170,11 +170,12 @@ namespace ToolRackSetup
 
     public class ToolChangeSettings : NotifyingObject
     {
-        private bool enableTestingMode;
-        private double zBump;
+        private bool enableTestingMode = true;
+        private double zBump = 0.005; // May need to be larger for CNC depot
         private double testingFeed = 200;
-        private double zClearance;
-        private double spindleWaitTime;
+        private double zClearance = 0; //unused right now
+        private double spindleWaitTime = 10.0; // seconds
+        private bool shouldCheckAirPressure = true;
 
         public bool EnableTestingMode { get => enableTestingMode; 
             set { 
@@ -186,13 +187,10 @@ namespace ToolRackSetup
         public double SpindleWaitTime { get => spindleWaitTime; set => spindleWaitTime = value; }
 
         public double TestingFeed { get => testingFeed; set { testingFeed = value; NotifyPropertyChanged(); } }
+        public bool ShouldCheckAirPressure { get => shouldCheckAirPressure; set { shouldCheckAirPressure = value; NotifyPropertyChanged(); } }
 
         public ToolChangeSettings()
         {
-            ZBump = 0.005;
-            ZClearance = 0;
-            SpindleWaitTime = 10;
-            EnableTestingMode = false;
         }
     }
 
@@ -209,7 +207,7 @@ namespace ToolRackSetup
         public double Y { get => y; set { object old = y; y = value; NotifyPropertyChanged(old); } }
         public double Z { get => z; set { object old = z; z = value; NotifyPropertyChanged(old); } }
 
-        private double _slideDistance = 1.2;
+        private double _slideDistance = 1.4; // somewhere from 1.2 to 1.4 is a good value
         public double SlideDistance
         {
             get { return _slideDistance; }
@@ -310,10 +308,11 @@ namespace ToolRackSetup
         const int Param_MaxToolBins = 161;
         const int Param_HasATC = 6;
         const int Param_HasEnhancedATC = 160;
+        const int Param_ShouldCheckAir = 724;
 
         ObservableCollection<ToolInfo> _toolInfoList;
         ObservableCollection<ToolPocketItem> _toolPocketItems;
-        
+
 
         public ToolChangeSettings Settings = new ToolChangeSettings();
         bool _loading = true;
@@ -354,6 +353,10 @@ namespace ToolRackSetup
             _pipe.tool.GetToolLibrary(out toolLibrary);
             double toolBinCount = 0;
             _pipe.parameter.GetMachineParameterValue(Param_MaxToolBins, out toolBinCount);
+            double shouldCheckAirPressure = 0;
+            _pipe.parameter.GetMachineParameterValue(Param_ShouldCheckAir, out shouldCheckAirPressure);
+            Settings.ShouldCheckAirPressure = Convert.ToBoolean(shouldCheckAirPressure);
+
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
@@ -370,7 +373,7 @@ namespace ToolRackSetup
                     item.Pocket = -1;
                 } else if (item.Pocket > 0)
                 {
-                    if (usedPockets.Contains(item.Pocket)) { 
+                    if (usedPockets.Contains(item.Pocket)) {
                         // Can't have two tools in one pocket!
                         item.Pocket = -1;
                     } else
@@ -385,7 +388,7 @@ namespace ToolRackSetup
             InitializeToolPocketItems((int)toolBinCount);
             LoadSavedValues();
             InitializeUI();
-            Settings.PropertyChanged += Tpi_PropertyChanged;
+            Settings.PropertyChanged += SettingsPropertyChanged;
 
             _dirty = false;
             _loading = false;
@@ -445,7 +448,7 @@ namespace ToolRackSetup
                     XElement? element = doc.XPathSelectElement(String.Format("/Table/Bin/BinNumber[text()='{0}']", item.Pocket));
                     XElement? parent = element?.Parent;
                     if (parent == null) { continue; }
-                    
+
 
                     v = parent.XPathSelectElement("XPosition")?.Value;
                     if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double x))
@@ -476,7 +479,7 @@ namespace ToolRackSetup
                         item.SlideAxis = clearingAxis;
                     }
                 }
-            }            
+            }
         }
 
         /*
@@ -494,8 +497,9 @@ namespace ToolRackSetup
         {
             // done in other spots...but here too
             _pipe.parameter.SetMachineParameter(Param_MaxToolBins, _toolPocketItems.Count);
-            _pipe.parameter.SetMachineParameter(Param_HasATC, 1);
-            _pipe.parameter.SetMachineParameter(Param_HasEnhancedATC, 0);
+            _pipe.parameter.SetMachineParameter(Param_HasATC, 0); // needs to be zero!
+            _pipe.parameter.SetMachineParameter(Param_HasEnhancedATC, 0); // needs to be zero!
+            _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
         }
 
         private void WriteSettings()
@@ -510,9 +514,7 @@ namespace ToolRackSetup
             topLevel.Add(new XElement("ZClearance", Settings.ZClearance.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement("SpindleWaitTime", Settings.SpindleWaitTime.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement("EnableTestingMode", Settings.EnableTestingMode.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement("TestingFeed", Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));            
-
-
+            topLevel.Add(new XElement("TestingFeed", Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));
             foreach (ToolPocketItem item in _toolPocketItems)
             {
                 XElement child = new XElement("Bin");
@@ -545,6 +547,7 @@ namespace ToolRackSetup
 
             // the real math is here..
             double adjustmentAmount = 5.5; // Looks about right, hardcoded inches.
+
             double xMin = 0;
             double xMax = 0;
             double yMin = 0;
@@ -639,6 +642,22 @@ namespace ToolRackSetup
 
             }
         }
+        private void InitializeUI()
+        {
+            lstviewTools.ItemsSource = _toolPocketItems;
+            // I can't figure out how to set bindings up in the xaml
+
+            // txtBxZClearance.DataContext = Settings;
+            txtBoxWaitTime.DataContext = Settings;
+            txtBoxZBump.DataContext = Settings;
+            chkbxTestingMode.DataContext = Settings;
+            txtBoxTestingFeed.DataContext = Settings;
+            chkbxCheckAirPressure.DataContext = Settings;
+
+
+            lstviewTools.UnselectAll();
+        }
+
 
         //CNCPipe.Job job = new CNCPipe.Job(_pipe);
         //String command = String.Format("G10 P{0} R{1}", CMaxToolBins, 50);
@@ -659,36 +678,33 @@ namespace ToolRackSetup
         }
 
         private bool _dirty = false; // only for changes that are not immediate, which require new files to be written.
+
+        private void SettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {   
+            if (_loading) return;
+
+            if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
+            {
+                // Update the parameter for this immedietly 
+                _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+            }
+            else
+            {
+                WriteSettings();
+                _dirty = true;
+            }            
+
+        }
         private void Tpi_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (sender == Settings)
+            if (_loading) return;
+            if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber)) // ignore changing the tool number..we set that dynamically all the time.
             {
-                // autosave
-                WriteSettings();
-            }
-            if (e.PropertyName != "ToolInfo" && e.PropertyName != "ToolNumber") // ignore
-            {
-                if (!_loading)
-                {
-                    _dirty = true; // TODO: only dirty when something is changed that needs to cause us to write the macros..                   
-                }
+                _dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
             }
 //            ToolPocketItem toolPocketItem = (ToolPocketItem)sender;
 //            MyPropertyChangedEventArgs args = (MyPropertyChangedEventArgs)e;
 ////            System.Diagnostics.Debug.WriteLine(e.PropertyName);
-        }
-
-        private void InitializeUI()
-        {
-            lstviewTools.ItemsSource = _toolPocketItems;
-            // I can't figure out how to set this  up in the xaml
-            txtBxZClearance.DataContext = Settings;
-            txtBoxWaitTime.DataContext = Settings;
-            txtBoxZBump.DataContext = Settings;
-            chkbxTestingMode.DataContext = Settings;
-            txtBoxTestingFeed.DataContext = Settings;
-
-            lstviewTools.UnselectAll();
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
