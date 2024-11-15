@@ -9,6 +9,7 @@
         Title="ATC Tools" Height="606" Width="971" Closing="window_Closing">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
     </Window.Resources>
 
     <Grid Margin="15,0,0,17">
@@ -21,6 +22,12 @@
         </Grid.ColumnDefinitions>
         <ListView x:Name="lstviewTools" Margin="0,10,10,120" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" Grid.ColumnSpan="4" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}">
 
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn x:Name="gvcPocket" Header="Pocket" Width="50" DisplayMemberBinding="{Binding Pocket, StringFormat=\{0:D\}}"/>
@@ -31,7 +38,14 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding ToolInfo.Description, TargetNullValue=' '}"/>
+                    <GridViewColumn Header="Description" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                     <GridViewColumn Header="Height" Width="75"  DisplayMemberBinding="{Binding ToolInfo.HeightOffset}"/>
                     <GridViewColumn Header="X" Width="90">
                         <GridViewColumn.CellTemplate>
@@ -56,22 +70,17 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Slide Distance" Width="105">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxSlideDistance" Background="Transparent" BorderThickness="1" 
-                                         Text="{Binding SlideDistance, Mode=TwoWay, StringFormat=\{0:F4\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Slide Axis" Width="105">
+                   
+                    <GridViewColumn Header="Style" Width="105">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
 
-                                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Grid.ColumnSpan="2" SelectedIndex="{Binding SlideAxis, Mode=TwoWay}">
-                                    <ComboBoxItem Content="X">
+                                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Grid.ColumnSpan="2" SelectedIndex="{Binding Style, Mode=TwoWay, Converter={StaticResource pocketStyleConverter}}" >
+                                    <ComboBoxItem Content="X Minus">
                                     </ComboBoxItem>
-                                    <ComboBoxItem Content="Y"/>
+                                    <ComboBoxItem Content="X Plus"/>
+                                    <ComboBoxItem Content="Y Minus"/>
+                                    <ComboBoxItem Content="Y Plus"/>
                                 </ComboBox>
 
 
@@ -109,15 +118,8 @@
         <Label Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="11,0,0,27" Width="121" Grid.Column="3" Height="26" VerticalAlignment="Bottom"/>
         <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="136,0,0,32" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="60" Grid.Column="3" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"/>
         <Label Content="Slide Distance:" Margin="5,0,5,27" Width="90" Grid.Column="1" Height="26" VerticalAlignment="Bottom"/>
-        <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="0,0,0,35" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Grid.Column="2" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom">
-            <TextBox.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="0"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </TextBox.RenderTransform>
+        <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="0,0,0,35" TextWrapping="Wrap" Text="{Binding SlideDistance, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Grid.Column="2" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom">
+     
         </TextBox>
         <CheckBox x:Name="chkbxCheckAirPressure" Grid.Column="3" Content="Check Air Pressure" HorizontalAlignment="Left" Margin="13,0,0,6" VerticalAlignment="Bottom" IsChecked="{Binding ShouldCheckAirPressure}" />
 

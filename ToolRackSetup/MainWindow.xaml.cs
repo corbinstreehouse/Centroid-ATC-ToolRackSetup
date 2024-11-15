@@ -155,6 +155,43 @@ namespace ToolRackSetup
         }
     }
 
+    public enum PocketStyle
+    {
+        XMinus = 0,
+        XPlus = 1,
+        YMinus = 2,
+        YPlus = 3,
+        //Hole = 4, // not implemented
+        //Hole = 4, // not implemented
+    }
+
+    public class PocketStyleConverter : IValueConverter
+    {
+        object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is PocketStyle)
+            {
+                PocketStyle ps = (PocketStyle)value;
+                return ((int)ps);
+            }
+            PocketStyle thisStyle = (PocketStyle)Enum.Parse(typeof(PocketStyle), (string)value, true);
+            
+            return thisStyle;
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int)
+            {
+                int v = (int)value;
+                PocketStyle ps  = (PocketStyle)v;
+                return ps;
+            }
+            return PocketStyle.XPlus;
+        }
+    }
+
+
     public  class NotifyingObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -174,8 +211,10 @@ namespace ToolRackSetup
         private double zBump = 0.005; // May need to be larger for CNC depot
         private double testingFeed = 200;
         private double zClearance = 0; //unused right now
-        private double spindleWaitTime = 10.0; // seconds
+        private double spindleWaitTime = 12.0; // seconds
         private bool shouldCheckAirPressure = true;
+        private double slideDistance = 1.4; // Default value
+        private double rackAdjustment = 5.5;
 
         public bool EnableTestingMode { get => enableTestingMode; 
             set { 
@@ -184,10 +223,28 @@ namespace ToolRackSetup
         }
         public double ZBump { get => zBump; set { zBump = value; NotifyPropertyChanged();  } }
         public double ZClearance { get => zClearance; set { zClearance = value; NotifyPropertyChanged(); } }
-        public double SpindleWaitTime { get => spindleWaitTime; set => spindleWaitTime = value; }
+        public double SpindleWaitTime { get => spindleWaitTime; set => 
+                spindleWaitTime = value; }
 
         public double TestingFeed { get => testingFeed; set { testingFeed = value; NotifyPropertyChanged(); } }
         public bool ShouldCheckAirPressure { get => shouldCheckAirPressure; set { shouldCheckAirPressure = value; NotifyPropertyChanged(); } }
+
+        public double SlideDistance
+        {
+            get => slideDistance;
+            set
+            {
+                if (slideDistance != value)
+                {
+                    slideDistance = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public double RackAdjustment { get => rackAdjustment;
+            set { rackAdjustment = value; NotifyPropertyChanged(); }
+        }
 
         public ToolChangeSettings()
         {
@@ -200,27 +257,26 @@ namespace ToolRackSetup
         private double x;
         private double y;
         private double z;
+        private PocketStyle style = PocketStyle.YPlus;
 
         public int Pocket { get; }
 
         public double X { get => x; set { object old = x;  x = value; NotifyPropertyChanged(old); } }
         public double Y { get => y; set { object old = y; y = value; NotifyPropertyChanged(old); } }
         public double Z { get => z; set { object old = z; z = value; NotifyPropertyChanged(old); } }
-
-        private double _slideDistance = 1.4; // somewhere from 1.2 to 1.4 is a good value
-        public double SlideDistance
+        public PocketStyle Style
         {
-            get { return _slideDistance; }
-            set { _slideDistance = value; NotifyPropertyChanged(); }
+            get { return style;  }
+            set
+            {
+                if (value != style)
+                {
+                    object old = value;
+                    style = value;
+                    NotifyPropertyChanged(old);
+                }
+            }
         }
-
-        private int _slideAxis = 1; // 0 = x, 1=y CNCPipe.Axes.AXIS_2; // Y, most likley
-        public int SlideAxis
-        {
-            get { return _slideAxis; }
-            set { _slideAxis = value; NotifyPropertyChanged(); }
-        }
-
 
         private ToolInfo? _toolInfo = null;
         public ToolInfo? ToolInfo {
@@ -308,7 +364,8 @@ namespace ToolRackSetup
         const int Param_MaxToolBins = 161;
         const int Param_HasATC = 6;
         const int Param_HasEnhancedATC = 160;
-        const int Param_ShouldCheckAir = 724;
+        const int Param_ShouldCheckAir = 724; // Avid setting
+        const int Param_SpindleWaitTime = 778; // corbin added; it looked free.
 
         ObservableCollection<ToolInfo> _toolInfoList;
         ObservableCollection<ToolPocketItem> _toolPocketItems;
@@ -355,7 +412,17 @@ namespace ToolRackSetup
             _pipe.parameter.GetMachineParameterValue(Param_MaxToolBins, out toolBinCount);
             double shouldCheckAirPressure = 0;
             _pipe.parameter.GetMachineParameterValue(Param_ShouldCheckAir, out shouldCheckAirPressure);
+
             Settings.ShouldCheckAirPressure = Convert.ToBoolean(shouldCheckAirPressure);
+
+            double spindleWaitTime = 0;
+            _pipe.parameter.GetMachineParameterValue(Param_SpindleWaitTime, out spindleWaitTime);
+            // if not set, default it to 12
+            if (spindleWaitTime <= 0)
+            {
+                spindleWaitTime = 12;
+            }
+            Settings.SpindleWaitTime = spindleWaitTime;
 
 
             // Convert toolInfoList into our own datastructure
@@ -395,8 +462,8 @@ namespace ToolRackSetup
 
         }
 
-        private const String settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
-        private const String systemSettingsPath = "C:\\cncm\\RackMountBin.xml";
+        private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
+        private const string systemSettingsPath = "C:\\cncm\\RackMountBin.xml";
 
         /*
          * 
@@ -414,32 +481,28 @@ namespace ToolRackSetup
             }
             if (doc != null)
             {
-                String? v = doc.XPathSelectElement(String.Format("/Table/ZBump"))?.Value;
-                if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double zBumpValue))
+                double ReadDouble(string name, double defaultValue)
                 {
-                    Settings.ZBump = zBumpValue;
-                }
-                v = doc.XPathSelectElement(String.Format("/Table/SpindleWaitTime"))?.Value;
-                if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double SpindleWaitTime))
-                {
-                    Settings.SpindleWaitTime = SpindleWaitTime;
-                }
-                v = doc.XPathSelectElement(String.Format("/Table/ZClearance"))?.Value;
-                if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double ZClearance))
-                {
-                    Settings.ZClearance = ZClearance;
-                }
-                v = doc.XPathSelectElement(String.Format("/Table/EnableTestingMode"))?.Value;
-                if (v != null && bool.TryParse(v, out bool EnableTestingMode))
-                {
-                    Settings.EnableTestingMode = EnableTestingMode;
-                }
-                v = doc.XPathSelectElement(String.Format("/Table/TestingFeed"))?.Value;
-                if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double TestingFeed))
-                {
-                    Settings.TestingFeed = TestingFeed;
+                    string expr = String.Format("/Table/{0}", name);
+                    string? v = doc.XPathSelectElement(expr)?.Value;
+                    if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double result)) return result;
+                    return defaultValue;                   
                 }
 
+                bool ReadBool(string name, bool defaultValue)
+                {
+                    string expr = String.Format("/Table/{0}", name);
+                    string? v = doc.XPathSelectElement(expr)?.Value;
+                    if (v != null && Boolean.TryParse(v, out bool result)) return result;
+                    return defaultValue;
+                }
+
+                Settings.ZBump = ReadDouble(nameof(Settings.ZBump), Settings.ZBump);
+                Settings.ZClearance = ReadDouble(nameof(Settings.ZClearance), Settings.ZClearance);
+                Settings.EnableTestingMode = ReadBool(nameof(Settings.EnableTestingMode), Settings.EnableTestingMode);
+                Settings.TestingFeed = ReadDouble(nameof(Settings.TestingFeed), Settings.TestingFeed);
+                Settings.SlideDistance = ReadDouble(nameof(Settings.SlideDistance), Settings.SlideDistance);
+                Settings.RackAdjustment = ReadDouble(nameof(Settings.RackAdjustment), Settings.RackAdjustment);
 
                 // probably not the fastest way to do this.
                 foreach (ToolPocketItem item in _toolPocketItems)
@@ -449,35 +512,21 @@ namespace ToolRackSetup
                     XElement? parent = element?.Parent;
                     if (parent == null) { continue; }
 
-
-                    v = parent.XPathSelectElement("XPosition")?.Value;
-                    if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double x))
+                    double ReadItemDouble(string name, double defaultValue)
                     {
-                        item.X = x;
+                        string? v = parent.XPathSelectElement(name)?.Value;
+                        if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double result)) return result;
+                        return defaultValue;
                     }
+                    item.X = ReadItemDouble("XPosition", item.X);
+                    item.Y = ReadItemDouble("YPosition", item.Y);
+                    item.Z = ReadItemDouble("ZHeight", item.Z);
 
-                    v = parent.XPathSelectElement("YPosition")?.Value;
-                    if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double y))
-                    {
-                        item.Y = y;
-                    }
-                    v = parent.XPathSelectElement("ZHeight")?.Value; // The variable names are copied from the Centroid base script generation
-                    if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double z))
-                    {
-                        item.Z = z;
+                    string? v = parent.XPathSelectElement("PocketStyle")?.Value;
+                    if (v != null) {
+                        item.Style =(PocketStyle)Enum.Parse(typeof(PocketStyle), v);
                     }
 
-                    v = parent.XPathSelectElement("DistancetoClear")?.Value;
-                    if (v != null && Double.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out double c))
-                    {
-                        item.SlideDistance = c;
-                    }
-
-                    v = parent.XPathSelectElement("ClearingAxis")?.Value;
-                    if (v != null && int.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out int clearingAxis))
-                    {
-                        item.SlideAxis = clearingAxis;
-                    }
                 }
             }
         }
@@ -500,6 +549,7 @@ namespace ToolRackSetup
             _pipe.parameter.SetMachineParameter(Param_HasATC, 0); // needs to be zero!
             _pipe.parameter.SetMachineParameter(Param_HasEnhancedATC, 0); // needs to be zero!
             _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+            _pipe.parameter.SetMachineParameter(Param_SpindleWaitTime, Settings.SpindleWaitTime);
         }
 
         private void WriteSettings()
@@ -510,11 +560,13 @@ namespace ToolRackSetup
             XDocument doc = new XDocument();
             XElement topLevel = new XElement("Table");
             // Write settings here..
-            topLevel.Add(new XElement("ZBump", Settings.ZBump.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement("ZClearance", Settings.ZClearance.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement("SpindleWaitTime", Settings.SpindleWaitTime.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement("EnableTestingMode", Settings.EnableTestingMode.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement("TestingFeed", Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.ZBump), Settings.ZBump.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.ZClearance), Settings.ZClearance.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.EnableTestingMode), Settings.EnableTestingMode.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.TestingFeed), Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.SlideDistance), Settings.SlideDistance.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.RackAdjustment), Settings.RackAdjustment.ToString(CultureInfo.InvariantCulture)));
+
             foreach (ToolPocketItem item in _toolPocketItems)
             {
                 XElement child = new XElement("Bin");
@@ -522,8 +574,7 @@ namespace ToolRackSetup
                 child.Add(new XElement("XPosition", item.X.ToString(CultureInfo.InvariantCulture)));
                 child.Add(new XElement("YPosition", item.Y.ToString(CultureInfo.InvariantCulture)));
                 child.Add(new XElement("ZHeight", item.Z.ToString(CultureInfo.InvariantCulture)));
-                child.Add(new XElement("DistancetoClear", item.SlideDistance.ToString(CultureInfo.InvariantCulture)));
-                child.Add(new XElement("ClearingAxis", item.SlideAxis.ToString(CultureInfo.InvariantCulture)));
+                child.Add(new XElement("PocketStyle", item.Style.ToString()));
                 topLevel.Add(child);
             }
 
@@ -546,7 +597,7 @@ namespace ToolRackSetup
             fileContents = fileContents.Replace("<SPEED>", testingSpeed);
 
             // the real math is here..
-            double adjustmentAmount = 5.5; // Looks about right, hardcoded inches.
+            double adjustmentAmount = Settings.RackAdjustment; 
 
             double xMin = 0;
             double xMax = 0;
@@ -572,42 +623,56 @@ namespace ToolRackSetup
                 // Figure out where to start the slide in at (or where to slide out to after clamping) in front of the fork
                 double xPosClear = xPos;
                 double yPosClear = yPos;
-                CNCPipe.Axes axis = (CNCPipe.Axes)item.SlideAxis;
-                if (axis == CNCPipe.Axes.AXIS_1) // x
+                double slideDistance = Settings.SlideDistance;
+
+                if (item.Style == PocketStyle.XMinus || item.Style == PocketStyle.XPlus)
                 {
                     // X axis slide means we are facing to the left or the right, depending on the slide direction.
-                    // I could check if we are sliding in from the middle, or what not, but
-                    // It doesn't really matter if we have a little extra movement that could be avoided, as it is minor
                     if (xPos > xMiddle)
                     {
                         // On the right side of the table; offset to the left
                         xPosFront -= adjustmentAmount;
-                    } else
+                    } 
+                    else
                     {
                         // on the left side of the table; offset to the right
                         xPosFront += adjustmentAmount;
                     }
-                    xPosClear -= item.SlideDistance;
-                } else if (axis == CNCPipe.Axes.AXIS_2) // y
+                    if (item.Style == PocketStyle.XMinus)
+                    {
+                        xPosClear -= slideDistance;
+                    }
+                    else
+                    {
+                        xPosClear += slideDistance;
+                    }
+                } 
+                else if (item.Style == PocketStyle.YMinus || item.Style == PocketStyle.YPlus)
                 {
-                    // Y axis slide means we are facing forwards or backwards from the table y axis
                     if (yPos > yMiddle)
                     {
                         // Back of table
                         yPosFront -= adjustmentAmount;
-                    } else
+                    }
+                    else
                     {
                         yPosFront += adjustmentAmount;
                     }
-                    yPosClear -= item.SlideDistance;
+                    if (item.Style == PocketStyle.YMinus)
+                    {
+                        yPosClear -= slideDistance;
+                    }
+                    else
+                    {
+                        yPosClear += slideDistance;
+                    }
 
                 } else
                 {
-                    // not allowed should error out/exception
-                    throw new Exception("Slide axis can only be 0 or 1 (X axis or Y axis)");
+                    throw new Exception("Unhandled pocket type");
                 }
-
-
+                
+                
                 double zPos = item.Z;
                 double zPosBump = item.Z + Settings.ZBump;
 
@@ -653,7 +718,7 @@ namespace ToolRackSetup
             chkbxTestingMode.DataContext = Settings;
             txtBoxTestingFeed.DataContext = Settings;
             chkbxCheckAirPressure.DataContext = Settings;
-
+            txtBxSlideDistance.DataContext = Settings;
 
             lstviewTools.UnselectAll();
         }
@@ -687,6 +752,9 @@ namespace ToolRackSetup
             {
                 // Update the parameter for this immedietly 
                 _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+            } else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
+            {
+                _pipe.parameter.SetMachineParameter(Param_SpindleWaitTime, Settings.SpindleWaitTime);
             }
             else
             {
@@ -702,6 +770,7 @@ namespace ToolRackSetup
             {
                 _dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
             }
+            WriteSettings(); // save the xml files
 //            ToolPocketItem toolPocketItem = (ToolPocketItem)sender;
 //            MyPropertyChangedEventArgs args = (MyPropertyChangedEventArgs)e;
 ////            System.Diagnostics.Debug.WriteLine(e.PropertyName);
@@ -776,11 +845,11 @@ namespace ToolRackSetup
             if (_toolPocketItems.Count > 0)
             {
                 ToolPocketItem last = _toolPocketItems.Last()!;
-                tpi.SlideAxis = last.SlideAxis;
-                tpi.SlideDistance = last.SlideDistance;
+
                 tpi.X = last.X;
                 tpi.Y = last.Y;
                 tpi.Z = last.Z;
+                tpi.Style = last.Style;
             }
 
             _toolPocketItems.Add(tpi);
