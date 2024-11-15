@@ -23,13 +23,15 @@ If #110 EQ #9718 THEN M81 ;deploy laser
 IF #110 NE #9718 THEN #[11000+#110]=#125;set entered diameter into the tool libary if its not a laser
 IF #110 EQ #9718 THEN #[11000+#9718]=#9719;set laser nozzle diameter to the tool diameter if we're on laser
 
-; CORBIN fixed to seet the right thing; no g43 calls, 
+; CORBIN; don't do a g43 call - it isn't needed
 ; G43h#110 ;sets the active tool height to the tool that you just picked
 ;#10000=0; zeros that tool height. This is so you can remeasure the same tool number if you want.
 #[10000 + #110] = 0
 
 #150=0 ;clears out the stored tool
 T#110 ;sets the tool number to the number that the user wants
+; CORBIN note - I should set the #variables that I use too!
+#9976 = #110
 
 
 IF #A NE 1 THEN m200 "Insert tool number %.0f and then press Cycle Start" #4120;don't stop if we're on laser
@@ -43,7 +45,8 @@ m225 #130 "New tool height set"
 If #A EQ 1 then GOTO 10000 ;end because M6 will clean the tools 
 
 ; CORBIN - check for ATC being enabled and skip this
-IF #9006 == 1 THEN GOTO 1200 ; ATC enabled
+;IF #9006 == 1 THEN GOTO 1200 ; ATC enabled -- currently the value can't be set for other reasons..
+GOTO 1200 ; skip cleanups
 
 IF #4120 EQ #9718 THEN GOTO 1200 ;don't clean tools if laser is in use (this allows for fast laser/router bit switching)
 #120=1 ;starting tool to zero out
