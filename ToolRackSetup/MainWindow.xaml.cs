@@ -21,6 +21,8 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Globalization;
 using System.Runtime;
+using System.Linq.Expressions;
+using static CentroidAPI.CNCPipe;
 
 
 namespace ToolRackSetup
@@ -29,6 +31,25 @@ namespace ToolRackSetup
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
+
+    public static class CNCPipeExtensions
+    {
+        // Same as the base name, but throws an exception instead of a return code
+        public static void SetMachineParameterEx(this CNCPipe pipe, int parameter_num, double value)
+        {
+            if (pipe == null || !pipe.IsConstructed())
+            {
+                throw new Exception("Disconnected from CNC12! Please restart.");
+            }
+            CNCPipe.ReturnCode rc = pipe.parameter.SetMachineParameter(parameter_num, value);
+            if (rc != CNCPipe.ReturnCode.SUCCESS)
+            {
+                string reason = rc.ToString();
+                string eMsg = String.Format("Failed to set machine parameter {0} to {1}.\nEnsure you are not running a job!\nError: {2}", parameter_num, value, reason);
+                throw new Exception(eMsg);
+            }
+        }
+    }
 
     public class ClickSelectTextBox : TextBox
     {
@@ -291,11 +312,19 @@ namespace ToolRackSetup
                 {
                     object ?old = _toolInfo;
                     _toolInfo = value;
+                    
                     NotifyPropertyChanged(old);
+                    NotifyPropertyChanged(nameof(IsToolEnabled));
                 }
 
             }
         }
+
+        public bool IsToolEnabled
+        {
+            get { return _toolInfo != null;  }
+        }
+
         private ObservableCollection<ToolInfo> _allTools;
 
         public ToolPocketItem(int pocket, ToolInfo? toolInfo, ObservableCollection<ToolInfo> allTools)
@@ -371,6 +400,11 @@ namespace ToolRackSetup
         ObservableCollection<ToolPocketItem> _toolPocketItems;
 
 
+        private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
+        private const string systemSettingsPath = "C:\\cncm\\RackMountBin.xml"; // If the file above isn't found we can attempt to load values from here, in case the user used the CNC script for ATC stuff.
+        private const string pocketTemplatePath = "c:\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc";
+        private const string generatedMacroPath = "C:\\cncm\\CorbinsWorkshop\\Generated\\";
+
         public ToolChangeSettings Settings = new ToolChangeSettings();
         bool _loading = true;
         public MainWindow()
@@ -379,8 +413,8 @@ namespace ToolRackSetup
             InitializeComponent();
 
             // Variables for the API Connection MessageBox
-            var messageBoxText = "API is not connected. Would you like to retry connection?";
-            var messageBoxTitle = "API Connection Error!";
+            var messageBoxText = "Can't connect to CNC12. Make sure it is running! Would you like to retry the connection?";
+            var messageBoxTitle = "Error Connecting to CNC12!";
             var messageBoxType = MessageBoxButton.YesNo;
 
             _pipe = new CNCPipe();
@@ -461,15 +495,6 @@ namespace ToolRackSetup
             _loading = false;
 
         }
-
-        private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
-        private const string systemSettingsPath = "C:\\cncm\\RackMountBin.xml";
-
-        /*
-         * 
-         * <Table>
-  <Speed>50</Speed>
-        */
         private void LoadSavedValues()
         {
             XDocument? doc = null;
@@ -544,12 +569,19 @@ namespace ToolRackSetup
 
         private void WriteParameters()
         {
-            // done in other spots...but here too
-            _pipe.parameter.SetMachineParameter(Param_MaxToolBins, _toolPocketItems.Count);
-            _pipe.parameter.SetMachineParameter(Param_HasATC, 0); // needs to be zero!
-            _pipe.parameter.SetMachineParameter(Param_HasEnhancedATC, 0); // needs to be zero!
-            _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
-            _pipe.parameter.SetMachineParameter(Param_SpindleWaitTime, Settings.SpindleWaitTime);
+            try
+            {
+                // done in other spots...but here too
+                _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
+                _pipe.SetMachineParameterEx(Param_HasATC, 0); // needs to be zero!
+                _pipe.SetMachineParameterEx(Param_HasEnhancedATC, 0); // needs to be zero!
+                _pipe.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+                _pipe.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Failed to write parameters");
+            }
         }
 
         private void WriteSettings()
@@ -584,9 +616,10 @@ namespace ToolRackSetup
 
         private void WriteMacros()
         {
-            string filePath = "c:\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc";
+
+            const string filePath = pocketTemplatePath;
             string fileContents = File.ReadAllText(filePath);
-            string targetDir = "C:\\cncm\\CorbinsWorkshop\\Generated\\";
+            const string targetDir = generatedMacroPath;
             Directory.CreateDirectory(targetDir);
 
             string testingSpeed = ""; // rapid speed
@@ -724,6 +757,7 @@ namespace ToolRackSetup
         }
 
 
+        // how to run gcode? not tested yet..
         //CNCPipe.Job job = new CNCPipe.Job(_pipe);
         //String command = String.Format("G10 P{0} R{1}", CMaxToolBins, 50);
         //job.RunCommand(command, "c:\\cncm", false);
@@ -751,10 +785,10 @@ namespace ToolRackSetup
             if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
             {
                 // Update the parameter for this immedietly 
-                _pipe.parameter.SetMachineParameter(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+                _pipe.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
             } else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
             {
-                _pipe.parameter.SetMachineParameter(Param_SpindleWaitTime, Settings.SpindleWaitTime);
+                _pipe.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
             }
             else
             {
@@ -771,9 +805,6 @@ namespace ToolRackSetup
                 _dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
             }
             WriteSettings(); // save the xml files
-//            ToolPocketItem toolPocketItem = (ToolPocketItem)sender;
-//            MyPropertyChangedEventArgs args = (MyPropertyChangedEventArgs)e;
-////            System.Diagnostics.Debug.WriteLine(e.PropertyName);
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -784,13 +815,14 @@ namespace ToolRackSetup
         private void txtBoxToolNumber_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key != System.Windows.Input.Key.Enter) return;
-
-            // your event handler here
+          
             e.Handled = true;
-            TextBox txtBoxToolNumber = (TextBox)sender;
-            BindingExpression binding = txtBoxToolNumber.GetBindingExpression(TextBox.TextProperty);
+            TextBox txtBox = (TextBox)sender;
+            BindingExpression binding = txtBox.GetBindingExpression(TextBox.TextProperty);
             binding.UpdateSource();
-            txtBoxToolNumber.SelectAll();
+
+            txtBox.SelectAll(); // maybe move the focus away?
+            
         }
 
         private void txtBoxToolNumber_GotFocus(object sender, RoutedEventArgs e)
@@ -821,6 +853,8 @@ namespace ToolRackSetup
                 item.ToolNumber = 0; /// make sure it doesn't have a tool..
                 _toolPocketItems.RemoveAt(_toolPocketItems.Count - 1);
             }
+            _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
+
             _dirty = true;
         }
 
@@ -857,8 +891,7 @@ namespace ToolRackSetup
             lstviewTools.SelectedItem = tpi;
 
             // Update the parameter right away
-            _pipe.parameter.SetMachineParameter(Param_MaxToolBins, _toolPocketItems.Count);
-
+            _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
         }
 
         private void btnAssignMachineCoordX_Click(object sender, RoutedEventArgs e)

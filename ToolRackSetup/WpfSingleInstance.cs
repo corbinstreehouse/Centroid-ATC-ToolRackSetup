@@ -69,7 +69,11 @@ namespace WpfSingleInstanceByEventWaitHandle
             Application app = (Application)state;
             _ = app.Dispatcher.BeginInvoke(new Action(() =>
             {
-                _ = Application.Current.MainWindow.Activate();
+                Window w = Application.Current.MainWindow;
+                w.Activate();
+                // force it up...the batch file opening it doesn't always work due to it closing
+                w.Topmost = true;
+                w.Topmost = false;
             }));
         }
     }

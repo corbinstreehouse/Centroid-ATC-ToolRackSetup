@@ -9,7 +9,9 @@
         Title="ATC Tools" Height="606" Width="971" Closing="window_Closing">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
+        <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
+
+
     </Window.Resources>
 
     <Grid Margin="15,0,0,17">
@@ -41,7 +43,7 @@
                     <GridViewColumn Header="Description" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}"/>
+                                <local:ClickSelectTextBox x:Name="txtBoxDescription" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}" IsEnabled="{Binding IsToolEnabled}" MaxLength="19" MaxLines="1"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
