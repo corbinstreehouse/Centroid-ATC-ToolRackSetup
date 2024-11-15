@@ -50,6 +50,12 @@ IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 if #135 < 0 THEN #135 = 0
 if #134 < 0 then #134 = 0
 
+#131 = #4003                     ;Save Positioning Mode
+;  5021–5028 MachinePosition
+; (axis1=5021,axis2=5022,etc.
+#132 = #5021 ; saved x
+#133 = #5022 ; saved y
+
 m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
 
 ;-----------------------------
@@ -60,8 +66,14 @@ IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 
 ; If we have the *same* tool, skip everything, but do a message first
 IF #134 != #135 THEN GOTO 100
-m221 #140 "Tool change: same tool is in the spindle. Checking if the tool height is set."
-GOTO 600
+m221 #140 "Tool change: same tool is in the spindle."
+
+; Check the tool length and measure it if it is zero
+; #10001 is first height for tool 1, etc.
+if [#135 <= 0 || #135 >= 200] then GOTO 1000 ; no tool; goto the end without doing anything
+if [#[10000 + #135] != 0] then GOTO 1000 ; height is set; go to the end without doing anything
+
+GOTO 600 ; check height
 
 N100
 
@@ -69,18 +81,13 @@ N100
 M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc" ; Sets #1 as the "return" variable, 1 = air good or set to ignore, 0 = air bad stop
 
 ; =============================================================================
-#131 = #4003                     ;Save Positioning Mode
+
 G90 ; absolute position mode
 G94                              ;Disable Inverse Time
 M5                               ;Turn off Spindle - normally this would already be called
 M9                               ;Disable Flood/Mist or DustCollector/VacuumHoldDown
 
 M101 /70014                      ;Ensure Spindle at Zero Speed ; corbin - doesn't work w/avid setup
-
-;  5021–5028 MachinePosition
-; (axis1=5021,axis2=5022,etc.
-#132 = #5021 ; saved x
-#133 = #5022 ; saved y
 
 ;m225 #140 "Putting the old tool away"
 ; ------------------------ PUT OLD TOOL AWAY -----------------
@@ -140,6 +147,7 @@ if [#135 <= 0 || #135 >= 200] then GOTO 900 ; no tool
 if [#[10000 + #135] != 0] then GOTO 900 ; height is set
 
 G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#135
+
 
 GOTO 900 ; goto restore
 ----------------------------------
