@@ -1,0 +1,23 @@
+;------------------------------------------------------------------------------
+; Filename: mfunc16.mac
+; Description: Tool clamp macro
+; Notes:
+; Requires: 
+;
+; Outputs:
+; ToolUnclamp IS OUT8
+;------------------------------------------------------------------------------
+
+IF #50010                        ;Prevent lookahead from parsing past here
+IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+
+N100                             ;Insert your code between N100 and N1000  
+
+M95 /15                          ;Turn on ToolUnclamp request
+IF #70261 && #70266 THEN GOTO 200
+M100 /70012
+GOTO 1000
+
+N200
+
+N1000                            ;End of Macro

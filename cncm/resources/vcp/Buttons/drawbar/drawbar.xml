@@ -1,0 +1,5 @@
+<vcp_button>
+	<run>
+	<line>g65 "c:\cncm\CorbinsWorkshop\drawebar.mac" a1</line>
+	</run>
+</vcp_button>

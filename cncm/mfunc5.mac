@@ -1,0 +1,23 @@
+;-------
+;M5 macro
+; stop the spindle
+; by corbin
+; and save the time we stopped it at for ATC.
+; Assumes: output 5 is set to spindle on/off, which is checked to see how long since the spindle was turned off
+; so the atc and wait for it to spin down
+; sets:
+; #151 to 0, if the spindle was off,else it sets #151 to #25012 - time in seconds
+;-------
+
+; CORBIN SPECIAL: I want to turn off relay 2 (air/case pressurization); add it to #9779 set to 1 manually
+IF [#9779 == 1 && #9711 EQ 2] THEN m84 ;turns off relay 2 if set to do so in wizard
+IF [#9779 == 1 && #9711 EQ 3] THEN m84 ;turns off relay 2 if set to do so in wizard
+
+; Record the time we stop the spindle so we can wait for it to spin down before doing the tool change
+; Only record the time if the spindle is actually on.
+; #60005 reads the PLC output 5 value - #151 is perm to store the current time #25012 in seconds
+if #60005 == 1 then #151 = #25012
+
+M95 /1/2/19
+G4P.01 ;With Added Small delay for Laser
+

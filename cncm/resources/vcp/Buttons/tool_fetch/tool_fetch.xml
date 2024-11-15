@@ -1,0 +1,5 @@
+<vcp_button>
+  <run>
+    <macro>c:\cncm\CorbinsWorkshop\tool_fetch.mac</macro>
+  </run>
+</vcp_button>

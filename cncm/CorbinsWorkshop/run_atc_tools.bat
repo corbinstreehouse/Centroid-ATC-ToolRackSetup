@@ -1,0 +1,1 @@
+start "" "C:\Users\corbi\source\repos\ToolRackSetup\ToolRackSetup\bin\Debug\net8.0-windows7.0\ToolRackSetup.exe"

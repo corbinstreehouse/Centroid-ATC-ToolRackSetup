@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<vcp_skin>
+  <hide_group>
+    <group>rotary</group>
+  </hide_group>
+  <hide_group>
+    <group>left</group>
+  </hide_group>
+  <hide_group>
+    <group>back</group>
+  </hide_group>
+  <hide_group>
+    <group>right</group>
+  </hide_group>
+  <hide_group>
+    <group>dev_group</group>
+  </hide_group>
+  <hide_group>
+    <group>incrx_group</group>
+  </hide_group>
+  <hide_group>
+    <group>avid_mtc</group>
+  </hide_group>
+  <background>#6c6c6c</background>
+  <image>
+    <column_span>4</column_span>
+    <column_start>2</column_start>
+    <row_span>1</row_span>
+    <row_start>1</row_start>
+    <path>C:\cncm\resources\vcp\images\avidlogowide.svg</path>
+  </image>
+  <on_click>
+    <opacity>100</opacity>
+    <outline_color>#000000</outline_color>
+  </on_click>
+  <on_hover>
+    <opacity>100</opacity>
+    <outline_color>#ffffff</outline_color>
+  </on_hover>
+  <border>
+    <column_span>6</column_span>
+    <column_start>1</column_start>
+    <fill>#c6c6c6</fill>
+    <row_span>2</row_span>
+    <row_start>2</row_start>
+    <outline_color>#000000</outline_color>
+    <outline_thickness>2</outline_thickness>
+  </border>
+  <button row="2" column="1">reset_home</button>
+  <button row="2" column="2" group="atc">tool_set</button>
+  <button row="2" column="3" group="atc">tool_put_back</button>
+  <button row="2" column="4" group="atc">tool_fetch</button>
+  <button row="2" column="6">limit_switch_defeat</button>
+  <button row="3" column="3">spin_warm</button>
+  <button row="3" column="1" group="avid_mtc">mtc</button>
+  <button row="3" column="1" group="atc">tool_run_atc_tools</button>
+  <button row="3" column="2">utils</button>
+  <button row="3" column="6">single_block</button>
+  <button row="2" column="5">relay1</button>
+  <button row="3" column="5">relay2</button>
+  <button row="3" column="4">spindle_auto_man</button>
+  <border>
+    <column_span>6</column_span>
+    <column_start>1</column_start>
+    <fill>#c6c6c6</fill>
+    <row_span>4</row_span>
+    <row_start>5</row_start>
+    <outline_color>#000000</outline_color>
+    <outline_thickness>2</outline_thickness>
+  </border>
+  <border>
+    <column_span>6</column_span>
+    <column_start>1</column_start>
+    <fill>Transparent</fill>
+    <row_span>1</row_span>
+    <row_start>4</row_start>
+    <text>
+      <content>JOG CONTROL</content>
+      <fontsize>40</fontsize>
+      <color>#ffffff</color>
+      <font>arial bold</font>
+      <horizontalalignment>center</horizontalalignment>
+      <verticalalignment>center</verticalalignment>
+    </text>
+  </border>
+  <button row="6" column="4" group="front">x_positive_front</button>
+  <button row="6" column="2" group="front">x_negative_front</button>
+  <button row="5" column="3" group="front">y_positive_front</button>
+  <button row="7" column="3" group="front">y_negative_front</button>
+  <button row="5" column="3" group="left">x_positive_left</button>
+  <button row="7" column="3" group="left">x_negative_left</button>
+  <button row="6" column="2" group="left">y_positive_left</button>
+  <button row="6" column="4" group="left">y_negative_left</button>
+  <button row="7" column="3" group="right">x_positive_right</button>
+  <button row="5" column="3" group="right">x_negative_right</button>
+  <button row="6" column="4" group="right">y_positive_right</button>
+  <button row="6" column="2" group="right">y_negative_right</button>
+  <button row="6" column="2" group="back">x_positive_back</button>
+  <button row="6" column="4" group="back">x_negative_back</button>
+  <button row="7" column="3" group="back">y_positive_back</button>
+  <button row="5" column="3" group="back">y_negative_back</button>
+  <button row="5" column="5">z_positive</button>
+  <button row="6" column="5">zg53z0</button>
+  <button row="7" column="5">z_negative</button>
+  <button row="5" column="6" group="rotary">a_positive</button>
+  <button row="6" column="6" group="rotary">a_home</button>
+  <button row="7" column="6" group="rotary">a_negative</button>
+ 
+  <button row="6" column="3">goto_xy_home</button>
+  <button row="5" column="1">park</button>
+  <button row="7" column="1">mpg</button>
+  <button row="5" column="2">keyboardjog</button>
+  <button row="8" column="2">incr_cont</button>
+  <button row="8" column="1">tortoise_hare</button>
+  <button row="8" column="3" group="incrx_group">x1</button>
+  <button row="8" column="4" group="incrx_group">x10</button>
+  <button row="8" column="5" group="incrx_group">x100</button>
+  <border>
+    <column_span>6</column_span>
+    <column_start>1</column_start>
+    <fill>#c6c6c6</fill>
+    <row_span>5</row_span>
+    <row_start>10</row_start>
+    <outline_color>#000000</outline_color>
+    <outline_thickness>2</outline_thickness>
+  </border>
+  <border>
+    <column_span>3</column_span>
+    <column_start>4</column_start>
+    <fill>Transparent</fill>
+    <row_span>1</row_span>
+    <row_start>9</row_start>
+    <text>
+      <content>FEEDRATE</content>
+      <fontsize>40</fontsize>
+      <color>#ffffff</color>
+      <font>arial bold</font>
+      <horizontalalignment>center</horizontalalignment>
+      <verticalalignment>center</verticalalignment>
+    </text>
+  </border>
+  <border>
+    <column_span>3</column_span>
+    <column_start>1</column_start>
+    <fill>Transparent</fill>
+    <row_span>1</row_span>
+    <row_start>9</row_start>
+    <text>
+      <content>SPINDLE</content>
+      <fontsize>40</fontsize>
+      <color>#ffffff</color>
+      <font>arial bold</font>
+      <horizontalalignment>center</horizontalalignment>
+      <verticalalignment>center</verticalalignment>
+    </text>
+  </border>
+  <button row="10" column="1">spindle_minus</button>
+  <button row="10" column="2">spindle_100</button>
+  <button row="10" column="3">spindle_plus</button>
+  <button row="10" column="4">feedrate_negative</button>
+  <button row="10" column="5">feedrate_100</button>
+  <button row="10" column="6">feedrate_positive</button>
+  <button row="13" column="1">prox_light_xyza</button>
+  <button row="13" column="2">prox_light_y2</button>
+  <button row="13" column="3">airpressure</button>
+  <button row="13" column="4">nofault</button>
+  <button row="14" column="1">cycle_start</button>
+  <button row="14" column="2">feed_hold</button>
+  <button row="14" column="3">tool_check</button>
+  <button row="14" column="4">cycle_cancel</button>
+  <button row="13" column="5" column_span="2" row_span="2">reset</button>
+</vcp_skin>

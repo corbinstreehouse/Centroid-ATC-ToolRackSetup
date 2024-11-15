@@ -1,0 +1,41 @@
+;------------------------------------------------------------------------------
+; Filename: tool_set.cnc
+; corbin dunn
+;------------------------------------------------------------------------------
+IF #50001                        ;Prevent lookahead from parsing past here
+IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+
+N100                             ;Insert your code between N100 and N1000
+
+M224 #101 "Enter the tool number currently in the spindle.\nEnter 0 for no tool."
+; #101 = requested tool
+
+if [#101 <0 || #101 > 200] THEN GOTO 800
+
+;#103 = 2 ; delay
+;m225 #103 "active tool in spindle %f" #4203
+
+G10 P976 R#101 ; Set the tool # in the PLC
+G4 P.2 ; force PLC to update so #4203 is updated; not needed in this short macro
+T[#101] ; tottally ignored if the ATC parameter is turned on and we have to set param 976
+#150 = #101 ; store here too, as Avid uses this in cncm.hom, and I don't want to edit that file.
+
+G43 H#101
+
+if [#101 <= 0 || #101 >= 200] then GOTO 900 ; no tool
+if [#[10000 + #135] != 0] then GOTO 900 ; height is set
+
+; if the height is 0 ask to mesure it now...
+ M222 Q0 #101 "Tool has no height set. Would you like to measure it now? Press Y to measure it now." 
+IF #101 != 121 THEN GOTO 1000
+G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#101
+
+GOTO 1000
+
+N800
+
+M200 "Invalid tool # %.0f. Press Cycle Start to Continue." #101
+
+N900
+
+N1000                            ;End of Macro

@@ -1,0 +1,28 @@
+; 
+; corbin dunn
+;------------------------------------------------------------------------------
+IF #50001                        ;Prevent lookahead from parsing past here
+IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+
+N100                             ;Insert your code between N100 and N1000
+
+M224 #101 "Enter the tool number to fetch, and then hit Cycle Start."
+
+if [#101 <0 || #101 > 200] THEN GOTO 800
+
+
+
+M6 T[#101]
+G43 H[#101]
+
+GOTO 1000
+
+
+N800
+
+M200 "Invalid tool # %.0f. Press Cycle Start to Continue." #101
+
+N900
+
+
+N1000                            ;End of Macro
