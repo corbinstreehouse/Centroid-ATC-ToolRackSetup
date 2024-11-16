@@ -5,7 +5,7 @@ xcopy /y c:\CNCM\mfunc5.mac CNCM\
 xcopy /y c:\CNCM\mfunc15.mac CNCM\
 xcopy /y c:\CNCM\mfunc16.mac CNCM\
 
-xcopy /y c:\CNCM\resources\vcp\skins\avid_router_corbin.vcp CNCM\resources\vcp\skins\
+xcopy /y c:\CNCM\resources\vcp\skins\avid_router.vcp CNCM\resources\vcp\skins\
 
 xcopy /y /i  c:\CNCM\resources\vcp\Buttons\tool_run_atc_tools\ CNCM\resources\vcp\Buttons\tool_run_atc_tools\
 xcopy /y /i c:\CNCM\resources\vcp\Buttons\tool_put_back\*.* CNCM\resources\vcp\Buttons\tool_put_back\
