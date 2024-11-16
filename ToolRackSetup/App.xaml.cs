@@ -21,8 +21,8 @@ namespace ToolRackSetup
 
         void HandleException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            MessageBox.Show(e.Exception.Message, "Unhandled exception! App may be unstable...restart it.");
-            e.Handled = true;
+            MessageBox.Show(e.Exception.Message, "Unhandled exception! App is going to crash...bye.");
+            // e.Handled = true;
 
         }
     }

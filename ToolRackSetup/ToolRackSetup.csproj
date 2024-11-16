@@ -7,7 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Authors>Corbin Dunn</Authors>
+    <Company>Corbin's Workshop</Company>
+    <Version>0.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\CopyFromCNCM.bat" Link="CopyFromCNCM.bat" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="CentroidAPI">
