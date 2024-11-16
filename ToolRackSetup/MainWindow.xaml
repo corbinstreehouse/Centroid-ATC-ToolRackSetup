@@ -96,13 +96,16 @@
         </ListView>
         <Grid Grid.Column="1" HorizontalAlignment="Left" Height="107" Margin="4,0,0,11" VerticalAlignment="Bottom" Width="290">
             <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="ZBump" Width="120" Height="18" VerticalAlignment="Bottom"/>
-            <TextBox x:Name="txtBoxWaitTime" HorizontalAlignment="Left" Margin="170,0,0,61" TextWrapping="Wrap" Text="Wait" Width="120" Height="18" VerticalAlignment="Bottom" />
+            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
+            <TextBox x:Name="txtBoxWaitTime" HorizontalAlignment="Left" Margin="170,0,0,61" TextWrapping="Wrap" Text="{Binding SpindleWaitTime, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" />
+            
             <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
+            
             <Label Content="Slide Distance:" Margin="12,0,0,85" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
-            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="Slide Dist" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"/>
-            <Label x:Name="lblZBump_Copy" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Rack Offset" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
+            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding SlideDistance, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
+
+            <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
+            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding RackOffset, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
 
         </Grid>
 
