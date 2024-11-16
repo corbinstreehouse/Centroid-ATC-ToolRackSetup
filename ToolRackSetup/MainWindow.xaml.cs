@@ -23,6 +23,7 @@ using System.Globalization;
 using System.Runtime;
 using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
+using static CentroidAPI.CNCPipe.State;
 
 
 namespace ToolRackSetup
@@ -34,20 +35,42 @@ namespace ToolRackSetup
 
     public static class CNCPipeExtensions
     {
-        // Same as the base name, but throws an exception instead of a return code
-        public static void SetMachineParameterEx(this CNCPipe pipe, int parameter_num, double value)
+        // Same as the base name, but throws an exception instead of a return code.
+        public static void SetMachineParameterEx(this Parameter parameter, int parameter_num, double value)
         {
-            if (pipe == null || !pipe.IsConstructed())
-            {
-                throw new Exception("Disconnected from CNC12! Please restart.");
-            }
-            CNCPipe.ReturnCode rc = pipe.parameter.SetMachineParameter(parameter_num, value);
+            CNCPipe.ReturnCode rc = parameter.SetMachineParameter(parameter_num, value);
             if (rc != CNCPipe.ReturnCode.SUCCESS)
             {
                 string reason = rc.ToString();
                 string eMsg = String.Format("Failed to set machine parameter {0} to {1}.\nEnsure you are not running a job!\nError: {2}", parameter_num, value, reason);
                 throw new Exception(eMsg);
             }
+        }
+
+        private const int Param_MaxToolBins = 161;
+
+        public static double GetParameterValue(this CNCPipe.Parameter p, int parameterNum)
+        {
+            double value = 0;
+            CNCPipe.ReturnCode rc = p.GetMachineParameterValue(parameterNum, out value);
+            if (rc != CNCPipe.ReturnCode.SUCCESS)
+            {
+                string reason = rc.ToString();
+                string eMsg = String.Format("Failed to get machine parameter {0}.\nEnsure that CNC12 is running!\nError: {2}", parameterNum, reason);
+                throw new Exception(eMsg);
+            }
+            return value;
+        }
+
+        public static int GetToolBinCount(this Parameter p) //can't be a property uet
+        {
+            return (int)p.GetParameterValue(Param_MaxToolBins);
+        }
+
+        public static void SetToolBinCount(this Parameter p, double value)
+        {
+            p.SetMachineParameter(Param_MaxToolBins, value);
+
         }
     }
 
@@ -183,7 +206,6 @@ namespace ToolRackSetup
         YMinus = 2,
         YPlus = 3,
         //Hole = 4, // not implemented
-        //Hole = 4, // not implemented
     }
 
     public class PocketStyleConverter : IValueConverter
@@ -263,7 +285,7 @@ namespace ToolRackSetup
             }
         }
 
-        public double RackAdjustment { get => rackAdjustment;
+        public double RackOffset { get => rackAdjustment;
             set { rackAdjustment = value; NotifyPropertyChanged(); }
         }
 
@@ -390,7 +412,6 @@ namespace ToolRackSetup
 
         private CNCPipe _pipe;
 
-        const int Param_MaxToolBins = 161;
         const int Param_HasATC = 6;
         const int Param_HasEnhancedATC = 160;
         const int Param_ShouldCheckAir = 724; // Avid setting
@@ -433,17 +454,10 @@ namespace ToolRackSetup
                     case MessageBoxResult.No:
                         Environment.Exit(0);
                         break;
-
-
-
                 }
 
             }
 
-            List<Info> toolLibrary;
-            _pipe.tool.GetToolLibrary(out toolLibrary);
-            double toolBinCount = 0;
-            _pipe.parameter.GetMachineParameterValue(Param_MaxToolBins, out toolBinCount);
             double shouldCheckAirPressure = 0;
             _pipe.parameter.GetMachineParameterValue(Param_ShouldCheckAir, out shouldCheckAirPressure);
 
@@ -462,7 +476,29 @@ namespace ToolRackSetup
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
             _toolInfoList = new ObservableCollection<ToolInfo>();
+            _toolPocketItems = new ObservableCollection<ToolPocketItem>();
+
+            RefreshTools();
+
+            InitializeToolPocketItems();
+            LoadSavedValues();
+            InitializeUI();
+            Settings.PropertyChanged += SettingsPropertyChanged;
+
+            _dirty = false;
+            _loading = false;
+
+        }
+
+        private void RefreshTools()
+        {
+
+            List<Info> toolLibrary;
+            _pipe.tool.GetToolLibrary(out toolLibrary);
+            double toolBinCount = _pipe.parameter.GetToolBinCount();
+
             HashSet<int> usedPockets = new HashSet<int>();
+            _toolInfoList.Clear();
 
             for (int i = 0; i < toolLibrary.Count; i++)
             {
@@ -472,29 +508,23 @@ namespace ToolRackSetup
                 if (item.Pocket > toolBinCount)
                 {
                     item.Pocket = -1;
-                } else if (item.Pocket > 0)
+                }
+                else if (item.Pocket > 0)
                 {
-                    if (usedPockets.Contains(item.Pocket)) {
+                    if (usedPockets.Contains(item.Pocket))
+                    {
                         // Can't have two tools in one pocket!
                         item.Pocket = -1;
-                    } else
+                    }
+                    else
                     {
                         usedPockets.Add(item.Pocket);
                     }
                 }
             }
 
-            _toolPocketItems = new ObservableCollection<ToolPocketItem>();
-
-            InitializeToolPocketItems((int)toolBinCount);
-            LoadSavedValues();
-            InitializeUI();
-            Settings.PropertyChanged += SettingsPropertyChanged;
-
-            _dirty = false;
-            _loading = false;
-
         }
+
         private void LoadSavedValues()
         {
             XDocument? doc = null;
@@ -527,7 +557,7 @@ namespace ToolRackSetup
                 Settings.EnableTestingMode = ReadBool(nameof(Settings.EnableTestingMode), Settings.EnableTestingMode);
                 Settings.TestingFeed = ReadDouble(nameof(Settings.TestingFeed), Settings.TestingFeed);
                 Settings.SlideDistance = ReadDouble(nameof(Settings.SlideDistance), Settings.SlideDistance);
-                Settings.RackAdjustment = ReadDouble(nameof(Settings.RackAdjustment), Settings.RackAdjustment);
+                Settings.RackOffset = ReadDouble(nameof(Settings.RackOffset), Settings.RackOffset);
 
                 // probably not the fastest way to do this.
                 foreach (ToolPocketItem item in _toolPocketItems)
@@ -572,11 +602,11 @@ namespace ToolRackSetup
             try
             {
                 // done in other spots...but here too
-                _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
-                _pipe.SetMachineParameterEx(Param_HasATC, 0); // needs to be zero!
-                _pipe.SetMachineParameterEx(Param_HasEnhancedATC, 0); // needs to be zero!
-                _pipe.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
-                _pipe.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
+                _pipe.parameter.SetToolBinCount(_toolPocketItems.Count);
+                _pipe.parameter.SetMachineParameterEx(Param_HasATC, 0); // needs to be zero!
+                _pipe.parameter.SetMachineParameterEx(Param_HasEnhancedATC, 0); // needs to be zero!
+                _pipe.parameter.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+                _pipe.parameter.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
             }
             catch (Exception ex)
             {
@@ -597,7 +627,7 @@ namespace ToolRackSetup
             topLevel.Add(new XElement(nameof(Settings.EnableTestingMode), Settings.EnableTestingMode.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.TestingFeed), Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.SlideDistance), Settings.SlideDistance.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement(nameof(Settings.RackAdjustment), Settings.RackAdjustment.ToString(CultureInfo.InvariantCulture)));
+            topLevel.Add(new XElement(nameof(Settings.RackOffset), Settings.RackOffset.ToString(CultureInfo.InvariantCulture)));
 
             foreach (ToolPocketItem item in _toolPocketItems)
             {
@@ -630,7 +660,7 @@ namespace ToolRackSetup
             fileContents = fileContents.Replace("<SPEED>", testingSpeed);
 
             // the real math is here..
-            double adjustmentAmount = Settings.RackAdjustment; 
+            double adjustmentAmount = Settings.RackOffset; 
 
             double xMin = 0;
             double xMax = 0;
@@ -752,6 +782,7 @@ namespace ToolRackSetup
             txtBoxTestingFeed.DataContext = Settings;
             chkbxCheckAirPressure.DataContext = Settings;
             txtBxSlideDistance.DataContext = Settings;
+            txtBoxRackOffset.DataContext = Settings;
 
             lstviewTools.UnselectAll();
         }
@@ -764,8 +795,9 @@ namespace ToolRackSetup
 
         public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return _toolPocketItems; } }
 
-        private void InitializeToolPocketItems(int toolBinCount)
+        private void InitializeToolPocketItems()
         {
+            int toolBinCount = _pipe.parameter.GetToolBinCount();
             for (int i = 1; i <= toolBinCount; i++)
             {
                 ToolInfo? toolInfo = _toolInfoList.FindToolInfoForPocket(i);
@@ -785,10 +817,10 @@ namespace ToolRackSetup
             if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
             {
                 // Update the parameter for this immedietly 
-                _pipe.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
+                _pipe.parameter.SetMachineParameterEx(Param_ShouldCheckAir, Convert.ToDouble(Settings.ShouldCheckAirPressure));
             } else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
             {
-                _pipe.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
+                _pipe.parameter.SetMachineParameterEx(Param_SpindleWaitTime, Settings.SpindleWaitTime);
             }
             else
             {
@@ -853,7 +885,7 @@ namespace ToolRackSetup
                 item.ToolNumber = 0; /// make sure it doesn't have a tool..
                 _toolPocketItems.RemoveAt(_toolPocketItems.Count - 1);
             }
-            _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
+            _pipe.parameter.SetToolBinCount(_toolPocketItems.Count);
 
             _dirty = true;
         }
@@ -871,6 +903,8 @@ namespace ToolRackSetup
                 }
             }
         }
+
+
 
         private void btnAddPocket_Click(object sender, RoutedEventArgs e)
         {
@@ -891,7 +925,14 @@ namespace ToolRackSetup
             lstviewTools.SelectedItem = tpi;
 
             // Update the parameter right away
-            _pipe.SetMachineParameterEx(Param_MaxToolBins, _toolPocketItems.Count);
+            try
+            {
+                _pipe.parameter.SetToolBinCount( _toolPocketItems.Count);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Failed to add a pocket.");
+            }
         }
 
         private void btnAssignMachineCoordX_Click(object sender, RoutedEventArgs e)
