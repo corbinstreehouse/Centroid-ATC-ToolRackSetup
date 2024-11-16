@@ -15,7 +15,17 @@
 ; #4120 = Requested Tool
 ; #25012 = current time
 ; #9976 parameter 976 is used by the PLC for ATC; I store the value here...but we don't need to. #151 would be fine
-;
+
+; #9006 ATC Enabled (Centroid): needs to be 0. This Requires PLC logic, so I made a new parameter
+; #9160 Enhanced ATC (Centroid): needs to be 0. Also requires PLC logic and affects the time the Txx is updated in the UI
+;                    If it is set to 1, I get an error when a MTC happens to a tool that has no bin, so it must be 0.
+
+; #9776 = ATC Enabled: 0=no, 1=yes      See note above. (Corbin added)
+; #9777 = Virtual Drawbar Button: 0=disabled, 1=enabled -- 
+;            Set to 1 if the user doesn't have a physical drawbar button (Corbin added)
+; #9778 = Wait time for the spindle to stop. (Corbin added)
+; #9724 = Should check air pressure; 1=should check, 0=skip checking. (Avid added)
+
 ; PLC Variables:
 ;
 ; User Variables:
@@ -31,6 +41,7 @@
 
 ; #150 = current tool; persists, but we also store it in ; #9976 
 ; #151 = the time the spindle stop command was given, M5, mfunc5.mac sets this value to #25012
+
 
 
 ;
@@ -66,7 +77,7 @@ IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 
 ; If we have the *same* tool, skip everything, but do a message first
 IF #134 != #135 THEN GOTO 100
-m221 #140 "Tool change: same tool is in the spindle."
+m221 #140 "Tool change: same tool is in the spindle. Continuing..."
 
 ; Check the tool length and measure it if it is zero
 ; #10001 is first height for tool 1, etc.

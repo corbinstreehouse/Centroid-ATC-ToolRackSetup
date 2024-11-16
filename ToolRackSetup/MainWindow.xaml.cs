@@ -23,8 +23,6 @@ using System.Globalization;
 using System.Runtime;
 using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
-using Microsoft.VisualBasic;
-
 
 namespace ToolRackSetup
 {
@@ -509,6 +507,7 @@ namespace ToolRackSetup
             {
                 Settings.SpindleWaitTime = 12;
             }
+            Settings.HasVirtualDrawbarButton = _pipe.parameter.GetBoolParameterValue(ParameterKey.HasVirtualDrawbarButton);
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
@@ -595,7 +594,6 @@ namespace ToolRackSetup
                 Settings.TestingFeed = ReadDouble(nameof(Settings.TestingFeed), Settings.TestingFeed);
                 Settings.SlideDistance = ReadDouble(nameof(Settings.SlideDistance), Settings.SlideDistance);
                 Settings.RackOffset = ReadDouble(nameof(Settings.RackOffset), Settings.RackOffset);
-                Settings.HasVirtualDrawbarButton = ReadBool(nameof(Settings.HasVirtualDrawbarButton), Settings.HasVirtualDrawbarButton);
 
                 // probably not the fastest way to do this.
                 foreach (ToolPocketItem item in _toolPocketItems)
@@ -666,7 +664,6 @@ namespace ToolRackSetup
             topLevel.Add(new XElement(nameof(Settings.TestingFeed), Settings.TestingFeed.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.SlideDistance), Settings.SlideDistance.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.RackOffset), Settings.RackOffset.ToString(CultureInfo.InvariantCulture)));
-            topLevel.Add(new XElement(nameof(Settings.HasVirtualDrawbarButton), Settings.HasVirtualDrawbarButton.ToString(CultureInfo.InvariantCulture)));
 
             foreach (ToolPocketItem item in _toolPocketItems)
             {
@@ -906,27 +903,38 @@ namespace ToolRackSetup
         private void SettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {   
             if (_loading) return;
+            try
+            {
+                if (e.PropertyName == nameof(Settings.HasVirtualDrawbarButton))
+                {
+                    // This doesn't need to dirty the state, but does need to write the machine parameter for it.
+                    // And I warn the user about it.
+                    if (Settings.HasVirtualDrawbarButton)
+                    {
+                        ShowVirtualDrawbarMessageIfNeeded();
+                    }
+                    _pipe.parameter.SetMachineParameterEx(ParameterKey.HasVirtualDrawbarButton, Settings.HasVirtualDrawbarButton);
+                    WriteVCPSettings();
 
-            if (e.PropertyName == nameof(Settings.HasVirtualDrawbarButton))
-            {
-                // This doesn't need to dirty the state, but does need to write the machine parameter for it.
-                // And I warn the user about it.
-                ShowVirtualDrawbarMessageIfNeeded();
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.HasVirtualDrawbarButton, Settings.HasVirtualDrawbarButton);
-                WriteVCPSettings();
-
-            } else if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
-            {
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
-            } else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
-            {
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
+                }
+                else if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
+                {
+                    _pipe.parameter.SetMachineParameterEx(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
+                }
+                else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
+                {
+                    _pipe.parameter.SetMachineParameterEx(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
+                }
+                else
+                {
+                    WriteSettings();
+                    _dirty = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                WriteSettings();
-                _dirty = true;
-            }            
+                MessageBox.Show(ex.Message);
+            }
 
         }
         private void Tpi_PropertyChanged(object? sender, PropertyChangedEventArgs e)

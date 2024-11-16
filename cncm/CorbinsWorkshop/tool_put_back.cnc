@@ -5,7 +5,7 @@
 IF #50001                        ;Prevent lookahead from parsing past here
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
-#107 = #A 
+#107 = #A
 #108 = #T
 ;#300 = "\cncm\CorbinsWorkshop\Generated\pocket_#107_position.cnc"; filename for this pocket's info ; ugh..this doesn't work
  

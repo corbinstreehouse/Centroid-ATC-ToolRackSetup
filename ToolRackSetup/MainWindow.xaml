@@ -115,11 +115,12 @@
             <Button x:Name="btnAssignMachineCoordY" Content="Y" HorizontalAlignment="Left" Margin="219,6,0,0" VerticalAlignment="Top" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
             <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="267,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
         </Grid>
-        <Grid Grid.Column="2" HorizontalAlignment="Left" Height="113" Margin="11,0,0,7" VerticalAlignment="Bottom" Width="189">
+        <Grid Grid.Column="2" HorizontalAlignment="Left" Height="121" Margin="11,0,0,-1" VerticalAlignment="Bottom" Width="292">
             <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableTestingMode}" Height="15" Width="123" />
             <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding EnableTestingMode}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
             <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding ShouldCheckAirPressure}" Height="14" Width="182" Margin="0,31,0,0" />
             <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding HasVirtualDrawbarButton}" Height="14" Width="184" Margin="0,63,0,0" />
+            <Label Content="Adds a VCP button to open/close the drawbar&#xD;&#xA;&amp; changes some non-rack tool change logic." HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top" Height="44" Width="286"/>
 
         </Grid>
 
