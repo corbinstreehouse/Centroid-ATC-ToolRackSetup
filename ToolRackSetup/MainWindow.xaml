@@ -136,7 +136,7 @@
 
         </Grid>
 
-        <Button x:Name="btnWriteChanges" Grid.Column="3" Content="Write Changes" HorizontalAlignment="Center" Margin="0,494,0,0" Width="94" IsEnabled="{Binding dirty}" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Top"/>
+        <Button x:Name="btnWriteChanges" Grid.Column="3" Content="Generate Macros" HorizontalAlignment="Center" Margin="0,494,0,0" Width="118" IsEnabled="{Binding dirty}" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Top"/>
         <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="4,0,0,131" Width="150" Height="20" VerticalAlignment="Bottom" Click="btnAddPocket_Click" Grid.Column="1"/>
         <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="176,0,0,130" Grid.Column="1" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="20" VerticalAlignment="Bottom"/>
         <Grid Grid.Column="2" HorizontalAlignment="Left" Width="334" Margin="9,0,0,123" Height="34" VerticalAlignment="Bottom">
