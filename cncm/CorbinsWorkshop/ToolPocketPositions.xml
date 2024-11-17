@@ -6,7 +6,6 @@
   <TestingFeed>200</TestingFeed>
   <SlideDistance>1.4</SlideDistance>
   <RackOffset>5.5</RackOffset>
-  <HasVirtualDrawbarButton>True</HasVirtualDrawbarButton>
   <Bin>
     <BinNumber>1</BinNumber>
     <XPosition>1.91883</XPosition>

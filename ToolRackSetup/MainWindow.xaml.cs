@@ -35,20 +35,65 @@ namespace ToolRackSetup
     {
         // System parameters
         HasATC = 6, // Currentlly needs to be 0
-        HasEnhancedATC = 160, // Currently needs to be 0
+        HasEnhancedATC = 160, // Currently needs to be 0, can have variuous bits set
         MaxToolBins = 161, // Read/written
 
-        // Custom parameters by Avid & Corbin
+        // Custom parameters by Avid
         ShouldCheckAir = 724, // Avid setting that I read and write
-        HasVirtualDrawbarButton = 777, // virtual drawbar button support; prefer to be 0. (corbin)
+
+        // Custom parameters by Corbin
+        ATCToolOptions = 776, // bitset, see ATCToolOptions enum
+
+      //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
         SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
+        // 779 = old bit for turning off relay 2
+    }
+
+    // Bitset values
+    public enum ATCToolOptions
+    {
+        ATCEnabled = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
+        TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job
+        EnableVirtualDrawbar = 4, // Enable vitual drawbar button
     }
 
     public static class CNCPipeExtensions
     {
+        public static bool GetToolOptionValue(this CNCPipe.Parameter parameter, ATCToolOptions option)
+        {
+            return parameter.GetBitValue((int)ParameterKey.ATCToolOptions, (int)option);
+        }
+        public static void SetToolOptionValue(this CNCPipe.Parameter parameter, ATCToolOptions option, bool value)
+        {
+            parameter.SetBitValue((int)ParameterKey.ATCToolOptions, (int)option, value);
+        }
 
-        // Same as the base name, but throws an exception instead of a return code.
-        public static void SetMachineParameterEx(this Parameter parameter, int parameter_num, double value)
+        public static void SetBitValue(this CNCPipe.Parameter parameter,
+            int parameter_num, int bit, bool onOrOff)
+        {
+            // Get the existing value and turn on/off the appropriate bit
+            int value = (int)parameter.GetValue(parameter_num);
+            if (onOrOff)
+            {
+                value = value | bit;
+            } else
+            {
+                value = value & ~bit;
+            }
+
+            parameter.SetValue(parameter_num, value);
+        }
+
+
+        public static bool GetBitValue(this CNCPipe.Parameter parameter, int parameterNum, int bit)
+        {
+            int value = (int)parameter.GetValue(parameterNum);
+            return (value & bit) == bit;
+        }
+
+
+        // Throws an exception on error!
+        public static void SetValue(this Parameter parameter, int parameter_num, double value)
         {
             CNCPipe.ReturnCode rc = parameter.SetMachineParameter(parameter_num, value);
             if (rc != CNCPipe.ReturnCode.SUCCESS)
@@ -59,17 +104,17 @@ namespace ToolRackSetup
             }
         }
 
-        public static void SetMachineParameterEx(this Parameter parameter, ParameterKey parameterKey, double value)
+        public static void SetValue(this Parameter parameter, ParameterKey parameterKey, double value)
         {
-            parameter.SetMachineParameterEx((int)parameterKey, value);
+            parameter.SetValue((int)parameterKey, value);
         }
 
-        public static void SetMachineParameterEx(this Parameter parameter, ParameterKey parameterKey, bool value)
+        public static void SetValue(this Parameter parameter, ParameterKey parameterKey, bool value)
         {
-            parameter.SetMachineParameterEx((int)parameterKey, Convert.ToDouble(value));
+            parameter.SetValue((int)parameterKey, Convert.ToDouble(value));
         }
 
-        public static double GetParameterValue(this CNCPipe.Parameter p, int parameterNum)
+        public static double GetValue(this CNCPipe.Parameter p, int parameterNum)
         {
             double value = 0;
             CNCPipe.ReturnCode rc = p.GetMachineParameterValue(parameterNum, out value);
@@ -81,25 +126,25 @@ namespace ToolRackSetup
             }
             return value;
         }
-        public static double GetParameterValue(this CNCPipe.Parameter p, ParameterKey parameterKey)
+        public static double GetValue(this CNCPipe.Parameter p, ParameterKey parameterKey)
         {
-            return p.GetParameterValue((int)parameterKey);
+            return p.GetValue((int)parameterKey);
         }
 
-        public static bool GetBoolParameterValue(this CNCPipe.Parameter p, ParameterKey parameterKey)
+        public static bool GetBoolValue(this CNCPipe.Parameter p, ParameterKey parameterKey)
         {
-            double d = p.GetParameterValue(parameterKey);
+            double d = p.GetValue(parameterKey);
             return System.Convert.ToBoolean(d);
         }
 
         public static int GetToolBinCount(this Parameter p) //can't be a property uet
         {
-            return (int)p.GetParameterValue(ParameterKey.MaxToolBins);
+            return (int)p.GetValue(ParameterKey.MaxToolBins);
         }
 
         public static void SetToolBinCount(this Parameter p, double value)
         {
-            p.SetMachineParameterEx(ParameterKey.MaxToolBins, value);
+            p.SetValue(ParameterKey.MaxToolBins, value);
         }
     }
 
@@ -302,7 +347,7 @@ namespace ToolRackSetup
         public double TestingFeed { get => testingFeed; set { testingFeed = value; NotifyPropertyChanged(); } }
         public bool ShouldCheckAirPressure { get => shouldCheckAirPressure; set { shouldCheckAirPressure = value; NotifyPropertyChanged(); } }
 
-        public bool HasVirtualDrawbarButton
+        public bool EnableVirtualDrawbar
         { 
             get => hasVirtualDrawbarButton;
             set {
@@ -462,10 +507,10 @@ namespace ToolRackSetup
         private const string systemSettingsPath = "C:\\cncm\\RackMountBin.xml"; // If the file above isn't found we can attempt to load values from here, in case the user used the CNC script for ATC stuff.
         private const string pocketTemplatePath = "c:\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc";
         private const string generatedMacroPath = "C:\\cncm\\CorbinsWorkshop\\Generated\\";
-        // TODO: maybe don't hardcode the VCP..I could loook it up in vcp\settings.xml
-        // but then it might not have the button...not sure what is best.
-        private const string vcpSkinPath = "C:\\cncm\\resources\\vcp\\skins\\avid_router.vcp";
-        
+
+        private const string vcpOptionsPath = "C:\\cncm\\resources\\vcp\\options.xml";
+        private const string vcpSkinPathFormat = "C:\\cncm\\resources\\vcp\\skins\\{0}.vcp";
+
 
         public ToolChangeSettings Settings = new ToolChangeSettings();
         bool _loading = true;
@@ -496,18 +541,31 @@ namespace ToolRackSetup
                         Environment.Exit(0);
                         break;
                 }
-
             }
 
-            Settings.ShouldCheckAirPressure = _pipe.parameter.GetBoolParameterValue(ParameterKey.ShouldCheckAir);
 
-            Settings.SpindleWaitTime = _pipe.parameter.GetParameterValue(ParameterKey.SpindleWaitTime);
+           _pipe.message_window.AddMessage("ToolRackSetup Connected");
+
+            // For now, always write this bit that the ATC is enabled
+            // This is only checked in Eric's code to not clear the tool table
+            // That is the only differnce so far.
+            _pipe.parameter.SetToolOptionValue(ATCToolOptions.ATCEnabled, true);
+
+
+            Settings.ShouldCheckAirPressure = _pipe.parameter.GetBoolValue(ParameterKey.ShouldCheckAir);
+
+            Settings.SpindleWaitTime = _pipe.parameter.GetValue(ParameterKey.SpindleWaitTime);
             // if not set, default it to 12
             if (Settings.SpindleWaitTime <= 0)
             {
                 Settings.SpindleWaitTime = 12;
             }
-            Settings.HasVirtualDrawbarButton = _pipe.parameter.GetBoolParameterValue(ParameterKey.HasVirtualDrawbarButton);
+
+            Settings.EnableVirtualDrawbar = _pipe.parameter.GetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar);
+
+            // Don't use the property, which has side effects
+            _vcpHasVirtualDrawbarButton = GetIfVCPHasVirtualdrawbarButton();
+            UpdateAddRemoveVCPButtonTitle();
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
@@ -636,13 +694,13 @@ namespace ToolRackSetup
         private void WriteParameters()
         {
             try
-            {
+            {  
                 // done in other spots...but here too
                 _pipe.parameter.SetToolBinCount(_toolPocketItems.Count);
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.HasATC, 0); // needs to be zero!
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.HasEnhancedATC, 0); // needs to be zero!
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
-                _pipe.parameter.SetMachineParameterEx(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
+                _pipe.parameter.SetValue(ParameterKey.HasATC, 0); // needs to be zero!
+                _pipe.parameter.SetValue(ParameterKey.HasEnhancedATC, 0); // needs to be zero!
+                _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
+                _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
             }
             catch (Exception ex)
             {
@@ -821,6 +879,7 @@ namespace ToolRackSetup
             txtBxSlideDistance.DataContext = Settings;
             txtBoxRackOffset.DataContext = Settings;
             chkbxVirtualDrawbarButton.DataContext = Settings;
+            btnAddRemoveVCPButton.DataContext = Settings;
 
             lstviewTools.UnselectAll();
         }
@@ -855,75 +914,118 @@ namespace ToolRackSetup
             if (_virtualDrawbarMessageBoxShown) return;
 
             _virtualDrawbarMessageBoxShown = true;
-            MessageBox.Show("Only set this if you do not have a physical drawbar release button.\n\nThis will add a virtual drawbar button to the Virtual Control Panel (VCP) when you restart CNC12.\n\nIt will also cause all manual tool change requests to prompt when the software is opening and closing the drawbar.");
+            MessageBox.Show("Please restart CNC12 to see the change.");
         }
 
-        private void WriteVCPSettings()
+
+        private string GetCurrentSkinPath()
+        {
+            if (!File.Exists(vcpOptionsPath)) throw new Exception(String.Format("No VCP options file at {0}", vcpOptionsPath));
+            // Read the skin being used..
+            XDocument doc = XDocument.Load(vcpOptionsPath);
+            XElement element = doc.XPathSelectElement("/ArrayOfVcpOption/VcpOption/Name[text()='Skin']") ?? throw new Exception("Failed to parse VCP options for the current Skin");
+
+            XElement value = element.Parent!.XPathSelectElement("Value")!;
+            return String.Format(vcpSkinPathFormat, value.Value!);
+        }
+
+        private bool GetIfVCPHasVirtualdrawbarButton()
         {
             try
             {
-                if (!File.Exists(vcpSkinPath)) throw new Exception(String.Format("No VCP file at {0}", vcpSkinPath));
+                string vcpSkinPath = GetCurrentSkinPath();
                 XDocument doc = XDocument.Load(vcpSkinPath);
-                XElement? element = doc.XPathSelectElement("/vcp_skin/hide_group/group[text()='atc_drawbar']");
-                if (element != null)
-                {
-                    // If it exists, and we are are showing the button, remove it
-                    if (Settings.HasVirtualDrawbarButton)
-                    {
-                        element.Parent.Remove();
-                        // element.Remove();
-                        doc.Save(vcpSkinPath);
-
-                    }
-
-                } else 
-                {
-                    if (!Settings.HasVirtualDrawbarButton)
-                    {
-                        // If it doesn't exist, and we are hiding it, create it and add it
-                        XElement hideGroupElement = new XElement("hide_group");
-                        XElement groupElement = new XElement("group", "atc_drawbar");
-                        hideGroupElement.Add(groupElement);
-                        doc.Root.Add(hideGroupElement);
-                        doc.Save(vcpSkinPath);
-
-
-                    }
-                } 
-
-
-
-
-            }
-            catch (Exception e) {
-                MessageBox.Show(e.Message, "Failed to write VCP settings");
+                XElement? element = doc.XPathSelectElement("/vcp_skin/button[text()='drawbar']");
+                return element != null;
+            } catch
+            {
+                return false;
             }
         }
+
+        private bool _vcpHasVirtualDrawbarButton = false;
+        // for bindings
+        private bool VCPHasVirtualDrawbarButton
+        {
+            get
+            {
+                return _vcpHasVirtualDrawbarButton;
+            }
+             set
+            {
+                if (_vcpHasVirtualDrawbarButton != value)
+                {
+                    _vcpHasVirtualDrawbarButton = value;
+                    UpdateVCPDrawbarButton(_vcpHasVirtualDrawbarButton);
+                    UpdateAddRemoveVCPButtonTitle();
+                    
+                }
+            }
+        }
+
+        private void UpdateAddRemoveVCPButtonTitle()
+        {
+            String s = VCPHasVirtualDrawbarButton ? "Remove Drawbar Button from VCP" : "Add Drawbar Button to VCP";
+            btnAddRemoveVCPButton.Content = s;
+        }
+
+        private void UpdateVCPDrawbarButton(bool shouldAdd)
+        {
+            try
+            {
+                //   <button row="12" column="1" group="atc">drawbar</button>
+                string vcpSkinPath = GetCurrentSkinPath();
+                XDocument doc = XDocument.Load(vcpSkinPath);
+                XElement? element = doc.XPathSelectElement("/vcp_skin/button[text()='drawbar']");
+
+                if (shouldAdd)
+                {
+                    // add it, if not found
+                    if (element == null)
+                    {
+                        element = new XElement("button", "drawbar");
+                        // Set the position...hardcoded for now
+                        element.Add(new XAttribute("row", "12"));
+                        element.Add(new XAttribute("column", "1"));
+                        element.Add(new XAttribute("group", "atc"));
+                        doc.Root!.Add(element);
+                        doc.Save(vcpSkinPath);
+                        ShowVirtualDrawbarMessageIfNeeded();
+                    }
+                } else
+                {
+                    if (element != null)
+                    {
+                        element!.Remove();
+                        doc.Save(vcpSkinPath);
+                        ShowVirtualDrawbarMessageIfNeeded();
+                    }
+                }
+ 
+            }
+            catch (Exception e) {
+                MessageBox.Show(e.Message, "Failed to write");
+            }
+        }
+
+
 
         private void SettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {   
             if (_loading) return;
             try
             {
-                if (e.PropertyName == nameof(Settings.HasVirtualDrawbarButton))
+                if (e.PropertyName == nameof(Settings.EnableVirtualDrawbar))
                 {
-                    // This doesn't need to dirty the state, but does need to write the machine parameter for it.
-                    // And I warn the user about it.
-                    if (Settings.HasVirtualDrawbarButton)
-                    {
-                        ShowVirtualDrawbarMessageIfNeeded();
-                    }
-                    _pipe.parameter.SetMachineParameterEx(ParameterKey.HasVirtualDrawbarButton, Settings.HasVirtualDrawbarButton);
-                    WriteVCPSettings();
-
+                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, Settings.EnableVirtualDrawbar);
                 }
                 else if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
                 {
-                    _pipe.parameter.SetMachineParameterEx(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
+                    _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
                 }
                 else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
                 {
-                    _pipe.parameter.SetMachineParameterEx(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
+                    _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
                 }
                 else
                 {
@@ -1074,6 +1176,18 @@ namespace ToolRackSetup
             {
                 tpi.Z = machine_pos[2];
             }
+        }
+
+        private void btnAddRemoveVCPButton_Click(object sender, RoutedEventArgs e)
+        {
+            VCPHasVirtualDrawbarButton = !VCPHasVirtualDrawbarButton;
+
+        }
+
+        private void mainWindow_Closed(object sender, EventArgs e)
+        {
+            _pipe.message_window.AddMessage("ToolRackSetup Disconnected");
+            _pipe = null;
         }
     }
 }

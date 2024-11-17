@@ -14,7 +14,7 @@ G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 
 ;---------------------------------------
 
-if #9777==0 then GOTO 900; #9777 is 1 if we need a virtual toolbar button
+if [#9776 and 4] == 0 then GOTO 900; ; skip if the virtual drawbar is not enabled
 
 ;------------------------------------------------------------------------------
 ; Virtual drawbar button support

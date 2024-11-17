@@ -2,7 +2,7 @@
 ; by: corbin dunn
 
 ; Parameters
-; #9777 = 1 if we need a virtual drawbar button, 0 otherwise (the default)
+; [#9776 and 4]  if we need a virtual drawbar support
 
 IF #50001                        ;Prevent lookahead from parsing past here
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
@@ -11,7 +11,7 @@ G53 Z0 ; go to z-zero to clear everything
 
 G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 
-if #9777 == 0 then GOTO 900 ; #9777 is 1 if we need a virtual toolbar button
+if [#9776 and 4] == 0 then GOTO 900 ; Skip if a virtual draw bar support is not enabled
 
 ;------------------------------------------------------------------------------
 ; Virtual drawbar button support

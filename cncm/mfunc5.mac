@@ -9,9 +9,10 @@
 ; #151 to 0, if the spindle was off,else it sets #151 to #25012 - time in seconds
 ;-------
 
-; CORBIN SPECIAL: I want to turn off relay 2 (air/case pressurization); add it to #9779 set to 1 manually
-IF [#9779 == 1 && #9711 EQ 2] THEN m84 ;turns off relay 2 if set to do so in wizard
-IF [#9779 == 1 && #9711 EQ 3] THEN m84 ;turns off relay 2 if set to do so in wizard
+; CORBIN: I want to turn off relay 2 (air/case pressurization) when the spindle is off, not when the job is done.
+; Add in [#9776 and 2] for that option
+IF [[#9776 and 2] && #9711 EQ 2] THEN m84 ;turns off relay 2 if set to do so in wizard
+IF [[#9776 and 2] && #9711 EQ 3] THEN m84 ;turns off relay 2 if set to do so in wizard
 
 ; Record the time we stop the spindle so we can wait for it to spin down before doing the tool change
 ; Only record the time if the spindle is actually on.

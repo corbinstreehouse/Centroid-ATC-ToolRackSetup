@@ -159,7 +159,6 @@
   <button row="10" column="4">feedrate_negative</button>
   <button row="10" column="5">feedrate_100</button>
   <button row="10" column="6">feedrate_positive</button>
-  <button row="12" column="1" group="atc_drawbar">drawbar</button>
   <button row="13" column="1">prox_light_xyza</button>
   <button row="13" column="2">prox_light_y2</button>
   <button row="13" column="3">airpressure</button>
@@ -169,7 +168,4 @@
   <button row="14" column="3">tool_check</button>
   <button row="14" column="4">cycle_cancel</button>
   <button row="13" column="5" column_span="2" row_span="2">reset</button>
-  <hide_group>
-    <group>atc_drawbar</group>
-  </hide_group>
 </vcp_skin>

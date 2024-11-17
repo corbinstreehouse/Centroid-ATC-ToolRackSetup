@@ -1,5 +1,5 @@
 <vcp_button>
   <run>
-    <line>M130 "\cncm\CorbinsWorkshop\run_atc_tools.bat"</line>
+    <line>M130 "C:\ToolRackSetup.exe"</line>
   </run>
 </vcp_button>

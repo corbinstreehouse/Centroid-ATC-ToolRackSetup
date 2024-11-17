@@ -1,16 +1,20 @@
-; tool_measure_height
-; by corbin dunn & eric hardtospelllastname
+; tool_measure_height.cnc
+; measures tool heights automatically with the touch plate
+;
+; by corbin dunn & eric 
 ; 
 
 ; #A = 1 ; set to 1 if we should not prompt the user to insert the tool
-; #T // not used..but i could pass the tool in too
+; #T = The tool to measure
 
 ; #110 = tool number from #4120
 ; #125 = tool diameter
 ; #106 = touch feed
 
-#110 = #4120
+IF #50001                        ;Prevent lookahead from parsing past here
+IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
+#110 = #T
 #125 = #[11000 + #110] ; diameter
 
 ; m225 #140 "Tool height measure for %.0f diameter %f" #110 #125
@@ -18,8 +22,11 @@
 ; -------------------- tool diameter check; required for large tools to not hit the spoilboard ---------------
 if #125 > 0 THEN GOTO 100
 
-IF #4120 NE #9718 && #11000 EQ 0 THEN m224 #125 "What's the DIAMETER of the tool you're inserting?" ELSE ;This will as the diameter of the tool unless it's a laser
-IF #4120 NE #9718 && #11000 EQ 0 THEN #[11000+#110] = #125;set entered diameter into the tool libary if its not a laser
+; if it is the laser, then skip that? Set it to the diameter of the thingy?
+if #110 == #9718 THEN GOTO 100
+
+m224 #125 "TOOL HEIGHT\nWhat's the DIAMETER of the tool %.0f?" #110 ;This will be the diameter of the tool unless it's a laser
+#[11000+#110] = #125 ;set entered diameter into the tool libary if its not a laser
 
 ; --------------------
 
@@ -48,8 +55,8 @@ IF #[50000 + #9706] EQ 0 THEN GOTO 51 ELSE GOTO 50;1 is clear 0 is triggered
 N51
 
 ;CORBIN - added #A check to avoid dialog
-IF [#4120 NE #9718 && #A == 0] THEN m200 "Insert tool number %.0f and then press Cycle Start" #4120;don't stop if we're on laser
-IF #4120 EQ #9718 THEN G53 x[#9708-#9715] y[#9709-#9716] ELSE G53 X#9708 Y#9709 ;get back to touch plate if we have jogged away
+IF [#110 NE #9718 && #A == 0] THEN m200 "Insert tool number %.0f and then press Cycle Start" #110 ;don't stop if we're on laser
+IF #110 EQ #9718 THEN G53 x[#9708-#9715] y[#9709-#9716] ELSE G53 X#9708 Y#9709 ;get back to touch plate if we have jogged away
 
 ;large tool with touch plate below spoilboard
 If #[11000+#110] GE #111 && #9713 GE 0 THEN GOTO 52
@@ -74,16 +81,15 @@ m200 "Are you sure your tool is ready to be probed?\nPlease make any further adj
 GOTO 60 ;proceed with probing
 
 N54
-G65 "\cncm\CorbinsWorkshop\avid_mantoolmeasure.cnc" A1 T#110 D#125 ; corbin: renamed, and fixed - not tested yet
+G65 "\cncm\AvidMacros\mantoolmeasure.mac" A1 T#110 D#125
 GOTO 62 ;we're done
 N60
 
-; CORBIN - value fixed
 #[10000 + #110]=0 ;zero the height of the current tool ; CORBIN NOTE - probably not needed
 
 M5; make sure the spindle is off!
 
-IF #4120 EQ #9718 THEN M61 ;(drop laser)
+IF #110 EQ #9718 THEN M61 ;(drop laser)
 
 M115 /Z P#9706 f#106 ;moves down in Z until the touch plate is hit
 G91 z#107 f#106 ;moves up a bit so we can hit the switch again in incremental mode
@@ -95,8 +101,8 @@ IF #[50000 + #9706] EQ 1 THEN GOTO 61 ELSE ;1 is clear 0 is triggered
 
 M115 /Z P#9706 f#105 ;moves down in Z until the touch plate is hit
 #103=[#5023 + #9713]; this should be the tool length to the spoilboard 5023 is machine coordinate of Z axis
-;IF #4120 EQ #9718 THEN #101=[#5023 - #9713 + #9717] ;this adds a little height for the laser focus
-IF #4120 EQ #9718 THEN #103=[#103 + #9717] ;this adds a little height for the laser focus
+;IF #110 EQ #9718 THEN #101=[#5023 - #9713 + #9717] ;this adds a little height for the laser focus
+IF #110 EQ #9718 THEN #103=[#103 + #9717] ;this adds a little height for the laser focus
 G53 z0; This brings us back up to the highest Z can go so we don't smash up a bit
 
 ; CORBIN - changed from #10000 to actually set the height for the tool, which may not be active yet (no G43)
@@ -104,8 +110,11 @@ G53 z0; This brings us back up to the highest Z can go so we don't smash up a bi
 #[10000 + #110] = #103
 
 
-;IF #4120 EQ #9718 THEN M81 (retract laser) 
-; ^ corbin note, probalby shouldn't have that line in here (was commented out prior)
+#130 = 1
+IF [[#9776 and 1] == 0] THEN m225 #130 "Tool %.0f measured!" #110
+
+;IF #110 EQ #9718 THEN M81 (retract laser) 
+; ^ corbin note, maybe shouldn't have that line in here (was commented out prior)
 N62
 
 M99

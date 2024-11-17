@@ -1,1 +1,0 @@
-start "" "C:CNCM\ToolRackSetup.exe"

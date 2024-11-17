@@ -25,7 +25,7 @@ G43 H#101
 if [#101 <= 0 || #101 >= 200] then GOTO 900 ; no tool
 if [#[10000 + #135] != 0] then GOTO 900 ; height is set
 
-; if the height is 0 ask to mesure it now...
+; if the height is 0 ask to measure it now...
  M222 Q0 #101 "Tool has no height set. Would you like to measure it now? Press Y to measure it now." 
 IF #101 != 121 THEN GOTO 1000
 G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#101
