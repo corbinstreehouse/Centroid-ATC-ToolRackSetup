@@ -104,7 +104,8 @@ G53 z0; This brings us back up to the highest Z can go so we don't smash up a bi
 #[10000 + #110] = #103
 
 
-;IF #4120 EQ #9718 THEN M81 (retract laser)
+;IF #4120 EQ #9718 THEN M81 (retract laser) 
+; ^ corbin note, probalby shouldn't have that line in here (was commented out prior)
 N62
 
 M99

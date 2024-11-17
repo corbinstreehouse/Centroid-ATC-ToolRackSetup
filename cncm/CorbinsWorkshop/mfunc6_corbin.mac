@@ -25,6 +25,7 @@
 ;            Set to 1 if the user doesn't have a physical drawbar button (Corbin added)
 ; #9778 = Wait time for the spindle to stop. (Corbin added)
 ; #9724 = Should check air pressure; 1=should check, 0=skip checking. (Avid added)
+; #9718 = laser tool number (Avid added)
 
 ; PLC Variables:
 ;
@@ -86,6 +87,7 @@ if [#[10000 + #135] != 0] then GOTO 1000 ; height is set; go to the end without 
 
 GOTO 600 ; check height
 
+;------------------------------
 N100
 
 ; m225 #140 "Checking air"
@@ -104,6 +106,10 @@ M101 /70014                      ;Ensure Spindle at Zero Speed ; corbin - doesn'
 ; ------------------------ PUT OLD TOOL AWAY -----------------
 ;Skip Putaway if No Tool in Spindle
 IF [#134 <= 0 || #134 == 255]  THEN GOTO 250
+
+; If the old tool is the laser, deactivate and skip put away
+if [#134 ==  #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
+if [#134 ==  #9718 &&  #9718 != 0] THEN GOTO 250 ; get next tool
 
 ; Find the pocket for the old tool
 ; 17001-17200 tool bin numbers for tools 1-200
@@ -127,6 +133,10 @@ N250
 
 ; if don't have a tool, skip stuff
 IF [#135 <= 0 || #135 == 255] THEN GOTO 300 ; set tool
+
+; if the new tool is the laser, activate it and skip stuff
+if [#135 ==  #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
+if [#135 ==  #9718 &&  #9718 != 0] THEN GOTO 300 ; set tool
 
 ; Find the pocket for the new tool
 #137 = #[#135 + 17000] 
