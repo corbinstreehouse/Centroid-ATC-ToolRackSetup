@@ -10,7 +10,10 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
-
+        <BitmapImage x:Key="xMinusImage" UriSource="tool_fork_x_minus.png" />
+        <BitmapImage x:Key="xPlusImage" UriSource="tool_fork_x_plus.png" />
+        <BitmapImage x:Key="yMinusImage" UriSource="tool_fork_y_minus.png" />
+        <BitmapImage x:Key="yPlusImage" UriSource="tool_fork_y_plus.png" />
     </Window.Resources>
 
     <Grid Margin="0,0,14,3">
@@ -71,16 +74,40 @@
                     </GridViewColumn>
 
 
-                    <GridViewColumn Header="Style" Width="105">
+                    <GridViewColumn Header="Style" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
 
-                                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="90" Grid.ColumnSpan="2" SelectedIndex="{Binding Style, Mode=TwoWay, Converter={StaticResource pocketStyleConverter}}" >
-                                    <ComboBoxItem Content="X Minus">
+                                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top"  SelectedIndex="{Binding Style, Mode=TwoWay, Converter={StaticResource pocketStyleConverter}}" >
+
+                                    <ComboBoxItem>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{StaticResource xMinusImage}" Height="20"></Image>
+                                            <TextBlock Padding="5,0,0,0" Text="X Minus"></TextBlock>
+                                        </StackPanel>
                                     </ComboBoxItem>
-                                    <ComboBoxItem Content="X Plus"/>
-                                    <ComboBoxItem Content="Y Minus"/>
-                                    <ComboBoxItem Content="Y Plus"/>
+
+                                    <ComboBoxItem>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{StaticResource xPlusImage}" Height="20"></Image>
+                                            <TextBlock  Padding="5,0,0,0"  Text="X Plus"></TextBlock>
+                                        </StackPanel>
+                                    </ComboBoxItem>
+
+                                    <ComboBoxItem>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{StaticResource yMinusImage}" Height="20"></Image>
+                                            <TextBlock  Padding="5,0,0,0" Text="Y Minus"></TextBlock>
+                                        </StackPanel>
+                                    </ComboBoxItem>
+
+                                    <ComboBoxItem>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{StaticResource yPlusImage}" Height="20"></Image>
+                                            <TextBlock  Padding="5,0,0,0" Text="Y Plus"></TextBlock>
+                                        </StackPanel>
+                                    </ComboBoxItem>
+
                                 </ComboBox>
 
 

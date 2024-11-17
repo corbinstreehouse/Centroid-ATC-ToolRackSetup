@@ -13,6 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="tool_fork_x_minus.png" />
+    <None Remove="tool_fork_x_plus.png" />
+    <None Remove="tool_fork_y_minus.png" />
+    <None Remove="tool_fork_y_plus.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="tool_fork_y_plus.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\CopyFromCNCM.bat" Link="CopyFromCNCM.bat" />
   </ItemGroup>
 
@@ -23,6 +34,12 @@
     <Reference Include="CentroidAPIUserControls">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Avid CNC\AvidCNC Centroid Profile Manager\Profiles\User\Avid 4x8 Pro\cncm\CentroidAPIUserControls.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="tool_fork_x_minus.png" />
+    <Resource Include="tool_fork_x_plus.png" />
+    <Resource Include="tool_fork_y_minus.png" />
   </ItemGroup>
 
   <ItemGroup>
