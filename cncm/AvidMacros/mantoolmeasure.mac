@@ -1,0 +1,65 @@
+; mantoolmeasure.mac
+;
+;full manual tool measure
+;this script will allow you to measure a tool on your worksurface
+;This can be useful if you have an oddball tool like a slab slayer or a dragknife
+
+#130 = 2 ;dialog timer
+
+IF #9701 EQ 0 THEN GOTO 1000 ;bail out if our spoilboard location isn't set.
+
+
+IF #A EQ 1 then goto 100 ;if this is being called from m6 then skip the prompts
+
+
+m200 "This utility will let you measure any tool off of your work surface\nThis can be useful if you have an odd or large tool that can't work with the touch plate"
+M224 #110 "What's the tool number you're inserting?"
+
+N100
+If #A EQ 1 THEN #110 = #T ;set tool number to called tool number
+If #A EQ 1 THEN GOTO 101 ;skip diameter question
+
+IF #110 NE #9718 THEN m224 #125 "What's the DIAMETER of the tool you're inserting?" ELSE ;This will as the diameter of the tool unless it's a laser
+N101
+If #110 EQ #9718 THEN M81 ;deploy laser
+IF #110 NE #9718 THEN #[11000+#110]=#125;set entered diameter into the tool libary if its not a laser
+IF #110 EQ #9718 THEN #[11000+#9718]=#9719;set laser nozzle diameter to the tool diameter if we're on laser
+
+; Don't do a g43 call - it isn't needed
+; G43h#110 ;sets the active tool height to the tool that you just picked
+#[10000 + #110] = 0 ; zeros that tool height. This is so you can remeasure the same tool number if you want.
+
+
+
+
+IF #A NE 1 THEN m200 "Insert tool number %.0f and then press Cycle Start" #110;don't stop if we're on laser
+
+if #A == 1 THEN goto 150 ; skip if called from m6
+; #150=0 ;clears out the stored tool -- Not sure why this was done
+#150 = #110
+T#110 ;sets the tool number to the number that the user wants
+G43 H#110
+; set the PLC number for the active tool 
+G10 P976 R#110
+
+N150
+
+m200 "Jog so that your tool is just skimming the work surface\nPress Cycle Start when ready"
+m200 "Are you sure your tool is exactly on the work surface?\nPress Cycle Start to confirm"
+
+#[10000 + #110]=#5023 ;Set's tool height for active tool
+m225 #130 "New tool height set"
+
+If #A EQ 1 then GOTO 10000 ;end because M6 will clean the tools 
+
+; cleanup the tool table if no ATC
+if  [#9776 and 1] == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#135
+
+m61 ;retract laser
+G53 z0
+GOTO 10000
+
+N1000
+M200 "Your work surface isn't calibrated yet. Please do that in UTILS menu"
+
+N10000
