@@ -199,7 +199,7 @@ namespace ToolRackSetup
         }
     }
 
-    public class ToolInfo
+    public class ToolInfo : NotifyingObject
     {
         private CNCPipe _pipe;
 
@@ -208,7 +208,7 @@ namespace ToolRackSetup
             _pipe = pipe;
             this.Number = info.number;
             _pocket = info.bin;
-            this.HeightOffset = info.height_offset;
+            _heightOffset = info.height_offset;
             _description = info.description;
         }
         public int Number { get; }
@@ -223,6 +223,7 @@ namespace ToolRackSetup
                 {
                     _pocket = value;
                     CheckForeError(_pipe.tool.SetBinNumber(this.Number, _pocket), "Setting tool pocket");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -247,12 +248,27 @@ namespace ToolRackSetup
                 if (_heightNumber != value)
                 {
                     _heightNumber = value;
-                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, _heightNumber), "Setting tool height");
+                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, _heightNumber), "Setting tool height number");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-        public double HeightOffset { get; }
+        public double HeightOffset { 
+            get
+            {
+                return _heightOffset;
+            }
+            set
+            {
+                if (_heightOffset != value) {
+                    _heightOffset = value;
+                    CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, _heightOffset), "Setting tool height");
+                    NotifyPropertyChanged();
+                }
+            }
+        
+        }
 
         //public int d_number;
 
@@ -265,6 +281,8 @@ namespace ToolRackSetup
         //public int spindle_speed;
 
         private string _description;
+        private double _heightOffset;
+
         public string Description
         {
             get { return _description; }
@@ -274,6 +292,7 @@ namespace ToolRackSetup
                 {
                     _description = value;
                     CheckForeError(_pipe.tool.SetToolDescription(this.Number, _description), "Setting tool description");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -1258,6 +1277,17 @@ namespace ToolRackSetup
         {
             // ignore errors on this call..
             _pipe.message_window.AddMessage("ToolRackSetup Disconnected");
+        }
+
+        private void btnResetHeight_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            ToolPocketItem item = b.DataContext as ToolPocketItem;
+
+            if (item.ToolInfo != null)
+            {
+                item.ToolInfo.HeightOffset = 0;
+            }
         }
     }
 }

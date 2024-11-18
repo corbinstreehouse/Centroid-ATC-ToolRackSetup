@@ -74,7 +74,7 @@
 
                                                 <Label Content="{Binding ToolInfo.HeightOffset}" ContentStringFormat="{}{0:F3}" HorizontalContentAlignment="Right" Height="26" Padding="0,2,0,0"></Label>
 
-                                                <Button x:Name="btnResetHeight" Content="X"  Width="22"  Margin="5,0,0,0" HorizontalAlignment="Right" Grid.Column="1"></Button>
+                                                <Button x:Name="btnResetHeight" Content="X"  Width="22"  Margin="5,0,0,0" HorizontalAlignment="Right" Grid.Column="1" Click="btnResetHeight_Click"></Button>
 
                                             </Grid>
                                             
