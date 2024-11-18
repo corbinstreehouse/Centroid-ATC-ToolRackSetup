@@ -189,6 +189,8 @@ N600
 if [#135 <= 0 || #135 >= 200] then GOTO 900 ; no tool, goto restore
 if [#[10000 + #135] != 0] then GOTO 900 ; height is already set, goto restore
 
+m221 #140 "Going to the touch plate and measuring the height of Tool %.0f" #135
+
 G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#135
 
@@ -219,6 +221,8 @@ GOTO 802
 ; Restore
 ; ----------------------------------
 N900 
+
+if #50001
 
 m221 #140 "End tool change: Restoring position to X%f Y%f" #132 #133
 
