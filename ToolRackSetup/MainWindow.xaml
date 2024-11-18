@@ -63,18 +63,37 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Height" Width="75"  DisplayMemberBinding="{Binding ToolInfo.HeightOffset}"/>
+                                <GridViewColumn Header="Height" Width="95">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid >
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="27"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Label Content="{Binding ToolInfo.HeightOffset}" ContentStringFormat="{}{0:F3}" HorizontalContentAlignment="Right" Height="26" Padding="0,2,0,0"></Label>
+
+                                                <Button x:Name="btnResetHeight" Content="X"  Width="22"  Margin="5,0,0,0" HorizontalAlignment="Right" Grid.Column="1"></Button>
+
+                                            </Grid>
+                                            
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
                                 <GridViewColumn Header="X" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                            <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat=\{00:000.000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                                
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Y" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxY" Background="Transparent" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                            <local:ClickSelectTextBox x:Name="txtBoxY" Background="Transparent" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat=\{00:000.000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -82,7 +101,7 @@
                                 <GridViewColumn Header="Z" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxZ" Background="Transparent" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                            <local:ClickSelectTextBox x:Name="txtBoxZ" Background="Transparent" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat=\{00:000.000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -131,6 +150,7 @@
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>
+
 
 
 
