@@ -23,6 +23,8 @@ using System.Globalization;
 using System.Runtime;
 using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
+using static CentroidAPI.CNCPipe.State;
+using Microsoft.VisualBasic;
 
 namespace ToolRackSetup
 {
@@ -44,21 +46,21 @@ namespace ToolRackSetup
         // Custom parameters by Corbin
         ATCToolOptions = 776, // bitset, see ATCToolOptions enum
 
-      //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
+        //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
         SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
-        // 779 = old bit for turning off relay 2
     }
 
     // Bitset values
     public enum ATCToolOptions
     {
-        ATCEnabled = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
+        EnableATC = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
         TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job
         EnableVirtualDrawbar = 4, // Enable vitual drawbar button
     }
 
     public static class CNCPipeExtensions
     {
+
         public static bool GetToolOptionValue(this CNCPipe.Parameter parameter, ATCToolOptions option)
         {
             return parameter.GetBitValue((int)ParameterKey.ATCToolOptions, (int)option);
@@ -220,12 +222,35 @@ namespace ToolRackSetup
                 if (_pocket != value)
                 {
                     _pocket = value;
-                    _pipe.tool.SetBinNumber(this.Number, _pocket);
+                    CheckForeError(_pipe.tool.SetBinNumber(this.Number, _pocket), "Setting tool pocket");
                 }
             }
-        }        
+        }
 
-        //public int h_number;
+        private void CheckForeError(ReturnCode code, string op)
+        {
+            if ( code != ReturnCode.SUCCESS)
+            {
+
+                string reason = code.ToString();
+                string eMsg = String.Format("Error: {0}.\nEnsure you are not running a job!\nError: {2}", op, reason);
+                throw new Exception(eMsg);              
+            }
+        }
+
+        int _heightNumber;
+        public int HeightNumber
+        {
+            get { return _heightNumber;  }
+            set
+            {
+                if (_heightNumber != value)
+                {
+                    _heightNumber = value;
+                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, _heightNumber), "Setting tool height");
+                }
+            }
+        }
 
         public double HeightOffset { get; }
 
@@ -248,7 +273,7 @@ namespace ToolRackSetup
                 if (_description != value)
                 {
                     _description = value;
-                    _pipe.tool.SetToolDescription(this.Number, _description);
+                    CheckForeError(_pipe.tool.SetToolDescription(this.Number, _description), "Setting tool description");
                 }
             }
         }
@@ -322,17 +347,20 @@ namespace ToolRackSetup
         }
     }
 
+    // TODO: Seperate to ParameterSettings and PocketSettings
     public class ToolChangeSettings : NotifyingObject
     {
+        CNCPipe _pipe;
+
         private bool enableTestingMode = true;
         private double zBump = 0.005; // May need to be larger for CNC depot
         private double testingFeed = 200;
         private double zClearance = 0; //unused right now
-        private double spindleWaitTime = 12.0; // seconds
-        private bool shouldCheckAirPressure = true;
+        private double _spindleWaitTime = 12.0; // seconds
+        private bool _shouldCheckAirPressure = true;
         private double slideDistance = 1.4; // Default value
         private double rackAdjustment = 5.5;
-        private bool hasVirtualDrawbarButton = false; // If true, we do more stuff
+        private bool _enableVirtualDrawbar = false; // If true, we do more stuff
 
         public bool EnableTestingMode { get => enableTestingMode; 
             set { 
@@ -341,19 +369,54 @@ namespace ToolRackSetup
         }
         public double ZBump { get => zBump; set { zBump = value; NotifyPropertyChanged();  } }
         public double ZClearance { get => zClearance; set { zClearance = value; NotifyPropertyChanged(); } }
-        public double SpindleWaitTime { get => spindleWaitTime; set => 
-                spindleWaitTime = value; }
+        public double SpindleWaitTime { get => _spindleWaitTime; 
+            set
+            {
+                if (_spindleWaitTime != value)
+                {
+                    _spindleWaitTime = value;
+                    _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, _spindleWaitTime);
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         public double TestingFeed { get => testingFeed; set { testingFeed = value; NotifyPropertyChanged(); } }
-        public bool ShouldCheckAirPressure { get => shouldCheckAirPressure; set { shouldCheckAirPressure = value; NotifyPropertyChanged(); } }
+
+        public bool ShouldCheckAirPressure { 
+            get => _shouldCheckAirPressure; 
+            set {
+                if (_shouldCheckAirPressure != value) {     
+                  _shouldCheckAirPressure = value;
+
+                    _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir,_shouldCheckAirPressure);
+                    NotifyPropertyChanged(); 
+                   
+                }
+            
+            } 
+        }
+
+        bool _enableATC = false;
+        public bool EnableATC { get => _enableATC; set
+            {
+                if (_enableATC != value) { _enableATC = value;
+
+                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, _enableATC);
+                    NotifyPropertyChanged(); 
+                }
+
+            }
+        }
 
         public bool EnableVirtualDrawbar
         { 
-            get => hasVirtualDrawbarButton;
+            get => _enableVirtualDrawbar;
             set {
-                if (hasVirtualDrawbarButton != value)
+                if (_enableVirtualDrawbar != value)
                 {
-                    hasVirtualDrawbarButton = value;
+                    _enableVirtualDrawbar = value;
+                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, _enableVirtualDrawbar);
                     NotifyPropertyChanged();
                 }
             } 
@@ -377,8 +440,18 @@ namespace ToolRackSetup
             set { rackAdjustment = value; NotifyPropertyChanged(); }
         }
 
-        public ToolChangeSettings()
+        public ToolChangeSettings(CNCPipe pipe)
         {
+            _pipe = pipe;
+            _enableATC = _pipe.parameter.GetToolOptionValue(ATCToolOptions.EnableATC);
+            _shouldCheckAirPressure = _pipe.parameter.GetBoolValue(ParameterKey.ShouldCheckAir);
+            _spindleWaitTime = _pipe.parameter.GetValue(ParameterKey.SpindleWaitTime);
+            // if not set, default it to 12
+            if (_spindleWaitTime <= 0)
+            {
+                _spindleWaitTime = 12;
+            }
+            _enableVirtualDrawbar = _pipe.parameter.GetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar);
         }
     }
 
@@ -512,7 +585,7 @@ namespace ToolRackSetup
         private const string vcpSkinPathFormat = "C:\\cncm\\resources\\vcp\\skins\\{0}.vcp";
 
 
-        public ToolChangeSettings Settings = new ToolChangeSettings();
+        public ToolChangeSettings Settings;
         bool _loading = true;
         public MainWindow()
         {
@@ -544,24 +617,11 @@ namespace ToolRackSetup
             }
 
 
+
+
            _pipe.message_window.AddMessage("ToolRackSetup Connected");
 
-            // For now, always write this bit that the ATC is enabled
-            // This is only checked in Eric's code to not clear the tool table
-            // That is the only differnce so far.
-            _pipe.parameter.SetToolOptionValue(ATCToolOptions.ATCEnabled, true);
-
-
-            Settings.ShouldCheckAirPressure = _pipe.parameter.GetBoolValue(ParameterKey.ShouldCheckAir);
-
-            Settings.SpindleWaitTime = _pipe.parameter.GetValue(ParameterKey.SpindleWaitTime);
-            // if not set, default it to 12
-            if (Settings.SpindleWaitTime <= 0)
-            {
-                Settings.SpindleWaitTime = 12;
-            }
-
-            Settings.EnableVirtualDrawbar = _pipe.parameter.GetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar);
+            Settings = new ToolChangeSettings(_pipe);
 
             // Don't use the property, which has side effects
             _vcpHasVirtualDrawbarButton = GetIfVCPHasVirtualdrawbarButton();
@@ -868,6 +928,8 @@ namespace ToolRackSetup
         private void InitializeUI()
         {
             lstviewTools.ItemsSource = _toolPocketItems;
+            lstviewTools.DataContext = Settings;
+            grdATCSettings.DataContext = Settings;
             // I can't figure out how to set bindings up in the xaml
 
             // txtBxZClearance.DataContext = Settings;
@@ -880,6 +942,7 @@ namespace ToolRackSetup
             txtBoxRackOffset.DataContext = Settings;
             chkbxVirtualDrawbarButton.DataContext = Settings;
             btnAddRemoveVCPButton.DataContext = Settings;
+            chkbxEnableATC.DataContext = Settings;
 
             lstviewTools.UnselectAll();
         }
@@ -1015,17 +1078,22 @@ namespace ToolRackSetup
             if (_loading) return;
             try
             {
+                // I should simplify this by seperating XML saved settings and parmaeter saved settings
                 if (e.PropertyName == nameof(Settings.EnableVirtualDrawbar))
                 {
-                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, Settings.EnableVirtualDrawbar);
+      
                 }
                 else if (e.PropertyName == nameof(Settings.ShouldCheckAirPressure))
                 {
-                    _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, Settings.ShouldCheckAirPressure);
+              
                 }
                 else if (e.PropertyName == nameof(Settings.SpindleWaitTime))
                 {
-                    _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, Settings.SpindleWaitTime);
+                   
+                }
+                else if (e.PropertyName == nameof(Settings.EnableATC))
+                {
+                    // nop
                 }
                 else
                 {
@@ -1112,6 +1180,8 @@ namespace ToolRackSetup
                     e.Cancel = true;
                 }
             }
+            Properties.Settings.Default.Save();
+
         }
 
 
@@ -1186,8 +1256,8 @@ namespace ToolRackSetup
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {
+            // ignore errors on this call..
             _pipe.message_window.AddMessage("ToolRackSetup Disconnected");
-            _pipe = null;
         }
     }
 }

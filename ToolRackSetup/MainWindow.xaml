@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToolRackSetup"
+        xmlns:properties="clr-namespace:ToolRackSetup.Properties"
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Collections.NonGeneric" x:Name="mainWindow" x:Class="ToolRackSetup.MainWindow"
         mc:Ignorable="d"
-        Title="ATC Tools" Height="666" Width="885" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed">
+        Title="Tools" Height="666" Width="885" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
@@ -15,143 +16,170 @@
         <BitmapImage x:Key="yMinusImage" UriSource="tool_fork_y_minus.png" />
         <BitmapImage x:Key="yPlusImage" UriSource="tool_fork_y_plus.png" />
     </Window.Resources>
-
-    <Grid Margin="0,0,14,3">
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="346"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="101*"/>
+            <ColumnDefinition Width="194*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="lstviewTools" Margin="0,10,0,160" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" Grid.ColumnSpan="2" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}">
-
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-
-            <ListView.View>
-                <GridView AllowsColumnReorder="False">
-                    <GridViewColumn x:Name="gvcPocket" Header="Pocket" Width="50" DisplayMemberBinding="{Binding Pocket, StringFormat=\{0:D\}}"/>
-                    <GridViewColumn Header="Tool" Width="50">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxToolNumber" Background="Transparent" BorderThickness="1" Text="{Binding ToolNumber, Mode=TwoWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Description" Width="200">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxDescription" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}" IsEnabled="{Binding IsToolEnabled}" MaxLength="19" MaxLines="1"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Header="Height" Width="75"  DisplayMemberBinding="{Binding ToolInfo.HeightOffset}"/>
-                    <GridViewColumn Header="X" Width="90">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Y" Width="90">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxY" Background="Transparent" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn Header="Z" Width="90">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <local:ClickSelectTextBox x:Name="txtBoxZ" Background="Transparent" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-
-                    <GridViewColumn Header="Style" Width="120">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-
-                                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top"  SelectedIndex="{Binding Style, Mode=TwoWay, Converter={StaticResource pocketStyleConverter}}" >
-
-                                    <ComboBoxItem>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{StaticResource xMinusImage}" Height="20"></Image>
-                                            <TextBlock Padding="5,0,0,0" Text="X Minus"></TextBlock>
-                                        </StackPanel>
-                                    </ComboBoxItem>
-
-                                    <ComboBoxItem>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{StaticResource xPlusImage}" Height="20"></Image>
-                                            <TextBlock  Padding="5,0,0,0"  Text="X Plus"></TextBlock>
-                                        </StackPanel>
-                                    </ComboBoxItem>
-
-                                    <ComboBoxItem>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{StaticResource yMinusImage}" Height="20"></Image>
-                                            <TextBlock  Padding="5,0,0,0" Text="Y Minus"></TextBlock>
-                                        </StackPanel>
-                                    </ComboBoxItem>
-
-                                    <ComboBoxItem>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{StaticResource yPlusImage}" Height="20"></Image>
-                                            <TextBlock  Padding="5,0,0,0" Text="Y Plus"></TextBlock>
-                                        </StackPanel>
-                                    </ComboBoxItem>
-
-                                </ComboBox>
+        <TabControl SelectedIndex="1" Grid.ColumnSpan="2">
+            <TabItem Header="Tool Table" d:IsLocked="True" >
+                <Grid>
+                    <Label Content="Tool table goes here&#xD;&#xA;" HorizontalAlignment="Left" Margin="226,130,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="ATC Setup" >
 
 
 
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
+                <Grid Margin="0,0,14,3" IsEnabled="{Binding EnableATC}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="855*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ListView x:Name="lstviewTools" Margin="0,10,0,187" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" IsEnabled="{Binding EnableATC}">
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn x:Name="gvcPocket" Header="Pocket" Width="50" DisplayMemberBinding="{Binding Pocket, StringFormat=\{0:D\}}"/>
+                                <GridViewColumn Header="Tool" Width="50">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <local:ClickSelectTextBox x:Name="txtBoxToolNumber" Background="Transparent" BorderThickness="1" Text="{Binding ToolNumber, Mode=TwoWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Description" Width="200">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <local:ClickSelectTextBox x:Name="txtBoxDescription" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}" IsEnabled="{Binding IsToolEnabled}" MaxLength="19" MaxLines="1"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Height" Width="75"  DisplayMemberBinding="{Binding ToolInfo.HeightOffset}"/>
+                                <GridViewColumn Header="X" Width="90">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Y" Width="90">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <local:ClickSelectTextBox x:Name="txtBoxY" Background="Transparent" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Z" Width="90">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <local:ClickSelectTextBox x:Name="txtBoxZ" Background="Transparent" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat=\{00:000.0000\}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+
+                                <GridViewColumn Header="Style" Width="120">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+
+                                            <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top"  SelectedIndex="{Binding Style, Mode=TwoWay, Converter={StaticResource pocketStyleConverter}}" >
+
+                                                <ComboBoxItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="{StaticResource xMinusImage}" Height="20"></Image>
+                                                        <TextBlock Padding="5,0,0,0" Text="X Minus"></TextBlock>
+                                                    </StackPanel>
+                                                </ComboBoxItem>
+
+                                                <ComboBoxItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="{StaticResource xPlusImage}" Height="20"></Image>
+                                                        <TextBlock  Padding="5,0,0,0"  Text="X Plus"></TextBlock>
+                                                    </StackPanel>
+                                                </ComboBoxItem>
+
+                                                <ComboBoxItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="{StaticResource yMinusImage}" Height="20"></Image>
+                                                        <TextBlock  Padding="5,0,0,0" Text="Y Minus"></TextBlock>
+                                                    </StackPanel>
+                                                </ComboBoxItem>
+
+                                                <ComboBoxItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="{StaticResource yPlusImage}" Height="20"></Image>
+                                                        <TextBlock  Padding="5,0,0,0" Text="Y Plus"></TextBlock>
+                                                    </StackPanel>
+                                                </ComboBoxItem>
+
+                                            </ComboBox>
 
 
 
-        </ListView>
-        <Grid Grid.Column="1" HorizontalAlignment="Left" Height="107" Margin="4,0,0,11" VerticalAlignment="Bottom" Width="290">
-            <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
-            <TextBox x:Name="txtBoxWaitTime" HorizontalAlignment="Left" Margin="170,0,0,61" TextWrapping="Wrap" Text="{Binding SpindleWaitTime, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
 
-            <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
 
-            <Label Content="Slide Distance:" Margin="12,0,0,85" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
-            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding SlideDistance, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
 
-            <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding RackOffset, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
+                    </ListView>
+                    <Grid x:Name="grdATCSettings" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="836" IsEnabled="{Binding EnableATC}" Height="158" VerticalAlignment="Bottom">
 
-        </Grid>
+                        <Grid HorizontalAlignment="Left" Height="107" Margin="0,0,0,12" VerticalAlignment="Bottom" Width="290">
+                            <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
+                            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
+                            <TextBox
 
-        <Button x:Name="btnWriteChanges" Grid.Column="2" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,16,122" Width="118" IsEnabled="{Binding dirty}" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
-        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="4,0,0,131" Width="150" Height="20" VerticalAlignment="Bottom" Click="btnAddPocket_Click" Grid.Column="1"/>
-        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="176,0,0,130" Grid.Column="1" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="20" VerticalAlignment="Bottom"/>
-        <Grid Grid.Column="2" HorizontalAlignment="Left" Width="334" Margin="9,0,0,123" Height="34" VerticalAlignment="Bottom">
-            <Label Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top" Height="26" Width="167"/>
-            <Button x:Name="btnAssignMachineCoordX" Content="X" HorizontalAlignment="Left" Margin="169,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordX_Click"/>
-            <Button x:Name="btnAssignMachineCoordY" Content="Y" HorizontalAlignment="Left" Margin="219,6,0,0" VerticalAlignment="Top" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
-            <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="267,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
-        </Grid>
-        <Grid Grid.Column="2" HorizontalAlignment="Left" Height="121" Margin="11,0,0,-1" VerticalAlignment="Bottom" Width="292">
-            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableTestingMode}" Height="15" Width="123" />
-            <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding EnableTestingMode}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
-            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding ShouldCheckAirPressure}" Height="14" Width="182" Margin="0,22,0,0" />
-            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding EnableVirtualDrawbar}" Height="14" Width="184" Margin="0,42,0,0" />
-            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="21,62,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding EnableVirtualDrawbar}"/>
+                        Width="120" VerticalAlignment="Bottom" Text="{Binding SpindleWaitTime, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" TextWrapping="Wrap" x:Name="txtBoxWaitTime" Margin="170,0,0,61" Height="18" HorizontalAlignment="Left" />
 
-        </Grid>
+                            <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
 
+                            <Label Content="Slide Distance:" Margin="12,0,0,85" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
+                            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding SlideDistance, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
+
+                            <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
+                            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding RackOffset, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
+
+                        </Grid>
+
+                        <Button x:Name="btnWriteChanges" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,0,123" Width="118" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
+                        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="0,0,0,132" Width="150" Height="20" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
+                        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="172,0,0,131" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="20" VerticalAlignment="Bottom"/>
+                        <Grid HorizontalAlignment="Left" Width="334" Margin="351,0,0,124" Height="34" VerticalAlignment="Bottom">
+                            <Label Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top" Height="26" Width="167"/>
+                            <Button x:Name="btnAssignMachineCoordX" Content="X" HorizontalAlignment="Left" Margin="169,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordX_Click"/>
+                            <Button x:Name="btnAssignMachineCoordY" Content="Y" HorizontalAlignment="Left" Margin="219,6,0,0" VerticalAlignment="Top" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
+                            <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="267,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
+                        </Grid>
+                        <Grid HorizontalAlignment="Left" Height="121" Margin="353,0,0,0" VerticalAlignment="Bottom" Width="292">
+                            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableTestingMode}" Height="15" Width="123" />
+                            <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding EnableTestingMode}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
+                            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding ShouldCheckAirPressure}" Height="14" Width="182" Margin="0,22,0,0" />
+                            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding EnableVirtualDrawbar}" Height="14" Width="194" Margin="0,42,0,0" />
+                            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="21,62,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding EnableVirtualDrawbar}"/>
+
+                        </Grid>
+
+
+                    </Grid>
+                    <CheckBox x:Name="chkbxEnableATC" Grid.Column="1" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="225" IsChecked="{Binding EnableATC}" Height="15" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="chkbxLockToolPocketSettings" Grid.Column="1" Content="Lock Tool Pocket Settings" HorizontalAlignment="Left" Margin="279,0,0,162" Width="225" Height="15" VerticalAlignment="Bottom" IsChecked="{Binding LockToolPocketSettings, Mode=TwoWay, Source={x:Static properties:Settings.Default}, UpdateSourceTrigger=Default, ValidatesOnNotifyDataErrors=True}" Visibility="Hidden"/>
+
+
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
