@@ -3,7 +3,7 @@
 IF #50001                        ;Prevent lookahead from parsing past here
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
-IF #9709 EQ -1 THEN GOTO 1100
+IF #9709 EQ -1 THEN GOTO 1000
 
 IF #9769 EQ 1 THEN m200 "Heading to touch plate. Press Cycle Start to proceed."
 
