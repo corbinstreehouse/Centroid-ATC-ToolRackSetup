@@ -37,7 +37,7 @@
                         <ColumnDefinition Width="855*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ListView x:Name="lstviewTools" Margin="0,10,0,187" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" IsEnabled="{Binding EnableATC}">
+                    <ListView x:Name="lstviewTools" Margin="0,10,0,187" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" FontSize="16" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}">
 
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
@@ -155,22 +155,22 @@
 
 
                     </ListView>
-                    <Grid x:Name="grdATCSettings" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="836" IsEnabled="{Binding EnableATC}" Height="158" VerticalAlignment="Bottom">
+                    <Grid x:Name="grdATCSettings" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="836" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="158" VerticalAlignment="Bottom">
 
                         <Grid HorizontalAlignment="Left" Height="107" Margin="0,0,0,12" VerticalAlignment="Bottom" Width="290">
                             <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-                            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding ZBump, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
+                            <TextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding Settings.ZBump, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
                             <TextBox
 
-                        Width="120" VerticalAlignment="Bottom" Text="{Binding SpindleWaitTime, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" TextWrapping="Wrap" x:Name="txtBoxWaitTime" Margin="170,0,0,61" Height="18" HorizontalAlignment="Left" />
+                        Width="120" VerticalAlignment="Bottom" Text="{Binding _parameterSettings.SpindleWaitTime, ElementName=mainWindow,  StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" TextWrapping="Wrap" x:Name="txtBoxWaitTime" Margin="170,0,0,61" Height="18" HorizontalAlignment="Left" />
 
                             <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
 
                             <Label Content="Slide Distance:" Margin="12,0,0,85" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
-                            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding SlideDistance, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
+                            <TextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding Settings.SlideDistance, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
 
                             <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-                            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding RackOffset, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
+                            <TextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Settings.RackOffset, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
 
                         </Grid>
 
@@ -184,17 +184,18 @@
                             <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="267,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
                         </Grid>
                         <Grid HorizontalAlignment="Left" Height="121" Margin="353,0,0,0" VerticalAlignment="Bottom" Width="292">
-                            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableTestingMode}" Height="15" Width="123" />
-                            <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding TestingFeed, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding EnableTestingMode}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
-                            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding ShouldCheckAirPressure}" Height="14" Width="182" Margin="0,22,0,0" />
-                            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding EnableVirtualDrawbar}" Height="14" Width="194" Margin="0,42,0,0" />
-                            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="21,62,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding EnableVirtualDrawbar}"/>
+                            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding Settings.EnableTestingMode, ElementName=mainWindow}" Height="15" Width="123" />
+                            <TextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding Settings.TestingFeed, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding EnableTestingMode}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
+                            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.ShouldCheckAirPressure, ElementName=mainWindow}" Height="14" Width="182" Margin="0,22,0,0" />
+                            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow}" Height="14" Width="194" Margin="0,42,0,0" />
+                            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="21,62,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow}"/>
+                            <CheckBox x:Name="chkbxPromptForTouchPlate" Content="Prompt When Going to Touch Plate" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.PromptWhenGoingToTouchPlate, ElementName=mainWindow, Mode=TwoWay}" Height="14" Width="220" Margin="0,87,0,0" />
 
                         </Grid>
 
 
                     </Grid>
-                    <CheckBox x:Name="chkbxEnableATC" Grid.Column="1" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="225" IsChecked="{Binding EnableATC}" Height="15" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="chkbxEnableATC" Grid.Column="1" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="225" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="15" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="chkbxLockToolPocketSettings" Grid.Column="1" Content="Lock Tool Pocket Settings" HorizontalAlignment="Left" Margin="279,0,0,162" Width="225" Height="15" VerticalAlignment="Bottom" IsChecked="{Binding LockToolPocketSettings, Mode=TwoWay, Source={x:Static properties:Settings.Default}, UpdateSourceTrigger=Default, ValidatesOnNotifyDataErrors=True}" Visibility="Hidden"/>
 
 

@@ -25,6 +25,7 @@ using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.State;
 using Microsoft.VisualBasic;
+// using CommunityToolkit.Mvvm; // corbin  - look into using this for po
 
 namespace ToolRackSetup
 {
@@ -40,8 +41,17 @@ namespace ToolRackSetup
         CentroidHasEnhancedATC = 160, // Currently needs to be 0, can have variuous bits set which cause the PLC to be used for the tool number
         MaxToolBins = 161, // Read/written
 
-        // Custom parameters by Avid
+        // Custom parameters by Avid (see resetparams.mac)
+        SpoilboardCalibrated = 701,
+        TouchOffPlateSet = 702,
         ShouldCheckAir = 724, // Avid setting that I read and write
+        TouchOffPlateX = 708,
+        TouchOffPlateY = 709,
+        LaserToolNumber = 718,
+
+        PromptToGoToTouchPlate = 769,
+
+
 
         // Custom parameters by Corbin
         ATCToolOptions = 776, // bitset, see ATCToolOptions enum
@@ -364,6 +374,7 @@ namespace ToolRackSetup
         private bool _shouldCheckAirPressure = true;
         private bool _enableVirtualDrawbar = false; // If true, we do more stuff
         private int _pocketCount = 0;
+       
 
         public ParameterSettings(CNCPipe pipe)
         {
@@ -378,7 +389,26 @@ namespace ToolRackSetup
             }
             _enableVirtualDrawbar = _pipe.parameter.GetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar);
             _pocketCount = (int)_pipe.parameter.GetValue(ParameterKey.MaxToolBins);
+            _promptWhenGoingToTouchPlate = _pipe.parameter.GetBoolValue(ParameterKey.PromptToGoToTouchPlate);
         }
+
+        public bool PromptWhenGoingToTouchPlate
+        {
+            get
+            {
+                return _promptWhenGoingToTouchPlate;
+            }
+            set
+            {
+                if (_promptWhenGoingToTouchPlate != value)
+                {
+                    _pipe.parameter.SetValue(ParameterKey.PromptToGoToTouchPlate, value);
+                    _promptWhenGoingToTouchPlate = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public double SpindleWaitTime
         {
             get => _spindleWaitTime;
@@ -386,8 +416,8 @@ namespace ToolRackSetup
             {
                 if (_spindleWaitTime != value)
                 {
-                    _spindleWaitTime = value;
                     _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, _spindleWaitTime);
+                    _spindleWaitTime = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -412,6 +442,8 @@ namespace ToolRackSetup
         }
 
         bool _enableATC = false;
+        private bool _promptWhenGoingToTouchPlate;
+
         public bool EnableATC
         {
             get => _enableATC; set
@@ -625,8 +657,15 @@ namespace ToolRackSetup
 
 
 
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        // I should use a 3d party framework to do this silly boiler plate code that should be built in.
+        public event PropertyChangedEventHandler? PropertyChanged;
+ 
+        protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new MyPropertyChangedEventArgs(null, propertyName));
+        }
 
         private CNCPipe _pipe;
 
@@ -642,8 +681,8 @@ namespace ToolRackSetup
         private const string vcpSkinPathFormat = "C:\\cncm\\resources\\vcp\\skins\\{0}.vcp";
 
 
-        private ToolChangeSettings Settings;
-        private ParameterSettings _parameterSettings;
+        public ToolChangeSettings Settings { get; }
+        public ParameterSettings _parameterSettings { get; }
 
         bool _loading = true;
         public MainWindow()
@@ -683,7 +722,9 @@ namespace ToolRackSetup
             // TODO: Check if we are metric and flip default values if we are
             bool isMetric = false;
             Settings = new ToolChangeSettings(isMetric);
+            NotifyPropertyChanged(nameof(Settings));
             _parameterSettings = new ParameterSettings(_pipe);
+            NotifyPropertyChanged(nameof(_parameterSettings));
 
             // Don't use the property, which has side effects
             _vcpHasVirtualDrawbarButton = GetIfVCPHasVirtualdrawbarButton();
@@ -698,7 +739,10 @@ namespace ToolRackSetup
 
             InitializeToolPocketItems();
             ReadSettings();
-            InitializeUI();
+
+            lstviewTools.ItemsSource = _toolPocketItems;
+            lstviewTools.UnselectAll();
+
             Settings.PropertyChanged += SettingsPropertyChanged;
 
             _dirty = false;
@@ -981,31 +1025,6 @@ namespace ToolRackSetup
 
 
             }
-        }
-        private void InitializeUI()
-        {
-            lstviewTools.ItemsSource = _toolPocketItems;
-            lstviewTools.DataContext = _parameterSettings;
-
-            grdATCSettings.DataContext = _parameterSettings;
-            // I can't figure out how to set bindings up in the xaml yet..
-
-            // txtBxZClearance.DataContext = Settings;
-            txtBoxWaitTime.DataContext = _parameterSettings;
-            txtBoxZBump.DataContext = Settings;
-            chkbxTestingMode.DataContext = Settings;
-            txtBoxTestingFeed.DataContext = Settings;
-
-            chkbxCheckAirPressure.DataContext = _parameterSettings;
-
-            txtBxSlideDistance.DataContext = Settings;
-            txtBoxRackOffset.DataContext = Settings;
-
-            chkbxVirtualDrawbarButton.DataContext = _parameterSettings;
-            btnAddRemoveVCPButton.DataContext = _parameterSettings;
-            chkbxEnableATC.DataContext = _parameterSettings;
-
-            lstviewTools.UnselectAll();
         }
 
 
