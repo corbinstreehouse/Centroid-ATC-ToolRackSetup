@@ -7,10 +7,11 @@ Currently in beta.
 Directions: https://www.corbinstreehouse.com/blog/atc-automatic-tool-changer-for-centroid-cnc12/
 
 Goals:
-* Full ATC support for rack style tool pockets. Version #1 is for pockets; Version #2 will support “holes”; Version #3 will support sliding racks (maybe).
+* Full ATC support for rack style tool pockets
+* Easy UI to setup the tool pocket position
 * Any tool number in any pocket number
 * Automatic tool height measurement
-* Tools not in the rack: user prompts to install and remove when needed
+* Support tools not in the rack: user prompts to install and remove when needed
 * Tool Library Management
 * Save & restore the position when a tool change happens; this is necessary for Vectric’s post to work well.
 
