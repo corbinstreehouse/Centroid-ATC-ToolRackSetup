@@ -1,4 +1,5 @@
 xcopy /y /i C:\CNCM\CorbinsWorkshop\*.* CNCM\CorbinsWorkshop\
+del CNCM\CorbinsWorkshop\ToolPocketPositions*.xml
 xcopy /y c:\CNCM\mfunc6.mac CNCM\
 xcopy /y c:\CNCM\mfunc3.mac CNCM\
 xcopy /y c:\CNCM\mfunc5.mac CNCM\
