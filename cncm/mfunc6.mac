@@ -5,8 +5,6 @@
 IF #50001                        ;Prevent lookahead from parsing past here
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
-; TODO: if laser stuff is enabled...just do Avid's macro instad of mine..but that will have some bad side effects, like resetting the tool table
-
 g65 "\cncm\CorbinsWorkshop\mfunc6_corbin.mac"
 
 N1000

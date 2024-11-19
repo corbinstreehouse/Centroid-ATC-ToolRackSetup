@@ -21,8 +21,6 @@ G53 Z0 ; go to z-zero to clear everything
 ; Move to above the fork
 G65 "\cncm\CorbinsWorkshop\Generated\pocket_#108_position.cnc" A4 ; X/Y position
 
-;G4 P0.1 ; dwell needed?
-
 M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc" 
 
 M15 ; open drawbar
