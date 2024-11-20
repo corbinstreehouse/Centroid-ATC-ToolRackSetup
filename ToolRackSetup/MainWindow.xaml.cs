@@ -24,7 +24,6 @@ using System.Runtime;
 using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.State;
-using Microsoft.VisualBasic;
 // using CommunityToolkit.Mvvm; // corbin  - look into using this for po
 
 namespace ToolRackSetup
