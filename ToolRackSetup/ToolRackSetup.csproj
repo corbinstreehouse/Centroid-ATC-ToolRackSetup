@@ -10,6 +10,8 @@
     <Authors>Corbin Dunn</Authors>
     <Company>Corbin's Workshop</Company>
     <Version>0.0.4</Version>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <StartupObject>ToolRackSetup.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,9 +32,11 @@
   <ItemGroup>
     <Reference Include="CentroidAPI">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Avid CNC\AvidCNC Centroid Profile Manager\Profiles\User\Avid 4x8 Pro\cncm\CentroidAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="CentroidAPIUserControls">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Avid CNC\AvidCNC Centroid Profile Manager\Profiles\User\Avid 4x8 Pro\cncm\CentroidAPIUserControls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 
