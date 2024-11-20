@@ -273,6 +273,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -1151,15 +1167,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ATC Tools"
-        "ProductCode" = "8:{1405EB09-8B22-47A5-BBD5-6CF2C7F71C13}"
-        "PackageCode" = "8:{384412F6-555E-4074-B1D2-86937CB13D04}"
+        "ProductCode" = "8:{B882DB4E-01F0-49FE-8A77-B6C06CAE033D}"
+        "PackageCode" = "8:{BA420731-9C43-4469-8E1C-D0E547B66B05}"
         "UpgradeCode" = "8:{34E826E8-0848-405D-A734-FAC0C9187189}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:0.0.5"
         "Manufacturer" = "8:Corbin's Workshop"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

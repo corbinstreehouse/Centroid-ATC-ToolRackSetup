@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolRackSetup", "ToolRackSetup\ToolRackSetup.csproj", "{A33E46B0-B436-4846-85FC-9D8C68716839}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup1", "Setup1\Setup1.vdproj", "{AC8EF95F-2662-43EE-A760-57284D3437BB}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ATCTools_Install", "Setup1\Setup1.vdproj", "{AC8EF95F-2662-43EE-A760-57284D3437BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +19,7 @@ Global
 		{A33E46B0-B436-4846-85FC-9D8C68716839}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC8EF95F-2662-43EE-A760-57284D3437BB}.Debug|Any CPU.ActiveCfg = Debug
 		{AC8EF95F-2662-43EE-A760-57284D3437BB}.Release|Any CPU.ActiveCfg = Release
+		{AC8EF95F-2662-43EE-A760-57284D3437BB}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
