@@ -1409,6 +1409,7 @@ namespace ToolRackSetup
                 MessageBox.Show("The connection to CNC12 has been lost! Exiting now...");
                 Environment.Exit(0);
             }
+            RefreshTools();
         }
     }
 }
