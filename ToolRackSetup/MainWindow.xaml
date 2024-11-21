@@ -42,7 +42,14 @@
 
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+         
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ToolInfo.IsInSpindle}"
+                Value="True">
+                                        <Setter Property="Background"
+            Value="LightGreen" />
+                                    </DataTrigger>
+                                </Style.Triggers>
                             </Style>
                         </ListView.ItemContainerStyle>
 
@@ -52,14 +59,14 @@
                                 <GridViewColumn Header="Tool" Width="50">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxToolNumber" Background="Transparent" BorderThickness="1" Text="{Binding ToolNumber, Mode=TwoWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
+                                            <local:ClickSelectTextBox x:Name="txtBoxToolNumber"  BorderThickness="1" Text="{Binding ToolNumber, Mode=TwoWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Description" Width="200">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxDescription" Background="Transparent" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}" IsEnabled="{Binding IsToolEnabled}" MaxLength="19" MaxLines="1"/>
+                                            <local:ClickSelectTextBox x:Name="txtBoxDescription" BorderThickness="1" Text="{Binding ToolInfo.Description, Mode=TwoWay}" IsEnabled="{Binding IsToolEnabled}" MaxLength="19" MaxLines="1"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -86,7 +93,7 @@
                                 <GridViewColumn Header="X" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxX" Background="Transparent" BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right" />
+                                            <local:ClickSelectTextBox x:Name="txtBoxX"  BorderThickness="1" Text="{Binding X, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right" />
                                                 
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -94,7 +101,7 @@
                                 <GridViewColumn Header="Y" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxY" Background="Transparent" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right"/>
+                                            <local:ClickSelectTextBox x:Name="txtBoxY" BorderThickness="1" Text="{Binding Y, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -102,7 +109,7 @@
                                 <GridViewColumn Header="Z" Width="90">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <local:ClickSelectTextBox x:Name="txtBoxZ" Background="Transparent" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right"/>
+                                            <local:ClickSelectTextBox x:Name="txtBoxZ" BorderThickness="1" Text="{Binding Z, Mode=TwoWay, StringFormat={}{0:F3}}" KeyUp="txtBoxToolNumber_KeyUp" GotFocus="txtBoxToolNumber_GotFocus" HorizontalContentAlignment="Right"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

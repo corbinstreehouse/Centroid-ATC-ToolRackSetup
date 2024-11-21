@@ -233,7 +233,9 @@ namespace ToolRackSetup
             }
         }
 
-        public bool IsInSpindle { get {  return _isInSpindle; }
+        public bool IsInSpindle { get {  
+                return _isInSpindle;
+            }
             set
             {
                 if (_isInSpindle != value)
@@ -815,12 +817,13 @@ namespace ToolRackSetup
           //  _toolInfoLibrary.Clear();
             bool useExisting = _toolInfoLibrary.Count > 0;
 
-            int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.LaserToolNumber);
+            int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
 
             for (int i = 0; i < toolLibrary.Count; i++)
-            {
-               
+            {               
                 ToolInfo item = useExisting ? _toolInfoLibrary[i] : new ToolInfo(_pipe, toolLibrary[i]);
+
+
                 if (!useExisting) _toolInfoLibrary.Add(item);
               //  System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
                 if (item.Pocket > toolBinCount)
@@ -840,6 +843,7 @@ namespace ToolRackSetup
                     }
                 }
                 item.IsInSpindle = item.Number == toolInSpindle;
+
             }
 
         }
