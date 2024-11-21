@@ -24,6 +24,7 @@ using System.Runtime;
 using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.State;
+using System.Linq;
 // using CommunityToolkit.Mvvm; // corbin  - look into using this for po
 
 namespace ToolRackSetup
@@ -213,6 +214,7 @@ namespace ToolRackSetup
             _pocket = info.bin;
             _heightOffset = info.height_offset;
             _description = info.description;
+            _isInSpindle = false;
         }
         public int Number { get; }
 
@@ -224,12 +226,24 @@ namespace ToolRackSetup
             {
                 if (_pocket != value)
                 {
-                    CheckForeError(_pipe.tool.SetBinNumber(this.Number, _pocket), "Setting tool pocket");
+                    CheckForeError(_pipe.tool.SetBinNumber(this.Number, value), "Setting tool pocket");
                     _pocket = value;
                     NotifyPropertyChanged();
                 }
             }
         }
+
+        public bool IsInSpindle { get {  return _isInSpindle; }
+            set
+            {
+                if (_isInSpindle != value)
+                {
+                    _isInSpindle = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
 
         private void CheckForeError(ReturnCode code, string op)
         {
@@ -250,7 +264,7 @@ namespace ToolRackSetup
             {
                 if (_heightNumber != value)
                 {
-                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, _heightNumber), "Setting tool height number");
+                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, value), "Setting tool height number");
                     _heightNumber = value;
                     NotifyPropertyChanged();
                 }
@@ -265,7 +279,7 @@ namespace ToolRackSetup
             set
             {
                 if (_heightOffset != value) {
-                    CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, _heightOffset), "Setting tool height");
+                    CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, value), "Setting tool height");
                     _heightOffset = value;
                     NotifyPropertyChanged();
                 }
@@ -285,7 +299,7 @@ namespace ToolRackSetup
             {
                 if (value != _diameter)
                 {
-                    CheckForeError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, _diameter), "Setting tool diameter");
+                    CheckForeError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, value), "Setting tool diameter");
                     _diameter = value;
                     NotifyPropertyChanged();
                 }
@@ -300,6 +314,7 @@ namespace ToolRackSetup
         //public int spindle_speed;
 
         private string _description;
+        private bool _isInSpindle;
         private double _heightOffset;
         private double _diameter;
 
@@ -310,7 +325,7 @@ namespace ToolRackSetup
             {
                 if (_description != value)
                 {
-                    CheckForeError(_pipe.tool.SetToolDescription(this.Number, _description), "Setting tool description");
+                    CheckForeError(_pipe.tool.SetToolDescription(this.Number, value), "Setting tool description");
                     _description = value;
                     NotifyPropertyChanged();
                 }
@@ -324,7 +339,7 @@ namespace ToolRackSetup
 
         public static ToolInfo? FindToolInfoForPocket(this ObservableCollection<ToolInfo> list, int pocketIndex)
         {
-            // this is not the right way to do this; I should sort _toolLibrary once into a new variable by bin, but this should be fast enough for finding stuff.
+            // this is not the right way to do this; I should sort _toolInfoLibrary once into a new variable by bin, but this should be fast enough for finding stuff.
             foreach (ToolInfo toolInfo in list)
             {
                 if (toolInfo.Pocket == pocketIndex)
@@ -689,7 +704,7 @@ namespace ToolRackSetup
 
         private CNCPipe _pipe;
 
-        ObservableCollection<ToolInfo> _toolLibrary;
+        ObservableCollection<ToolInfo> _toolInfoLibrary;
         ObservableCollection<ToolPocketItem> _toolPocketItems;
 
         private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
@@ -749,7 +764,7 @@ namespace ToolRackSetup
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
-            _toolLibrary = new ObservableCollection<ToolInfo>();
+            _toolInfoLibrary = new ObservableCollection<ToolInfo>();
             _toolPocketItems = new ObservableCollection<ToolPocketItem>();
 
             RefreshTools();
@@ -762,18 +777,28 @@ namespace ToolRackSetup
 
             Settings.PropertyChanged += SettingsPropertyChanged;
 
-            HighlightCurrentTool();
-
             _dirty = false;
             _loading = false;
 
         }
 
 
-
+        // TODO: cache value?
         private void HighlightCurrentTool()
         {
-           
+            int highllightedRow = -1;
+            int selectedTool = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
+            if (selectedTool > 0)
+            {
+                for (int i = 0; i < _toolPocketItems.Count; i++)
+                {
+                    if (_toolPocketItems[i].ToolNumber == selectedTool)
+                    {
+                        selectedTool = i;
+                        break;
+                    }
+                }
+            }
         }
 
         private void RefreshTools()
@@ -784,12 +809,19 @@ namespace ToolRackSetup
             double toolBinCount = _parameterSettings.PocketCount;
 
             HashSet<int> usedPockets = new HashSet<int>();
-            _toolLibrary.Clear();
+
+            // Pockets are pointing to tools; it would be better to just update the existing ones if they are there..
+            // going to assume the tool count won't ever change..
+          //  _toolInfoLibrary.Clear();
+            bool useExisting = _toolInfoLibrary.Count > 0;
+
+            int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.LaserToolNumber);
 
             for (int i = 0; i < toolLibrary.Count; i++)
             {
-                ToolInfo item = new ToolInfo(_pipe, toolLibrary[i]);
-                _toolLibrary.Add(item);
+               
+                ToolInfo item = useExisting ? _toolInfoLibrary[i] : new ToolInfo(_pipe, toolLibrary[i]);
+                if (!useExisting) _toolInfoLibrary.Add(item);
               //  System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
                 if (item.Pocket > toolBinCount)
                 {
@@ -807,6 +839,7 @@ namespace ToolRackSetup
                         usedPockets.Add(item.Pocket);
                     }
                 }
+                item.IsInSpindle = item.Number == toolInSpindle;
             }
 
         }
@@ -1072,8 +1105,8 @@ namespace ToolRackSetup
             int toolBinCount = _parameterSettings.PocketCount;
             for (int i = 1; i <= toolBinCount; i++)
             {
-                ToolInfo? toolInfo = _toolLibrary.FindToolInfoForPocket(i);
-                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolLibrary);
+                ToolInfo? toolInfo = _toolInfoLibrary.FindToolInfoForPocket(i);
+                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolInfoLibrary);
                 _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
             }
@@ -1281,7 +1314,7 @@ namespace ToolRackSetup
         private void btnAddPocket_Click(object sender, RoutedEventArgs e)
         {
             _dirty = true;
-            ToolPocketItem tpi = new ToolPocketItem(_toolPocketItems.Count + 1, null, _toolLibrary);
+            ToolPocketItem tpi = new ToolPocketItem(_toolPocketItems.Count + 1, null, _toolInfoLibrary);
             if (_toolPocketItems.Count > 0)
             {
                 ToolPocketItem last = _toolPocketItems.Last()!;
