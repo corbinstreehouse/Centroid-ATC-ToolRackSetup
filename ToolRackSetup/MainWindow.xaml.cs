@@ -52,11 +52,15 @@ namespace ToolRackSetup
 
 
 
+
         // Custom parameters by Corbin
         ATCToolOptions = 776, // bitset, see ATCToolOptions enum
 
         //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
         SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
+
+        CurrentToolNumber = 976, // System, used by the PLC and I read/write it.
+
     }
 
     // Bitset values
@@ -758,9 +762,18 @@ namespace ToolRackSetup
 
             Settings.PropertyChanged += SettingsPropertyChanged;
 
+            HighlightCurrentTool();
+
             _dirty = false;
             _loading = false;
 
+        }
+
+
+
+        private void HighlightCurrentTool()
+        {
+           
         }
 
         private void RefreshTools()
@@ -1347,6 +1360,17 @@ namespace ToolRackSetup
             if (item.ToolInfo != null)
             {
                 item.ToolInfo.HeightOffset = 0;
+            }
+        }
+
+        private void mainWindow_Activated(object sender, EventArgs e)
+        {
+            // Make sure the pipe is good
+            double value = 0;
+            CNCPipe.ReturnCode rc = _pipe.parameter.GetMachineParameterValue((int)ParameterKey.CurrentToolNumber, out value);
+            if (rc == CNCPipe.ReturnCode.ERROR_PIPE_IS_BROKEN) { 
+                MessageBox.Show("The connection to CNC12 has been lost! Exiting now...");
+                Environment.Exit(0);
             }
         }
     }
