@@ -220,8 +220,8 @@ namespace ToolRackSetup
             {
                 if (_pocket != value)
                 {
-                    _pocket = value;
                     CheckForeError(_pipe.tool.SetBinNumber(this.Number, _pocket), "Setting tool pocket");
+                    _pocket = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -246,8 +246,8 @@ namespace ToolRackSetup
             {
                 if (_heightNumber != value)
                 {
-                    _heightNumber = value;
                     CheckForeError(_pipe.tool.SetToolHNumber(this.Number, _heightNumber), "Setting tool height number");
+                    _heightNumber = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -261,8 +261,8 @@ namespace ToolRackSetup
             set
             {
                 if (_heightOffset != value) {
-                    _heightOffset = value;
                     CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, _heightOffset), "Setting tool height");
+                    _heightOffset = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -271,7 +271,23 @@ namespace ToolRackSetup
 
         //public int d_number;
 
-        //public double diameter_offset;
+        public double Diameter
+        {
+            get
+            {
+                return _diameter;
+            }
+            set
+            {
+                if (value != _diameter)
+                {
+                    CheckForeError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, _diameter), "Setting tool diameter");
+                    _diameter = value;
+                    NotifyPropertyChanged();
+                }
+            }
+
+        }
 
         //public Coolant coolant;
 
@@ -281,6 +297,7 @@ namespace ToolRackSetup
 
         private string _description;
         private double _heightOffset;
+        private double _diameter;
 
         public string Description
         {
@@ -289,8 +306,8 @@ namespace ToolRackSetup
             {
                 if (_description != value)
                 {
-                    _description = value;
                     CheckForeError(_pipe.tool.SetToolDescription(this.Number, _description), "Setting tool description");
+                    _description = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -322,7 +339,7 @@ namespace ToolRackSetup
         XPlus = 1,
         YMinus = 2,
         YPlus = 3,
-        //Hole = 4, // not implemented
+        Hole = 4,
     }
 
     public class PocketStyleConverter : IValueConverter
@@ -668,7 +685,7 @@ namespace ToolRackSetup
 
         private CNCPipe _pipe;
 
-        ObservableCollection<ToolInfo> _toolInfoList;
+        ObservableCollection<ToolInfo> _toolLibrary;
         ObservableCollection<ToolPocketItem> _toolPocketItems;
 
         private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
@@ -713,10 +730,7 @@ namespace ToolRackSetup
                 }
             }
 
-
-
-
-           _pipe.message_window.AddMessage("ToolRackSetup Connected");
+           _pipe.message_window.AddMessage("ATC Tools Connected");
 
             // TODO: Check if we are metric and flip default values if we are
             bool isMetric = false;
@@ -731,7 +745,7 @@ namespace ToolRackSetup
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
-            _toolInfoList = new ObservableCollection<ToolInfo>();
+            _toolLibrary = new ObservableCollection<ToolInfo>();
             _toolPocketItems = new ObservableCollection<ToolPocketItem>();
 
             RefreshTools();
@@ -757,13 +771,13 @@ namespace ToolRackSetup
             double toolBinCount = _parameterSettings.PocketCount;
 
             HashSet<int> usedPockets = new HashSet<int>();
-            _toolInfoList.Clear();
+            _toolLibrary.Clear();
 
             for (int i = 0; i < toolLibrary.Count; i++)
             {
                 ToolInfo item = new ToolInfo(_pipe, toolLibrary[i]);
-                _toolInfoList.Add(item);
-                System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
+                _toolLibrary.Add(item);
+              //  System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
                 if (item.Pocket > toolBinCount)
                 {
                     item.Pocket = -1;
@@ -928,6 +942,10 @@ namespace ToolRackSetup
             double yMiddle = yMin + ((yMax - yMin) / 2.0);
             double xMiddle = xMin + ((xMax - xMin) / 2.0);
 
+            // TODO: verify that the user can reach this position and it isn't outside of the limits
+            // Chad was hitting a case where the slide was too large and put it outside where his machine could go. I can check for that..
+
+
             foreach (ToolPocketItem item in _toolPocketItems)
             {
                 StringBuilder stringBuilder = new StringBuilder(fileContents);
@@ -942,6 +960,8 @@ namespace ToolRackSetup
                 double xPosClear = xPos;
                 double yPosClear = yPos;
                 double slideDistance = Settings.SlideDistance;
+                double zPos = item.Z;
+                double zPosBump = item.Z + Settings.ZBump;
 
                 if (item.Style == PocketStyle.XMinus || item.Style == PocketStyle.XPlus)
                 {
@@ -987,12 +1007,12 @@ namespace ToolRackSetup
 
                 } else
                 {
-                    throw new Exception("Unhandled pocket type");
+                    // Hole style....just go straight to it! 
+                    zPosBump = item.Z; // Maybe we need it? not sure..
                 }
                 
                 
-                double zPos = item.Z;
-                double zPosBump = item.Z + Settings.ZBump;
+   
 
                 string xPosString = xPos.ToString("F4", CultureInfo.InvariantCulture);
                 stringBuilder.Replace("<XPOS>", xPosString);
@@ -1039,8 +1059,8 @@ namespace ToolRackSetup
             int toolBinCount = _parameterSettings.PocketCount;
             for (int i = 1; i <= toolBinCount; i++)
             {
-                ToolInfo? toolInfo = _toolInfoList.FindToolInfoForPocket(i);
-                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolInfoList);
+                ToolInfo? toolInfo = _toolLibrary.FindToolInfoForPocket(i);
+                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolLibrary);
                 _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
             }
@@ -1248,7 +1268,7 @@ namespace ToolRackSetup
         private void btnAddPocket_Click(object sender, RoutedEventArgs e)
         {
             _dirty = true;
-            ToolPocketItem tpi = new ToolPocketItem(_toolPocketItems.Count + 1, null, _toolInfoList);
+            ToolPocketItem tpi = new ToolPocketItem(_toolPocketItems.Count + 1, null, _toolLibrary);
             if (_toolPocketItems.Count > 0)
             {
                 ToolPocketItem last = _toolPocketItems.Last()!;
@@ -1316,7 +1336,7 @@ namespace ToolRackSetup
         private void mainWindow_Closed(object sender, EventArgs e)
         {
             // ignore errors on this call..
-            _pipe.message_window.AddMessage("ToolRackSetup Disconnected");
+            _pipe.message_window.AddMessage("ATC Tools Disconnected");
         }
 
         private void btnResetHeight_Click(object sender, RoutedEventArgs e)

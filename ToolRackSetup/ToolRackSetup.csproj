@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="hole.png" />
     <Resource Include="tool_fork_y_plus.png" />
   </ItemGroup>
 

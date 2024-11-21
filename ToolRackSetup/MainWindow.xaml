@@ -15,6 +15,7 @@
         <BitmapImage x:Key="xPlusImage" UriSource="tool_fork_x_plus.png" />
         <BitmapImage x:Key="yMinusImage" UriSource="tool_fork_y_minus.png" />
         <BitmapImage x:Key="yPlusImage" UriSource="tool_fork_y_plus.png" />
+        <BitmapImage x:Key="holeImage" UriSource="hole.png" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -140,6 +141,14 @@
                                                         <TextBlock  Padding="5,0,0,0" Text="Y Plus"></TextBlock>
                                                     </StackPanel>
                                                 </ComboBoxItem>
+
+                                                <ComboBoxItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="{StaticResource holeImage}" Height="20"></Image>
+                                                        <TextBlock  Padding="5,0,0,0" Text="Hole"></TextBlock>
+                                                    </StackPanel>
+                                                </ComboBoxItem>
+
 
                                             </ComboBox>
 
