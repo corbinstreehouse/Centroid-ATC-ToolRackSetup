@@ -63,12 +63,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3CDFB8F0F0A346A381336EC182FCF442"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3F573C0160AD4147B65D45562CA0ECA4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -94,6 +88,12 @@
         "Entry"
         {
         "MsmKey" = "8:_437FB7F3D95D4812AD197F8220FF860E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_453598AE549346419E2607BB24C58F34"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1167,15 +1167,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ATC Tools"
-        "ProductCode" = "8:{880D8A2D-4824-48B1-AB94-FDE8A301B5A8}"
-        "PackageCode" = "8:{F349C061-3F2A-4AE9-9D87-2BDD1FDB3E83}"
+        "ProductCode" = "8:{A5C14A59-03E2-4831-BA53-624D42E56FAC}"
+        "PackageCode" = "8:{FC81084F-5231-4E08-AB18-EA2E2565DD2B}"
         "UpgradeCode" = "8:{34E826E8-0848-405D-A734-FAC0C9187189}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.6"
+        "ProductVersion" = "8:0.0.7"
         "Manufacturer" = "8:Corbin's Workshop"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1630,7 +1630,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3CDFB8F0F0A346A381336EC182FCF442"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_453598AE549346419E2607BB24C58F34"
             {
             "SourcePath" = "8:..\\ToolRackSetup\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
@@ -1650,7 +1650,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
+            "OutputConfiguration" = "8:Release|Any CPU"
             "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{A33E46B0-B436-4846-85FC-9D8C68716839}"
             "ShowKeyOutput" = "11:TRUE"
