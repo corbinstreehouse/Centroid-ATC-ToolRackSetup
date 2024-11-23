@@ -32,6 +32,10 @@ namespace ToolRackSetup
 
     public class WindowTheme : ObservableObject
     {
+        public WindowTheme() { }
+        
+        Color BackgroundColor { get; set; }
+
 
     } 
 
@@ -501,8 +505,10 @@ namespace ToolRackSetup
             InitializeToolPocketItems();
             ReadSettings();
 
-            lstviewTools.ItemsSource = _toolPocketItems;
-            lstviewTools.UnselectAll();
+            lstviewPockets.ItemsSource = _toolPocketItems;
+            lstviewPockets.UnselectAll();
+
+            lstvwTools.ItemsSource = _toolController.Tools;
 
             Settings.PropertyChanged += SettingsPropertyChanged;
 
@@ -1029,7 +1035,7 @@ namespace ToolRackSetup
 
                 _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
-                lstviewTools.SelectedItem = tpi;
+                lstviewPockets.SelectedItem = tpi;
 
             }
             catch (Exception ex)
@@ -1043,7 +1049,7 @@ namespace ToolRackSetup
             double[] machine_pos = new double[4];
             _pipe.state.GetCurrentMachinePosition(out machine_pos);
 
-            foreach (ToolPocketItem tpi in lstviewTools.SelectedItems)
+            foreach (ToolPocketItem tpi in lstviewPockets.SelectedItems)
             {
                 tpi.X = machine_pos[0];
             }
@@ -1054,7 +1060,7 @@ namespace ToolRackSetup
             double[] machine_pos = new double[4];
             _pipe.state.GetCurrentMachinePosition(out machine_pos);
 
-            foreach (ToolPocketItem tpi in lstviewTools.SelectedItems)
+            foreach (ToolPocketItem tpi in lstviewPockets.SelectedItems)
             {
                 tpi.Y = machine_pos[1];
             }
@@ -1065,7 +1071,7 @@ namespace ToolRackSetup
             double[] machine_pos = new double[4];
             _pipe.state.GetCurrentMachinePosition(out machine_pos);
 
-            foreach (ToolPocketItem tpi in lstviewTools.SelectedItems)
+            foreach (ToolPocketItem tpi in lstviewPockets.SelectedItems)
             {
                 tpi.Z = machine_pos[2];
             }

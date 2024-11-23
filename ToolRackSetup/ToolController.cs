@@ -21,6 +21,10 @@ namespace ToolRackSetup {
             _heightOffset = info.height_offset;
             _description = info.description;
             _isInSpindle = false;
+            _diameter = info.diameter_offset;
+            _heightNumber = info.h_number;
+            _diameterNumber = info.d_number;
+
         }
         public int Number { get; }
 
@@ -88,7 +92,20 @@ namespace ToolRackSetup {
 
         }
 
-        //public int d_number;
+        int _diameterNumber;
+        public int DiameterNumber
+        {
+            get => _diameterNumber;
+            set
+            {
+                if (value != _diameterNumber)
+                {
+                    CheckForError(_pipe.tool.SetToolDNumber(this.Number, value), "Setting tool diameter number");
+                    SetProperty(ref _diameterNumber, value);
+
+                }
+            }
+        }
 
         public double Diameter
         {
