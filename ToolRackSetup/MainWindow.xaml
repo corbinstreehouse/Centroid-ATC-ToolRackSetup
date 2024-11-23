@@ -42,13 +42,15 @@
 
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
-         
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ToolInfo.IsInSpindle}"
                 Value="True">
                                         <Setter Property="Background"
             Value="LightGreen" />
                                     </DataTrigger>
+                                    
                                 </Style.Triggers>
                             </Style>
                         </ListView.ItemContainerStyle>
@@ -72,9 +74,9 @@
                                 </GridViewColumn>
 
                                 <GridViewColumn Header="Height" Width="95">
-                                    <GridViewColumn.CellTemplate>
+                                    <GridViewColumn.CellTemplate >
                                         <DataTemplate>
-                                            <Grid >
+                                            <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="27"/>
