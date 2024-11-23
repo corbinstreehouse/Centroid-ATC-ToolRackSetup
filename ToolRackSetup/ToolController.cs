@@ -4,10 +4,12 @@ using static CentroidAPI.CNCPipe.Parameter;
 using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.Tool;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Xml.Linq;
 
 namespace ToolRackSetup {
 
-    public class ToolInfo : MyObservableObject
+    public class ToolInfo : ObservableObject
     {
         private CNCPipe _pipe;
 
@@ -30,31 +32,21 @@ namespace ToolRackSetup {
             {
                 if (_pocket != value)
                 {
-                    CheckForeError(_pipe.tool.SetBinNumber(this.Number, value), "Setting tool pocket");
-                    _pocket = value;
-                    NotifyPropertyChanged();
+                    CheckForError(_pipe.tool.SetBinNumber(this.Number, value), "Setting tool pocket");
+                    SetProperty(ref _pocket, value);
                 }
             }
         }
 
         public bool IsInSpindle
         {
-            get
-            {
-                return _isInSpindle;
-            }
-            set
-            {
-                if (_isInSpindle != value)
-                {
-                    _isInSpindle = value;
-                    NotifyPropertyChanged();
-                }
-            }
+            get => _isInSpindle;
+            set => SetProperty(ref _isInSpindle, value);
+
         }
 
 
-        private void CheckForeError(ReturnCode code, string op)
+        private void CheckForError(ReturnCode code, string op)
         {
             if (code != ReturnCode.SUCCESS)
             {
@@ -73,9 +65,8 @@ namespace ToolRackSetup {
             {
                 if (_heightNumber != value)
                 {
-                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, value), "Setting tool height number");
-                    _heightNumber = value;
-                    NotifyPropertyChanged();
+                    CheckForError(_pipe.tool.SetToolHNumber(this.Number, value), "Setting tool height number");
+                    SetProperty(ref _heightNumber, value);
                 }
             }
         }
@@ -90,9 +81,8 @@ namespace ToolRackSetup {
             {
                 if (_heightOffset != value)
                 {
-                    CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, value), "Setting tool height");
-                    _heightOffset = value;
-                    NotifyPropertyChanged();
+                    CheckForError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, value), "Setting tool height");
+                    SetProperty(ref _heightOffset, value);
                 }
             }
 
@@ -110,9 +100,8 @@ namespace ToolRackSetup {
             {
                 if (value != _diameter)
                 {
-                    CheckForeError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, value), "Setting tool diameter");
-                    _diameter = value;
-                    NotifyPropertyChanged();
+                    CheckForError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, value), "Setting tool diameter");
+                    SetProperty(ref _diameter, value);  
                 }
             }
 
@@ -136,9 +125,8 @@ namespace ToolRackSetup {
             {
                 if (_description != value)
                 {
-                    CheckForeError(_pipe.tool.SetToolDescription(this.Number, value), "Setting tool description");
-                    _description = value;
-                    NotifyPropertyChanged();
+                    CheckForError(_pipe.tool.SetToolDescription(this.Number, value), "Setting tool description");
+                    SetProperty(ref _description, value);   
                 }
             }
         }
