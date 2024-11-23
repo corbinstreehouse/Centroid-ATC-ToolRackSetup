@@ -55,7 +55,7 @@
 IF #50001                        ;Prevent lookahead from parsing past here
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
-#140 = 3
+#140 = 3 ; //message time in seconds
 
 ; #4120 is the tool requested
 ; #4203 is the tool in the spindle -- but this variable is wonky..see 16.) What is System Variable #4203'
@@ -74,6 +74,12 @@ if #134 < 0 then #134 = 0
 #133 = #5022 ; saved y
 
 m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
+
+; OKAY, if the ATC is enabled (9776 and 1), then I'm going to disable Centroid's ATC Installed.
+; As it makes things...different, for when tool values are updated and the PLC updates.
+;  I might change my mind about this later. Param 160 really has to be 0 to allow a 0 or -1 tool or a tool not  in a bin.
+IF [#9776 and 1] G10 P6 R0 ; Param 6 = ATC Installed, set to 0
+IF [#9776 and 1] G10 P160 R0 ; Paaram 160 = Enhanced ATC, set to 0
 
 ;-----------------------------
 ; Check that the touch plate is setup
