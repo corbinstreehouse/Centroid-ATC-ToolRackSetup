@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace ToolRackSetup {
 
-    public class ToolInfo : NotifyingObject
+    public class ToolInfo : MyObservableObject
     {
         private CNCPipe _pipe;
 

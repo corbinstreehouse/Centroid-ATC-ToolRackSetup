@@ -25,10 +25,16 @@ using System.Linq.Expressions;
 using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.State;
 using System.Linq;
-// using CommunityToolkit.Mvvm; // corbin  - look into using this for po
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ToolRackSetup
 {
+
+    public class WindowTheme : ObservableObject
+    {
+
+    } 
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -121,7 +127,7 @@ namespace ToolRackSetup
     }
 
 
-    public  class NotifyingObject : INotifyPropertyChanged
+    public  class MyObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged(object? oldValue, [CallerMemberName] String propertyName = "")
@@ -135,15 +141,13 @@ namespace ToolRackSetup
     }
 
     // Settings that write parameter values
-    public class ParameterSettings : NotifyingObject
+    public class ParameterSettings : ObservableObject
     {
         CNCPipe _pipe;
         private double _spindleWaitTime = 12.0; // seconds
         private bool _shouldCheckAirPressure = true;
         private bool _enableVirtualDrawbar = false; // If true, we do more stuff
         private int _pocketCount = 0;
-       
-
         public ParameterSettings(CNCPipe pipe)
         {
             _pipe = pipe;
@@ -171,8 +175,7 @@ namespace ToolRackSetup
                 if (_promptWhenGoingToTouchPlate != value)
                 {
                     _pipe.parameter.SetValue(ParameterKey.PromptToGoToTouchPlate, value);
-                    _promptWhenGoingToTouchPlate = value;
-                    NotifyPropertyChanged();
+                    SetProperty(ref _promptWhenGoingToTouchPlate, value);
                 }
             }
         }
@@ -185,8 +188,7 @@ namespace ToolRackSetup
                 if (_spindleWaitTime != value)
                 {
                     _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, _spindleWaitTime);
-                    _spindleWaitTime = value;
-                    NotifyPropertyChanged();
+                    SetProperty(ref _spindleWaitTime, value);
                 }
             }
         }
@@ -199,11 +201,8 @@ namespace ToolRackSetup
             {
                 if (_shouldCheckAirPressure != value)
                 {
-                    _shouldCheckAirPressure = value;
-
                     _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, _shouldCheckAirPressure);
-                    NotifyPropertyChanged();
-
+                    SetProperty(ref _shouldCheckAirPressure, value);
                 }
 
             }
@@ -218,7 +217,6 @@ namespace ToolRackSetup
             {
                 if (_enableATC != value)
                 {
-                    _enableATC = value;
 
                     _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, _enableATC);
 
@@ -226,7 +224,7 @@ namespace ToolRackSetup
                     _pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0); // needs to be zero!
                     _pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0); // needs to be zero!
 
-                    NotifyPropertyChanged();
+                    SetProperty(ref _enableATC, value);
                 }
 
             }
@@ -240,8 +238,7 @@ namespace ToolRackSetup
                 if (_enableVirtualDrawbar != value)
                 {
                     _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, value); // throws on error
-                    _enableVirtualDrawbar = value;
-                    NotifyPropertyChanged();
+                    SetProperty(ref _enableVirtualDrawbar, value);
                 }
             }
         }
@@ -254,8 +251,7 @@ namespace ToolRackSetup
                 if (_pocketCount != value)
                 {
                     _pipe.parameter.SetValue(ParameterKey.MaxToolBins, value); // throws on error
-                    _pocketCount = value;
-                    NotifyPropertyChanged();
+                    SetProperty(ref _pocketCount, value);
                 }
             }
         }
@@ -263,7 +259,7 @@ namespace ToolRackSetup
     }
 
     // TODO: Seperate to ParameterSettings and PocketSettings
-    public class ToolChangeSettings : NotifyingObject
+    public class ToolChangeSettings : MyObservableObject
     {
 
         private bool _enableTestingMode = true;
@@ -313,7 +309,7 @@ namespace ToolRackSetup
     }
 
     // I suppose this is the model object
-    public class ToolPocketItem : NotifyingObject
+    public class ToolPocketItem : MyObservableObject
     {
         private double x;
         private double y;
@@ -512,6 +508,8 @@ namespace ToolRackSetup
 
             _dirty = false;
             _loading = false;
+
+
 
         }
 
