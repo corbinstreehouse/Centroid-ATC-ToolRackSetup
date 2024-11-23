@@ -6,6 +6,44 @@ using System;
 
 namespace ToolRackSetup
 {
+    public enum ParameterKey
+    {
+        // System parameters
+        CentroidHasATC = 6, // Currentlly needs to be 0
+        CentroidHasEnhancedATC = 160, // Currently needs to be 0, can have variuous bits set which cause the PLC to be used for the tool number
+        MaxToolBins = 161, // Read/written
+
+        // Custom parameters by Avid (see resetparams.mac)
+        SpoilboardCalibrated = 701,
+        TouchOffPlateSet = 702,
+        ShouldCheckAir = 724, // Avid setting that I read and write
+        TouchOffPlateX = 708,
+        TouchOffPlateY = 709,
+        LaserToolNumber = 718,
+
+        PromptToGoToTouchPlate = 769,
+
+
+
+
+        // Custom parameters by Corbin
+        ATCToolOptions = 776, // bitset, see ATCToolOptions enum
+
+        //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
+        SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
+
+        CurrentToolNumber = 976, // System, used by the PLC and I read/write it.
+
+    }
+
+    // Bitset values
+    public enum ATCToolOptions
+    {
+        EnableATC = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
+        TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job
+        EnableVirtualDrawbar = 4, // Enable vitual drawbar button
+    }
+
 
     public static class CNCPipeExtensions
     {

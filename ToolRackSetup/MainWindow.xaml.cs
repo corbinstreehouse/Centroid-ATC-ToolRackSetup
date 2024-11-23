@@ -34,43 +34,6 @@ namespace ToolRackSetup
     /// </summary>
     /// 
 
-    public enum ParameterKey
-    {
-        // System parameters
-        CentroidHasATC = 6, // Currentlly needs to be 0
-        CentroidHasEnhancedATC = 160, // Currently needs to be 0, can have variuous bits set which cause the PLC to be used for the tool number
-        MaxToolBins = 161, // Read/written
-
-        // Custom parameters by Avid (see resetparams.mac)
-        SpoilboardCalibrated = 701,
-        TouchOffPlateSet = 702,
-        ShouldCheckAir = 724, // Avid setting that I read and write
-        TouchOffPlateX = 708,
-        TouchOffPlateY = 709,
-        LaserToolNumber = 718,
-
-        PromptToGoToTouchPlate = 769,
-
-
-
-
-        // Custom parameters by Corbin
-        ATCToolOptions = 776, // bitset, see ATCToolOptions enum
-
-        //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
-        SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
-
-        CurrentToolNumber = 976, // System, used by the PLC and I read/write it.
-
-    }
-
-    // Bitset values
-    public enum ATCToolOptions
-    {
-        EnableATC = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
-        TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job
-        EnableVirtualDrawbar = 4, // Enable vitual drawbar button
-    }
 
     public class ClickSelectTextBox : TextBox
     {
@@ -121,156 +84,6 @@ namespace ToolRackSetup
         }
     }
 
-    public class ToolInfo : NotifyingObject
-    {
-        private CNCPipe _pipe;
-
-        public ToolInfo(CNCPipe pipe, Info info)
-        {
-            _pipe = pipe;
-            this.Number = info.number;
-            _pocket = info.bin;
-            _heightOffset = info.height_offset;
-            _description = info.description;
-            _isInSpindle = false;
-        }
-        public int Number { get; }
-
-        private int _pocket = -1;
-        public int Pocket
-        {
-            get { return _pocket; }
-            set
-            {
-                if (_pocket != value)
-                {
-                    CheckForeError(_pipe.tool.SetBinNumber(this.Number, value), "Setting tool pocket");
-                    _pocket = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsInSpindle { get {  
-                return _isInSpindle;
-            }
-            set
-            {
-                if (_isInSpindle != value)
-                {
-                    _isInSpindle = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-
-        private void CheckForeError(ReturnCode code, string op)
-        {
-            if ( code != ReturnCode.SUCCESS)
-            {
-
-                string reason = code.ToString();
-                string eMsg = String.Format("Error: {0}.\nEnsure you are not running a job!\nError: {2}", op, reason);
-                throw new Exception(eMsg);              
-            }
-        }
-
-        int _heightNumber;
-        public int HeightNumber
-        {
-            get { return _heightNumber;  }
-            set
-            {
-                if (_heightNumber != value)
-                {
-                    CheckForeError(_pipe.tool.SetToolHNumber(this.Number, value), "Setting tool height number");
-                    _heightNumber = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public double HeightOffset { 
-            get
-            {
-                return _heightOffset;
-            }
-            set
-            {
-                if (_heightOffset != value) {
-                    CheckForeError(_pipe.tool.SetToolHeightOffsetAmout(this.Number, value), "Setting tool height");
-                    _heightOffset = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        
-        }
-
-        //public int d_number;
-
-        public double Diameter
-        {
-            get
-            {
-                return _diameter;
-            }
-            set
-            {
-                if (value != _diameter)
-                {
-                    CheckForeError(_pipe.tool.SetToolDiameterOffsetAmout(this.Number, value), "Setting tool diameter");
-                    _diameter = value;
-                    NotifyPropertyChanged();
-                }
-            }
-
-        }
-
-        //public Coolant coolant;
-
-        //public SpindleDirection spindle_direction;
-
-        //public int spindle_speed;
-
-        private string _description;
-        private bool _isInSpindle;
-        private double _heightOffset;
-        private double _diameter;
-
-        public string Description
-        {
-            get { return _description; }
-            set
-            {
-                if (_description != value)
-                {
-                    CheckForeError(_pipe.tool.SetToolDescription(this.Number, value), "Setting tool description");
-                    _description = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-    }
-
-    public static class Extensions
-    {
-
-        public static ToolInfo? FindToolInfoForPocket(this ObservableCollection<ToolInfo> list, int pocketIndex)
-        {
-            // this is not the right way to do this; I should sort _toolInfoLibrary once into a new variable by bin, but this should be fast enough for finding stuff.
-            foreach (ToolInfo toolInfo in list)
-            {
-                if (toolInfo.Pocket == pocketIndex)
-                {
-                    return toolInfo;
-                }
-
-            }
-            return null;
-        }
-    }
 
     public enum PocketStyle
     {
@@ -426,8 +239,8 @@ namespace ToolRackSetup
             {
                 if (_enableVirtualDrawbar != value)
                 {
+                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, value); // throws on error
                     _enableVirtualDrawbar = value;
-                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableVirtualDrawbar, _enableVirtualDrawbar);
                     NotifyPropertyChanged();
                 }
             }
@@ -440,8 +253,8 @@ namespace ToolRackSetup
             {
                 if (_pocketCount != value)
                 {
+                    _pipe.parameter.SetValue(ParameterKey.MaxToolBins, value); // throws on error
                     _pocketCount = value;
-                    _pipe.parameter.SetValue(ParameterKey.MaxToolBins, _pocketCount);
                     NotifyPropertyChanged();
                 }
             }
@@ -552,13 +365,13 @@ namespace ToolRackSetup
             get { return _toolInfo != null;  }
         }
 
-        private ObservableCollection<ToolInfo> _allTools;
+        private ToolController _toolController;
 
-        public ToolPocketItem(int pocket, ToolInfo? toolInfo, ObservableCollection<ToolInfo> allTools)
+        public ToolPocketItem(int pocket, ToolInfo? toolInfo, ToolController toolController)
         {
             Pocket = pocket;
             ToolInfo = toolInfo;
-            _allTools = allTools;
+            _toolController = toolController;
         }
 
         public int ToolNumber
@@ -582,7 +395,7 @@ namespace ToolRackSetup
                     if (value > 0)
                     {
                         // If we have a valid new tool index (should check max 200 too)
-                        ToolInfo tInfo = _allTools[value - 1];
+                        ToolInfo tInfo = _toolController.Tools[value - 1];
                         // If it is already in a pocket, just move it here
                         if (tInfo.Pocket > 0)
                         {
@@ -599,7 +412,7 @@ namespace ToolRackSetup
                     if (value > 0)
                     {
                         // If we have a valid new tool index (should check max 200 too)
-                        ToolInfo = _allTools[value - 1];
+                        ToolInfo = _toolController.Tools[value - 1];
                         ToolInfo.Pocket = Pocket;
                     }
                     NotifyPropertyChanged(oldToolNumber);
@@ -624,7 +437,7 @@ namespace ToolRackSetup
 
         private CNCPipe _pipe;
 
-        ObservableCollection<ToolInfo> _toolInfoLibrary;
+        ToolController _toolController;
         ObservableCollection<ToolPocketItem> _toolPocketItems;
 
         private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
@@ -684,7 +497,7 @@ namespace ToolRackSetup
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
-            _toolInfoLibrary = new ObservableCollection<ToolInfo>();
+            _toolController = new ToolController(_pipe);
             _toolPocketItems = new ObservableCollection<ToolPocketItem>();
 
             RefreshTools();
@@ -723,47 +536,7 @@ namespace ToolRackSetup
 
         private void RefreshTools()
         {
-
-            List<Info> toolLibrary;
-            _pipe.tool.GetToolLibrary(out toolLibrary);
-            double toolBinCount = _parameterSettings.PocketCount;
-
-            HashSet<int> usedPockets = new HashSet<int>();
-
-            // Pockets are pointing to tools; it would be better to just update the existing ones if they are there..
-            // going to assume the tool count won't ever change..
-          //  _toolInfoLibrary.Clear();
-            bool useExisting = _toolInfoLibrary.Count > 0;
-
-            int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
-
-            for (int i = 0; i < toolLibrary.Count; i++)
-            {               
-                ToolInfo item = useExisting ? _toolInfoLibrary[i] : new ToolInfo(_pipe, toolLibrary[i]);
-
-
-                if (!useExisting) _toolInfoLibrary.Add(item);
-              //  System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
-                if (item.Pocket > toolBinCount)
-                {
-                    item.Pocket = -1;
-                }
-                else if (item.Pocket > 0)
-                {
-                    if (usedPockets.Contains(item.Pocket))
-                    {
-                        // Can't have two tools in one pocket!
-                        item.Pocket = -1;
-                    }
-                    else
-                    {
-                        usedPockets.Add(item.Pocket);
-                    }
-                }
-                item.IsInSpindle = item.Number == toolInSpindle;
-
-            }
-
+            _toolController.RefreshTools();
         }
 
         private void ReadSettings()
@@ -1027,8 +800,8 @@ namespace ToolRackSetup
             int toolBinCount = _parameterSettings.PocketCount;
             for (int i = 1; i <= toolBinCount; i++)
             {
-                ToolInfo? toolInfo = _toolInfoLibrary.FindToolInfoForPocket(i);
-                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolInfoLibrary);
+                ToolInfo? toolInfo = _toolController.FindToolInfoForPocket(i);
+                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolController);
                 _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
             }
@@ -1206,13 +979,15 @@ namespace ToolRackSetup
         {
             if (_toolPocketItems.Count > 0)
             {
+                // Attempt the API call first; if it fails an exception will be thrown and our UI won't update and have a bad state
+                int lastIndex = _toolPocketItems.Count - 1;
+                _parameterSettings.PocketCount = lastIndex;
+
                 ToolPocketItem? item = _toolPocketItems.Last();
                 item.ToolNumber = 0; /// make sure it doesn't have a tool..
-                _toolPocketItems.RemoveAt(_toolPocketItems.Count - 1);
+                _toolPocketItems.RemoveAt(lastIndex);
+                _dirty = true;
             }
-            _parameterSettings.PocketCount = _toolPocketItems.Count;
-
-            _dirty = true;
         }
 
         private void window_Closing(object sender, CancelEventArgs e)
@@ -1235,26 +1010,29 @@ namespace ToolRackSetup
 
         private void btnAddPocket_Click(object sender, RoutedEventArgs e)
         {
-            _dirty = true;
-            ToolPocketItem tpi = new ToolPocketItem(_toolPocketItems.Count + 1, null, _toolInfoLibrary);
-            if (_toolPocketItems.Count > 0)
-            {
-                ToolPocketItem last = _toolPocketItems.Last()!;
-
-                tpi.X = last.X;
-                tpi.Y = last.Y;
-                tpi.Z = last.Z;
-                tpi.Style = last.Style;
-            }
-
-            _toolPocketItems.Add(tpi);
-            tpi.PropertyChanged += Tpi_PropertyChanged;
-            lstviewTools.SelectedItem = tpi;
-
             // Update the parameter right away
             try
             {
-                _parameterSettings.PocketCount = _toolPocketItems.Count;
+                // Make sure we aren't running first!! otherwise we get to a strange state. Attempting to set the pocket count will do it.
+                int newCount = _toolPocketItems.Count + 1;
+                _parameterSettings.PocketCount = newCount;
+
+                _dirty = true;
+                ToolPocketItem tpi = new ToolPocketItem(newCount, null, _toolController);
+                if (_toolPocketItems.Count > 0)
+                {
+                    ToolPocketItem last = _toolPocketItems.Last()!;
+
+                    tpi.X = last.X;
+                    tpi.Y = last.Y;
+                    tpi.Z = last.Z;
+                    tpi.Style = last.Style;
+                }
+
+                _toolPocketItems.Add(tpi);
+                tpi.PropertyChanged += Tpi_PropertyChanged;
+                lstviewTools.SelectedItem = tpi;
+
             }
             catch (Exception ex)
             {
