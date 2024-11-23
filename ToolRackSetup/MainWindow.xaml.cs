@@ -191,7 +191,7 @@ namespace ToolRackSetup
             {
                 if (_spindleWaitTime != value)
                 {
-                    _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, _spindleWaitTime);
+                    _pipe.parameter.SetValue(ParameterKey.SpindleWaitTime, value);
                     SetProperty(ref _spindleWaitTime, value);
                 }
             }
@@ -224,9 +224,12 @@ namespace ToolRackSetup
 
                     _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, _enableATC);
 
-                    // We have other bits that *must* be zero for now
-                    _pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0); // needs to be zero!
-                    _pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0); // needs to be zero!
+                    // We have other bits that *must* be zero for now.
+                    // I'm now settings these in mfunc6_corbin.mac instead
+                    // of doing it here, as one person had ran the wizard and it
+                    // re-wrote these values and caused problems.
+                    //_pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0); // needs to be zero!
+                    //_pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0); // needs to be zero!
 
                     SetProperty(ref _enableATC, value);
                 }
@@ -946,7 +949,7 @@ namespace ToolRackSetup
 
         }
 
-        private void txtBoxToolNumber_KeyUp(object sender, KeyEventArgs e)
+        private void txtBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key != System.Windows.Input.Key.Enter) return;
           
@@ -1089,15 +1092,33 @@ namespace ToolRackSetup
             _pipe.message_window.AddMessage("ATC Tools Disconnected");
         }
 
+        private ToolInfo? ToolInfoFromSender(object sender)
+        {
+            Button? b = sender as Button;
+            ToolInfo? toolInfo = null;
+            if (b?.DataContext is ToolPocketItem)
+            {
+                ToolPocketItem item = (ToolPocketItem)b.DataContext;
+                toolInfo = item.ToolInfo;
+            }
+            else if (b?.DataContext is ToolInfo)
+            {
+                toolInfo = (ToolInfo)b.DataContext;
+            }
+            return toolInfo;
+        }
+
         private void btnResetHeight_Click(object sender, RoutedEventArgs e)
         {
-            Button b = sender as Button;
-            ToolPocketItem item = b.DataContext as ToolPocketItem;
+      
+            ToolInfo? toolInfo = ToolInfoFromSender(sender);
+            if (toolInfo != null) toolInfo.HeightOffset = 0;
+        }
 
-            if (item.ToolInfo != null)
-            {
-                item.ToolInfo.HeightOffset = 0;
-            }
+        private void BtnResetDiameter_click(object sender, RoutedEventArgs e)
+        {
+            ToolInfo? toolInfo = ToolInfoFromSender(sender);
+            if (toolInfo != null) toolInfo.Diameter = 0;
         }
 
         private void mainWindow_Activated(object sender, EventArgs e)
