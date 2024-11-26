@@ -111,7 +111,7 @@ namespace ToolRackSetup
             if (rc != CNCPipe.ReturnCode.SUCCESS)
             {
                 string reason = rc.ToString();
-                string eMsg = String.Format("Failed to get machine parameter {0}.\nEnsure that CNC12 is running!\nError: {2}", parameterNum, reason);
+                string eMsg = String.Format("Failed to get machine parameter {0}.\nEnsure that CNC12 is running!\nError: {1}", parameterNum, reason);
                 throw new Exception(eMsg);
             }
             return value;
