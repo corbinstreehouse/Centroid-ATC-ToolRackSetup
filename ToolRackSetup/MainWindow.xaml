@@ -20,7 +20,9 @@
         <SolidColorBrush  Color="#d1d1d1" x:Key="infoTextColor" />
         <SolidColorBrush  Color="#6c6c6c" x:Key="backgroundColor" />
         <SolidColorBrush  Color="#494949" x:Key="editBackgroundColor" />
-        <SolidColorBrush  Color="#FF00004E" x:Key="selectedRowBackgroundColor" />
+        <SolidColorBrush  Color="#FF005ABE" x:Key="selectedRowBackgroundColor" />
+        <SolidColorBrush  Color="#7f7f7f" x:Key="menuUneditableColor" />
+        
 
         <System:Double x:Key="FontSize-Normal">18</System:Double>
 
@@ -29,13 +31,22 @@
         </Style>
 
         <Style TargetType="Control" x:Key="BaseColors">
-            <Setter Property="Background" Value="{DynamicResource backgroundColor}" />
             <Setter Property="Foreground" Value="{DynamicResource infoTextColor}" />
             <Setter Property='FontSize' Value="{DynamicResource FontSize-Normal}"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground"
+              Value="{DynamicResource menuUneditableColor}" />
+                </Trigger>
+            </Style.Triggers>
+
         </Style>
 
         <Style TargetType="{x:Type local:ClickSelectTextBox}" BasedOn="{StaticResource BaseColors}" >
             <Setter Property="Background" Value="{DynamicResource editBackgroundColor}" />
+            <Setter Property="Height" Value="26"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+
         </Style>
 
         <Style TargetType="TextBox" BasedOn="{StaticResource BaseColors}">
@@ -43,18 +54,34 @@
         <Style TargetType="Label">
             <Setter Property="Foreground" Value="{DynamicResource infoTextColor}" />
             <Setter Property='FontSize' Value="{DynamicResource FontSize-Normal}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
 
+
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground"
+                 Value="{DynamicResource menuUneditableColor}" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource infoTextColor}" />
             <Setter Property='FontSize' Value="{DynamicResource FontSize-Normal}"/>
 
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground"
+              Value="{DynamicResource menuUneditableColor}" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="ComboBoxItem">
 
         </Style>
         <Style TargetType="CheckBox" BasedOn="{StaticResource BaseColors}">
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Height" Value="30"></Setter>
 
 
         </Style>
@@ -69,10 +96,21 @@
 
         <Style x:Key="MyListViewStyle" TargetType="{x:Type ListViewItem}">
 
-             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-             <Setter Property="Margin" Value="0,-1,0,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0,-1,0,0"/>
 
-     
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border
+                         BorderBrush="Transparent"
+                         BorderThickness="1"
+                         Background="{TemplateBinding Background}">
+                            <GridViewRowPresenter HorizontalAlignment="Stretch" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Width="Auto" Margin="0" Content="{TemplateBinding Content}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
 
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
@@ -80,16 +118,15 @@
                       Value="{DynamicResource selectedRowBackgroundColor}" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="BorderBrush" Value="Black" />
+                    <Setter Property="BorderBrush" Value="Black" />
                 </Trigger>
-                  
-                  
-                  
+
+
+
                 <DataTrigger Binding="{Binding IsInSpindle}"
                      Value="True">
                     <Setter Property="Background"
-                         Value="LightGreen" />
+                         Value="DarkGreen" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -99,13 +136,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.ColumnSpan="2" SelectedIndex="0">
+        <TabControl Grid.ColumnSpan="2" SelectedIndex="1">
             <TabItem Header="Tool Table" >
                 <Grid>
                     <ListView x:Name="lstvwTools" Margin="1,2,0,1" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}"
                               ItemContainerStyle="{StaticResource MyListViewStyle}">
 
-                     
+
 
 
                         <ListView.View>
@@ -121,7 +158,7 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Height" Width="95">
+                                <GridViewColumn Header="Height" Width="100">
                                     <GridViewColumn.CellTemplate >
                                         <DataTemplate>
                                             <Grid>
@@ -171,9 +208,7 @@
 
             <TabItem Header="ATC Setup" >
 
-
-
-                <Grid Margin="0,0,14,3" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}">
+                <Grid Margin="0,0,0,3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
@@ -182,7 +217,7 @@
                               
                               ItemContainerStyle="{StaticResource MyListViewStyle}">
 
-              
+
 
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
@@ -202,7 +237,7 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Height" Width="95">
+                                <GridViewColumn Header="Height" Width="100">
                                     <GridViewColumn.CellTemplate >
                                         <DataTemplate>
                                             <Grid>
@@ -302,47 +337,47 @@
 
 
                     </ListView>
-                    <Grid x:Name="grdATCSettings" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="836" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="158" VerticalAlignment="Bottom">
+                    <Grid x:Name="grdATCSettings" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="876" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="158" VerticalAlignment="Bottom">
 
-                        <Grid HorizontalAlignment="Left" Height="112" Margin="0,0,0,12" VerticalAlignment="Bottom" Width="290">
-                            <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-                            <local:ClickSelectTextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding Settings.ZBump, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
-                            <local:ClickSelectTextBox
+                        <Grid HorizontalAlignment="Left" Height="117" Margin="0,0,0,8" VerticalAlignment="Bottom" Width="329">
+                            <Label x:Name="lblZBump" Content="Z Bump:" Margin="8,0,0,26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Width="158"/>
+                            <local:ClickSelectTextBox x:Name="txtBoxZBump" Margin="175,0,31,30" TextWrapping="Wrap" Text="{Binding Settings.ZBump, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" VerticalAlignment="Bottom"/>
+                            <local:ClickSelectTextBox VerticalAlignment="Bottom" Text="{Binding _parameterSettings.SpindleWaitTime, ElementName=mainWindow,  StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" TextWrapping="Wrap" x:Name="txtBoxWaitTime" Margin="175,0,31,60" />
 
-                        Width="120" VerticalAlignment="Bottom" Text="{Binding _parameterSettings.SpindleWaitTime, ElementName=mainWindow,  StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" TextWrapping="Wrap" x:Name="txtBoxWaitTime" Margin="170,0,0,61" Height="18" HorizontalAlignment="Left" />
+                            <Label x:Name="lblWaitTime" Content="Spindle Stop Wait:" Margin="1,24,0,57" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Width="165"/>
 
-                            <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
+                            <Label Content="Slide Distance:" Margin="8,-6,0,91" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
 
-                            <Label Content="Slide Distance:" Margin="12,0,0,85" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
-                            <local:ClickSelectTextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding Settings.SlideDistance, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="22" VerticalAlignment="Bottom"  />
+                            <local:ClickSelectTextBox x:Name="txtBxSlideDistance" Margin="175,0,30,91" TextWrapping="Wrap" Text="{Binding Settings.SlideDistance, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  />
 
-                            <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
-                            <local:ClickSelectTextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Settings.RackOffset, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
+                            <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="8,0,0,-4"  VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Width="158"/>
+
+                            <local:ClickSelectTextBox x:Name="txtBoxRackOffset" TextWrapping="Wrap" Text="{Binding Settings.RackOffset, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  VerticalAlignment="Bottom" Margin="175,0,31,0"/>
 
                         </Grid>
 
-                        <Button x:Name="btnWriteChanges" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,0,123" Width="118" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
-                        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="0,0,0,132" Width="150" Height="20" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
-                        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="172,0,0,131" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="20" VerticalAlignment="Bottom"/>
-                        <Grid HorizontalAlignment="Left" Width="334" Margin="351,0,0,124" Height="34" VerticalAlignment="Bottom">
-                            <Label Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top" Height="26" Width="167"/>
-                            <Button x:Name="btnAssignMachineCoordX" Content="X" HorizontalAlignment="Left" Margin="169,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordX_Click"/>
-                            <Button x:Name="btnAssignMachineCoordY" Content="Y" HorizontalAlignment="Left" Margin="219,6,0,0" VerticalAlignment="Top" Height="20" Width="34" Click="btnAssignMachineCoordY_Click"/>
-                            <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="267,6,0,0" VerticalAlignment="Top" Height="20" Width="35" Click="btnAssignMachineCoordZ_Click"/>
+                        <Button x:Name="btnWriteChanges" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,13,93" Width="118" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
+                        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="0,0,0,132" Width="150" Height="25" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
+                        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="172,0,0,131" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="28" VerticalAlignment="Bottom"/>
+                        <Grid HorizontalAlignment="Left" Width="432" Margin="351,0,0,110" Height="48" VerticalAlignment="Bottom">
+                            <Label Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="-1,-5,0,0" VerticalAlignment="Top" Width="262" HorizontalContentAlignment="Right"/>
+                            <Button x:Name="btnAssignMachineCoordX" Content="X" HorizontalAlignment="Left" Margin="270,2,0,0" VerticalAlignment="Top" Height="24" Width="38" Click="btnAssignMachineCoordX_Click"/>
+                            <Button x:Name="btnAssignMachineCoordY" Content="Y" HorizontalAlignment="Left" Margin="321,2,0,0" VerticalAlignment="Top" Height="24" Width="38" Click="btnAssignMachineCoordY_Click"/>
+                            <Button x:Name="btnAssignMachineCoordZ" Content="Z" HorizontalAlignment="Left" Margin="372,2,0,0" VerticalAlignment="Top" Height="24" Width="38 " Click="btnAssignMachineCoordZ_Click"/>
                         </Grid>
-                        <Grid HorizontalAlignment="Left" Height="121" Margin="353,0,0,0" VerticalAlignment="Bottom" Width="292">
-                            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" IsChecked="{Binding Settings.EnableTestingMode, ElementName=mainWindow, ValidatesOnExceptions=True}" Height="15" Width="123" />
-                            <local:ClickSelectTextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="128,0,0,0" TextWrapping="Wrap" Text="{Binding Settings.TestingFeed, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding Settings.EnableTestingMode, ElementName=mainWindow}" Width="60" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Top"/>
-                            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.ShouldCheckAirPressure, ElementName=mainWindow, ValidatesOnExceptions=True}" Height="14" Width="182" Margin="0,22,0,0" />
-                            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow, ValidatesOnExceptions=True}" Height="14" Width="194" Margin="0,42,0,0" />
-                            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="21,62,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow}"/>
-                            <CheckBox x:Name="chkbxPromptForTouchPlate" Content="Prompt When Going to Touch Plate" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.PromptWhenGoingToTouchPlate, ElementName=mainWindow, Mode=TwoWay, ValidatesOnExceptions=True}" Height="14" Width="220" Margin="0,87,0,0" />
+                        <Grid HorizontalAlignment="Left" Height="122" Margin="353,0,0,1" VerticalAlignment="Bottom" Width="385">
+                            <CheckBox x:Name="chkbxTestingMode" Content="Testing Mode Feed:" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding Settings.EnableTestingMode, ElementName=mainWindow, ValidatesOnExceptions=True}"  Width="180" Margin="0,-6,0,0" />
+                            <local:ClickSelectTextBox x:Name="txtBoxTestingFeed" HorizontalAlignment="Left" Margin="183,-2,0,0" TextWrapping="Wrap" Text="{Binding Settings.TestingFeed, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}"  IsEnabled="{Binding Settings.EnableTestingMode, ElementName=mainWindow}" Width="60"  VerticalAlignment="Top"/>
+                            <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.ShouldCheckAirPressure, ElementName=mainWindow, ValidatesOnExceptions=True}"  Width="182" Margin="0,21,0,0" />
+                            <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow, ValidatesOnExceptions=True}" Width="295" Margin="0,49,0,0" />
+                            <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="129,76,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow}"/>
+                            <CheckBox x:Name="chkbxPromptForTouchPlate" Content="Prompt When Going to Touch Plate" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.PromptWhenGoingToTouchPlate, ElementName=mainWindow, Mode=TwoWay, ValidatesOnExceptions=True}"  Width="325" Margin="0,92,0,0" />
 
                         </Grid>
 
 
                     </Grid>
-                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="334" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="20" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,161" Width="334" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="25" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="chkbxLockToolPocketSettings" Content="Lock Tool Pocket Settings" HorizontalAlignment="Left" Margin="279,0,0,162" Width="225" Height="15" VerticalAlignment="Bottom" IsChecked="{Binding LockToolPocketSettings, Mode=TwoWay, Source={x:Static properties:Settings.Default}, UpdateSourceTrigger=Default, ValidatesOnNotifyDataErrors=True}" Visibility="Hidden"/>
 
 
