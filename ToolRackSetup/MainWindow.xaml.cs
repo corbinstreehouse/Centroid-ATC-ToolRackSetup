@@ -27,25 +27,46 @@ using static CentroidAPI.CNCPipe.State;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Controls.Primitives;
+using System.Runtime.Serialization;
 
 namespace ToolRackSetup
 {
 
-    public class WindowTheme : ObservableObject
+    /// <summary>
+    /// This converter targets a column header,
+    /// in order to take its width to zero when
+    /// it should be hidden
+    /// </summary>
+    public class ColumnWidthConverter
+        : IValueConverter
     {
-        public WindowTheme() { }
-        
-        Color BackgroundColor { get; set; }
+        public object Convert(
+            object value,
+            Type targetType,
+            object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            var isVisible = (bool)value;
+            var width = double.Parse(parameter as string);
+            return isVisible ? width : 0.0;
+        }
 
 
-    } 
+        public object ConvertBack(
+            object value,
+            Type targetType,
+            object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
 
+    }
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
-
-
     public class ClickSelectTextBox : TextBox
     {
         public ClickSelectTextBox()
@@ -265,7 +286,6 @@ namespace ToolRackSetup
 
     }
 
-    // TODO: Seperate to ParameterSettings and PocketSettings
     public class ToolChangeSettings : MyObservableObject
     {
 
@@ -1065,6 +1085,21 @@ namespace ToolRackSetup
             }
         }
 
+        private void RunGCode(string code)
+        {
+            CNCPipe.Job job = new CNCPipe.Job(_pipe);
+            job.RunCommand(code, "c:\\cncm", false);
+        }
+
+        private void BtnFetchClick(object sender, RoutedEventArgs e)
+        {
+            ToolInfo? toolInfo = ToolInfoFromSender(sender);
+            if (toolInfo != null)
+            {
+                RunGCode(String.Format("T{0} M6\nG43 H{0}", toolInfo.Number));
+            }
+        }
+
         private void window_Closing(object sender, CancelEventArgs e)
         {
             if (_dirty)
@@ -1153,6 +1188,8 @@ namespace ToolRackSetup
             VCPHasVirtualDrawbarButton = !VCPHasVirtualDrawbarButton;
 
         }
+
+
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {

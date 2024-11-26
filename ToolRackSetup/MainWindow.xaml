@@ -211,6 +211,15 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
+                                <GridViewColumn Header="Fetch" Width="95" >
+                                    <GridViewColumn.CellTemplate >
+                                        <DataTemplate>
+                                            <Button Content="Fetch"   Click="BtnFetchClick" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+
                             </GridView>
                         </ListView.View>
 
