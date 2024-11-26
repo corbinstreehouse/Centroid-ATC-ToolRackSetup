@@ -104,7 +104,7 @@
                     <ControlTemplate TargetType="{x:Type ListViewItem}">
                         <Border
                          BorderBrush="Transparent"
-                         BorderThickness="1"
+                         BorderThickness="2"
                          Background="{TemplateBinding Background}">
                             <GridViewRowPresenter HorizontalAlignment="Stretch" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Width="Auto" Margin="0" Content="{TemplateBinding Content}"/>
                         </Border>
@@ -121,15 +121,29 @@
                     <Setter Property="BorderBrush" Value="Black" />
                 </Trigger>
 
+            </Style.Triggers>
+        </Style>
 
-
-                <DataTrigger Binding="{Binding IsInSpindle}"
+        <Style x:Key="PocketListViewStyle"  TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MyListViewStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ToolInfo.IsInSpindle}"
                      Value="True">
                     <Setter Property="Background"
                          Value="DarkGreen" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="ToolTableListViewStyle"  TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MyListViewStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsInSpindle}"
+                    Value="True">
+                    <Setter Property="Background"
+                        Value="DarkGreen" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
 
     </Window.Resources>
     <Grid>
@@ -140,7 +154,7 @@
             <TabItem Header="Tool Table" >
                 <Grid>
                     <ListView x:Name="lstvwTools" Margin="1,2,0,1" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}"
-                              ItemContainerStyle="{StaticResource MyListViewStyle}">
+                              ItemContainerStyle="{StaticResource ToolTableListViewStyle}">
 
 
 
@@ -213,9 +227,8 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <ListView x:Name="lstviewPockets" Margin="1,2,0,187" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}"
-                              
-                              ItemContainerStyle="{StaticResource MyListViewStyle}">
+                    <ListView x:Name="lstviewPockets" Margin="1,2,0,187" SelectionChanged="ListView_SelectionChanged" SelectedIndex="1" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}"                              
+                              ItemContainerStyle="{StaticResource PocketListViewStyle}">
 
 
 
