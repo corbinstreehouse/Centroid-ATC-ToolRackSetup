@@ -205,7 +205,7 @@ namespace ToolRackSetup
             {
                 if (_shouldCheckAirPressure != value)
                 {
-                    _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, _shouldCheckAirPressure);
+                    _pipe.parameter.SetValue(ParameterKey.ShouldCheckAir, value);
                     SetProperty(ref _shouldCheckAirPressure, value);
                 }
 
@@ -222,8 +222,7 @@ namespace ToolRackSetup
                 if (_enableATC != value)
                 {
 
-                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, _enableATC);
-
+                    _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, value);
                     // We have other bits that *must* be zero for now.
                     // I'm now settings these in mfunc6_corbin.mac instead
                     // of doing it here, as one person had ran the wizard and it

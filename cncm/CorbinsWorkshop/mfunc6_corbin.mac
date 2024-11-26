@@ -75,11 +75,13 @@ if #134 < 0 then #134 = 0
 
 m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
 
+DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
+
 ; OKAY, if the ATC is enabled (9776 and 1), then I'm going to disable Centroid's ATC Installed.
 ; As it makes things...different, for when tool values are updated and the PLC updates.
 ;  I might change my mind about this later. Param 160 really has to be 0 to allow a 0 or -1 tool or a tool not  in a bin.
-IF [#9776 and 1] G10 P6 R0 ; Param 6 = ATC Installed, set to 0
-IF [#9776 and 1] G10 P160 R0 ; Paaram 160 = Enhanced ATC, set to 0
+IF <ATC_ENABLED> G10 P6 R0 ; Param 6 = ATC Installed, set to 0
+IF <ATC_ENABLED> G10 P160 R0 ; Paaram 160 = Enhanced ATC, set to 0
 
 ;-----------------------------
 ; Check that the touch plate is setup
@@ -93,7 +95,7 @@ m221 #140 "Tool change: same tool is in the spindle. Continuing..."
 
 ; Check the tool length and measure it if it is zero
 ; #10001 is first height for tool 1, etc.
-if [#135 <= 0 || #135 >= 200] then GOTO 1000 ; no tool; goto the end without doing anything
+if [#135 <= 0 || #135 > 200] then GOTO 1000 ; no tool; goto the end without doing anything
 if [#[10000 + #135] != 0] then GOTO 1000 ; height is set; go to the end without doing anything
 
 GOTO 600 ; check height
@@ -126,7 +128,7 @@ if [#134 ==  #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_deactiv
 if [#134 ==  #9718 &&  #9718 != 0] THEN GOTO 250 ; get next tool
 
 ; If ATC is not enabled, skip put back and get the next tool
-if  [#9776 and 1] == 0 THEN GOTO 250; // get the next tool
+if !<ATC_ENABLED> THEN GOTO 250; // get the next tool
 
 ; --------------- ATC tool put back -------------
 
@@ -160,8 +162,8 @@ if [#135 == #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_activate
 if [#135 == #9718 &&  #9718 != 0] THEN GOTO 300 ; set tool & check height
 
 ; If ATC Support is not enabled, just ask the user to put in the new tool, if it isn't the laser
-IF [[#9776 and 1] == 0] && [#135 != #9718] THEN m200 "Insert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
-IF [[#9776 and 1] == 0] GOTO 600 ; goto height measurement, if needed...
+IF [!<ATC_ENABLED>] && [#135 != #9718] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
+IF [!<ATC_ENABLED>] GOTO 600 ; goto height measurement, if needed...
 
 ;----------------- ATC fetch tool ------------------- 
 
