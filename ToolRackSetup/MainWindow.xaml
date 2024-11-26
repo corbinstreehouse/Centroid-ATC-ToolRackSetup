@@ -20,6 +20,7 @@
         <SolidColorBrush  Color="#d1d1d1" x:Key="infoTextColor" />
         <SolidColorBrush  Color="#6c6c6c" x:Key="backgroundColor" />
         <SolidColorBrush  Color="#494949" x:Key="editBackgroundColor" />
+        <SolidColorBrush  Color="#FF00004E" x:Key="selectedRowBackgroundColor" />
 
         <System:Double x:Key="FontSize-Normal">18</System:Double>
 
@@ -67,19 +68,24 @@
         </Style>
 
         <Style x:Key="MyListViewStyle" TargetType="{x:Type ListViewItem}">
-            <Style.Resources>
-                <!-- Foreground for Selected ListViewItem -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
-                                 Color="Green"/>
-                <!-- Background for Selected ListViewItem -->
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                                 Color="Red"/>
-                
-                
-             </Style.Resources>
+
              <Setter Property="HorizontalContentAlignment" Value="Stretch" />
              <Setter Property="Margin" Value="0,-1,0,0"/>
-              <Style.Triggers>
+
+     
+
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background"
+                      Value="{DynamicResource selectedRowBackgroundColor}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="Black" />
+                </Trigger>
+                  
+                  
+                  
                 <DataTrigger Binding="{Binding IsInSpindle}"
                      Value="True">
                     <Setter Property="Background"
@@ -167,7 +173,7 @@
 
 
 
-                <Grid Margin="0,0,14,3" IsEnabled="{Binding EnableATC}">
+                <Grid Margin="0,0,14,3" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
@@ -298,7 +304,7 @@
                     </ListView>
                     <Grid x:Name="grdATCSettings" HorizontalAlignment="Center" Margin="0,0,0,-1" Width="836" IsEnabled="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="158" VerticalAlignment="Bottom">
 
-                        <Grid HorizontalAlignment="Left" Height="107" Margin="0,0,0,12" VerticalAlignment="Bottom" Width="290">
+                        <Grid HorizontalAlignment="Left" Height="112" Margin="0,0,0,12" VerticalAlignment="Bottom" Width="290">
                             <Label x:Name="lblZBump" Content="Z Bump:" Margin="0,0,120,26" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
                             <local:ClickSelectTextBox x:Name="txtBoxZBump" HorizontalAlignment="Left" Margin="170,0,0,30" TextWrapping="Wrap" Text="{Binding Settings.ZBump, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom"/>
                             <local:ClickSelectTextBox
@@ -307,8 +313,8 @@
 
                             <Label x:Name="lblWaitTime" Content="Wait Time For Spindle to Stop:" Margin="0,24,120,57" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="170"/>
 
-                            <Label Content="Slide Distance:" Margin="12,0,0,85" Height="26" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
-                            <local:ClickSelectTextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding Settings.SlideDistance, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="18" VerticalAlignment="Bottom"  />
+                            <Label Content="Slide Distance:" Margin="12,0,0,85" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="158" HorizontalContentAlignment="Right"/>
+                            <local:ClickSelectTextBox x:Name="txtBxSlideDistance" HorizontalAlignment="Left" Margin="170,0,0,89" TextWrapping="Wrap" Text="{Binding Settings.SlideDistance, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" RenderTransformOrigin="1.017,3.28" Height="22" VerticalAlignment="Bottom"  />
 
                             <Label x:Name="lblRackOffset" Content="Rack Offset:" Margin="0,0,120,-4" Height="26" VerticalAlignment="Bottom" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="158"/>
                             <local:ClickSelectTextBox x:Name="txtBoxRackOffset" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Settings.RackOffset, ElementName=mainWindow, StringFormat=\{0:F3\}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True}" Width="120" Height="18" VerticalAlignment="Bottom" Margin="170,0,0,0"/>
@@ -336,7 +342,7 @@
 
 
                     </Grid>
-                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="225" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="15" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,162" Width="334" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="chkbxLockToolPocketSettings" Content="Lock Tool Pocket Settings" HorizontalAlignment="Left" Margin="279,0,0,162" Width="225" Height="15" VerticalAlignment="Bottom" IsChecked="{Binding LockToolPocketSettings, Mode=TwoWay, Source={x:Static properties:Settings.Default}, UpdateSourceTrigger=Default, ValidatesOnNotifyDataErrors=True}" Visibility="Hidden"/>
 
 
