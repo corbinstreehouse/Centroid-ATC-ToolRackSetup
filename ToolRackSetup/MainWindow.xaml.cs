@@ -694,8 +694,10 @@ namespace ToolRackSetup
             // Chad was hitting a case where the slide was too large and put it outside where his machine could go. I can check for that..
 
 
-            foreach (ToolPocketItem item in _toolPocketItems)
+            for (int i = 0; i < _toolPocketItems.Count; i++)
             {
+
+                ToolPocketItem item = _toolPocketItems[i];
                 StringBuilder stringBuilder = new StringBuilder(fileContents);
 
                 double xPos = item.X;
@@ -757,6 +759,19 @@ namespace ToolRackSetup
                 {
                     // Hole style....just go straight to it! 
                     zPosBump = item.Z; // Maybe we need it? not sure..
+                    // Well, see if the front pos can be figured out by looking at the prior/next and figuring otu the alignment... would maybe be nice to do..
+                    //ToolPocketItem? adjacentItem = null;
+                    //if (i > 0)
+                    //{
+                    //    // Was the last one also a pocket? was it close?
+
+
+                    //} else
+                    //{
+
+                    //}
+
+
                 }
                 
                 
