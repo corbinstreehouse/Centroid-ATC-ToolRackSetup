@@ -76,6 +76,9 @@ if #134 < 0 then #134 = 0
 m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
 
 DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
+DEFINE <OLD_TOOL_IS_LASER> [#134 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
+DEFINE <NEW_TOOL_IS_LASER> [#135 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
+
 
 ; OKAY, if the ATC is enabled (9776 and 1), then I'm going to disable Centroid's ATC Installed.
 ; As it makes things...different, for when tool values are updated and the PLC updates.
@@ -91,6 +94,10 @@ IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 
 ; If we have the *same* tool, skip everything, but do a message first
 IF #134 != #135 THEN GOTO 100
+
+; ...but always activate the laser; seems to be required
+if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
+
 m221 #140 "Tool change: same tool is in the spindle. Continuing..."
 
 ; Check the tool length and measure it if it is zero
@@ -124,8 +131,8 @@ m109/1 ;disable feedrate override
 IF [#134 <= 0]  THEN GOTO 250
 
 ; If the old tool is the laser, deactivate and skip put away
-if [#134 ==  #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
-if [#134 ==  #9718 &&  #9718 != 0] THEN GOTO 250 ; get next tool
+if <OLD_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
+if <OLD_TOOL_IS_LASER> THEN GOTO 250 ; get next tool to get; skip put back
 
 ; If ATC is not enabled, skip put back and get the next tool
 if !<ATC_ENABLED> THEN GOTO 250; // get the next tool
@@ -158,15 +165,14 @@ N250
 IF [#135 <= 0] THEN GOTO 300 ; set tool
 
 ; if the new tool is the laser, activate it and skip stuff
-if [#135 == #9718 &&  #9718 != 0] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
-if [#135 == #9718 &&  #9718 != 0] THEN GOTO 300 ; set tool & check height
+if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
+if <NEW_TOOL_IS_LASER> THEN GOTO 300 ; set tool & check height
 
 ; If ATC Support is not enabled, just ask the user to put in the new tool, if it isn't the laser
-IF [!<ATC_ENABLED>] && [#135 != #9718] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
+IF [!<ATC_ENABLED>] && ![NEW_TOOL_IS_LASER] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
 IF [!<ATC_ENABLED>] GOTO 600 ; goto height measurement, if needed...
 
 ;----------------- ATC fetch tool ------------------- 
-
 
 ; Find the pocket for the new tool
 #137 = #[#135 + 17000] 
@@ -241,7 +247,7 @@ G53 X#132 Y#133 ; restore position
 G#131 ;Restore Positioning Mode
 
 ; cleanup the tool table if no ATC
-if  [#9776 and 1] == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#135
+if  !<ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#135
 
 If #9753 GT 0 THEN G22 K[#10000 + [#9753 * -1]] ELSE G23 ;If we have spoilboard anti dig in enabled set work envelope for z axis, else do nothing.
 
