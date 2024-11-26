@@ -169,7 +169,7 @@ if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
 if <NEW_TOOL_IS_LASER> THEN GOTO 300 ; set tool & check height
 
 ; If ATC Support is not enabled, just ask the user to put in the new tool, if it isn't the laser
-IF [!<ATC_ENABLED>] && ![NEW_TOOL_IS_LASER] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
+IF [!<ATC_ENABLED>] && ![<NEW_TOOL_IS_LASER>] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
 IF [!<ATC_ENABLED>] GOTO 600 ; goto height measurement, if needed...
 
 ;----------------- ATC fetch tool ------------------- 
