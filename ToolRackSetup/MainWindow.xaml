@@ -136,7 +136,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.ColumnSpan="2" SelectedIndex="1">
+        <TabControl Grid.ColumnSpan="2">
             <TabItem Header="Tool Table" >
                 <Grid>
                     <ListView x:Name="lstvwTools" Margin="1,2,0,1" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}"
