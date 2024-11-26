@@ -26,18 +26,12 @@ using static CentroidAPI.CNCPipe;
 using static CentroidAPI.CNCPipe.State;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using MahApps.Metro.Controls;
+using ControlzEx.Theming;
 
 namespace ToolRackSetup
 {
-
-    public class WindowTheme : ObservableObject
-    {
-        public WindowTheme() { }
-        
-        Color BackgroundColor { get; set; }
-
-
-    } 
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -422,13 +416,11 @@ namespace ToolRackSetup
                 }
             }
         }
-
-  
     }
 
 
 
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
         // I should use a 3d party framework to do this silly boiler plate code that should be built in.
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -456,10 +448,87 @@ namespace ToolRackSetup
         public ParameterSettings _parameterSettings { get; }
 
         bool _loading = true;
+
+
+        private string GetThemeFilename()
+        {
+            string fileContents = File.ReadAllText("c:\\cncm\\ColorPicker.txt");
+            fileContents = fileContents.Trim();
+            if (!File.Exists(fileContents))
+            {
+                // add the resource directory
+                return String.Format("C:\\cncm\\resources\\colors\\{0}", fileContents);
+            }
+             return fileContents;
+        }
+
+        public System.Windows.Media.Color ColorFromString(String hex)
+        {
+            byte a = 255;
+            byte r = 255;
+            byte g = 255;
+            byte b = 255;
+
+            int start = 0;
+
+            //handle ARGB strings (8 characters long)
+            if (hex.Length == 8)
+            {
+                a = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                start = 2;
+            }
+
+            //convert RGB characters to bytes
+            r = byte.Parse(hex.Substring(start, 2), System.Globalization.NumberStyles.HexNumber);
+            g = byte.Parse(hex.Substring(start + 2, 2), System.Globalization.NumberStyles.HexNumber);
+            b = byte.Parse(hex.Substring(start + 4, 2), System.Globalization.NumberStyles.HexNumber);
+
+            return System.Windows.Media.Color.FromArgb(a, r, g, b);
+        }
+        private void LoadTheme()
+        {
+
+            string filename = GetThemeFilename();
+            XDocument doc = XDocument.Load(filename);
+
+           Color GetThemeColor(string name)
+            {
+                string key = String.Format("/Table/Colors/{0}", name);
+
+                string value = doc.XPathSelectElement(key)!.Value;
+                return ColorFromString(value);
+            }
+
+
+
+
+            Color AccentColor = Colors.Blue;
+            Theme newTheme = new Theme("CNC12Theme",
+                           "[DisplayName of the generated theme]",
+                           ThemeManager.BaseColorLight,
+                           "AccentName", 
+                           AccentColor,
+                           new SolidColorBrush(AccentColor),
+                           true,
+                           false);
+
+
+
+            Color bgColor = GetThemeColor("backgroundColor");
+            this.Background = new SolidColorBrush(bgColor);
+            newTheme.Resources["MahApps.Colors.ThemeBackground"] = bgColor;
+            //newTheme.Resources["MahApps.Brushes.Highlight"] = new SolidColorBrush(HighlightColor);
+
+            ThemeManager.Current.AddTheme(newTheme);
+            ThemeManager.Current.ChangeTheme(this, newTheme);
+
+        }
         public MainWindow()
         {
 
             InitializeComponent();
+
+            LoadTheme();
 
             // Variables for the API Connection MessageBox
             var messageBoxText = "Can't connect to CNC12. Make sure it is running! Would you like to retry the connection?";
