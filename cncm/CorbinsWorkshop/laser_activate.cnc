@@ -40,6 +40,11 @@ M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc"
 N3
 IF #120 EQ 666 THEN GOTO 800 ;bail out if laser safety check fails
 
+
+; corbin, debugging
+;#140 = 5
+;m225 #140 "Laser Activate"
+
 ;-------------------------------------
 ; activate laser
 S0			 	     			;Set laser power to zero				

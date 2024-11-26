@@ -8,6 +8,8 @@
 ; Parameters
 ; #9718 = laser tool number
 
+; corbin, debugging
+; m225 #140 "Laser deactivate"
 
 ;--------------- Disable Laser
 ;S0							 	;Turn Laser Off
