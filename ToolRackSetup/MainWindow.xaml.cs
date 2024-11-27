@@ -62,7 +62,30 @@ namespace ToolRackSetup
         }
 
     }
-    
+
+    [ValueConversion(typeof(bool), typeof(bool))]
+    public class InverseBooleanConverter : IValueConverter
+    {
+        #region IValueConverter Members
+
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            if (targetType != typeof(bool))
+                throw new InvalidOperationException("The target must be a boolean");
+
+            return !(bool)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+
+        #endregion
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -156,13 +179,10 @@ namespace ToolRackSetup
     public  class MyObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void NotifyPropertyChanged(object? oldValue, [CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new MyPropertyChangedEventArgs(oldValue, propertyName));
-        }
+
         protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new MyPropertyChangedEventArgs(null, propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -345,9 +365,9 @@ namespace ToolRackSetup
 
         public int Pocket { get; }
 
-        public double X { get => x; set { object old = x;  x = value; NotifyPropertyChanged(old); } }
-        public double Y { get => y; set { object old = y; y = value; NotifyPropertyChanged(old); } }
-        public double Z { get => z; set { object old = z; z = value; NotifyPropertyChanged(old); } }
+        public double X { get => x; set {   x = value; NotifyPropertyChanged(); } }
+        public double Y { get => y; set {  y = value; NotifyPropertyChanged(); } }
+        public double Z { get => z; set {  z = value; NotifyPropertyChanged(); } }
         public PocketStyle Style
         {
             get { return style;  }
@@ -355,9 +375,8 @@ namespace ToolRackSetup
             {
                 if (value != style)
                 {
-                    object old = value;
                     style = value;
-                    NotifyPropertyChanged(old);
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -373,10 +392,9 @@ namespace ToolRackSetup
             {
                 if (_toolInfo != value)
                 {
-                    object ?old = _toolInfo;
                     _toolInfo = value;
                     
-                    NotifyPropertyChanged(old);
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(IsToolEnabled));
                 }
 
@@ -438,7 +456,7 @@ namespace ToolRackSetup
                         ToolInfo = _toolController.Tools[value - 1];
                         ToolInfo.Pocket = Pocket;
                     }
-                    NotifyPropertyChanged(oldToolNumber);
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -455,7 +473,7 @@ namespace ToolRackSetup
  
         protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new MyPropertyChangedEventArgs(null, propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private CNCPipe _pipe;
@@ -474,6 +492,23 @@ namespace ToolRackSetup
 
         public ToolChangeSettings Settings { get; }
         public ParameterSettings _parameterSettings { get; }
+
+        public bool Dirty
+        {
+            get
+            {
+                return _dirty;
+
+            }
+            set
+            {
+                if (_dirty != value)
+                {
+                    _dirty = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         bool _loading = true;
 
@@ -594,26 +629,6 @@ namespace ToolRackSetup
 
 
         }
-
-
-        // TODO: cache value?
-        private void HighlightCurrentTool()
-        {
-            int highllightedRow = -1;
-            int selectedTool = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
-            if (selectedTool > 0)
-            {
-                for (int i = 0; i < _toolPocketItems.Count; i++)
-                {
-                    if (_toolPocketItems[i].ToolNumber == selectedTool)
-                    {
-                        selectedTool = i;
-                        break;
-                    }
-                }
-            }
-        }
-
         private void RefreshTools()
         {
             _toolController.RefreshTools();
@@ -1014,7 +1029,7 @@ namespace ToolRackSetup
             try
             {
                WriteSettings();
-               _dirty = true;
+               Dirty = true;
             }
             catch (Exception ex)
             {
@@ -1027,7 +1042,7 @@ namespace ToolRackSetup
             if (_loading) return;
             if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber)) // ignore changing the tool number..we set that dynamically all the time.
             {
-                _dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
+                Dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
             }
             WriteSettings(); // save the xml files
         }
@@ -1060,7 +1075,7 @@ namespace ToolRackSetup
             WriteParameters();
             WriteSettings();
             WriteMacros();
-            _dirty = false;
+            Dirty = false;
 
         }
 
@@ -1081,7 +1096,7 @@ namespace ToolRackSetup
                 ToolPocketItem? item = _toolPocketItems.Last();
                 item.ToolNumber = 0; /// make sure it doesn't have a tool..
                 _toolPocketItems.RemoveAt(lastIndex);
-                _dirty = true;
+                Dirty = true;
             }
         }
 
@@ -1102,7 +1117,7 @@ namespace ToolRackSetup
 
         private void window_Closing(object sender, CancelEventArgs e)
         {
-            if (_dirty)
+            if (this.Dirty)
             {
                 MessageBoxResult r = MessageBox.Show("Changes were made that require the macros to be updated. Do you want to write out the macros now?", "Whoa there", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Yes);
                 if (r == MessageBoxResult.Yes)
@@ -1127,7 +1142,7 @@ namespace ToolRackSetup
                 int newCount = _toolPocketItems.Count + 1;
                 _parameterSettings.PocketCount = newCount;
 
-                _dirty = true;
+                Dirty = true;
                 ToolPocketItem tpi = new ToolPocketItem(newCount, null, _toolController);
                 if (_toolPocketItems.Count > 0)
                 {

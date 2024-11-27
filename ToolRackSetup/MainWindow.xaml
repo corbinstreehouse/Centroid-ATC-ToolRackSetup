@@ -10,6 +10,7 @@
         Title="Tools" Height="666" Width="885" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed" Activated="mainWindow_Activated">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <local:PocketStyleConverter x:Key="pocketStyleConverter"/>
         <BitmapImage x:Key="xMinusImage" UriSource="tool_fork_x_minus.png" />
         <BitmapImage x:Key="xPlusImage" UriSource="tool_fork_x_plus.png" />
@@ -214,7 +215,7 @@
                                 <GridViewColumn Header="Fetch" Width="95" >
                                     <GridViewColumn.CellTemplate >
                                         <DataTemplate>
-                                            <Button Content="Fetch"   Click="BtnFetchClick" />
+                                            <Button Content="Fetch"   Click="BtnFetchClick" IsEnabled="{Binding Dirty, ElementName=mainWindow, Converter={StaticResource InverseBooleanConverter}}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -352,6 +353,17 @@
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
+
+
+                                <GridViewColumn Header="Fetch" Width="95"  >
+                                    <GridViewColumn.CellTemplate >
+                                        <DataTemplate>
+                                            <Button Content="Fetch"   Click="BtnFetchClick" IsEnabled="{Binding Dirty, ElementName=mainWindow, Converter={StaticResource InverseBooleanConverter}}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+
                             </GridView>
                         </ListView.View>
 
