@@ -84,17 +84,8 @@ namespace ToolRackSetup
         #endregion
     }
 
-   
-    public class MyPropertyChangedEventArgs: PropertyChangedEventArgs
-    {
-        public Object? oldValue { get; }
-        public MyPropertyChangedEventArgs(object? oldValue, string propertyName) : base(propertyName)
-        {
-            this.oldValue = oldValue;
-        }
-    }
-
-
+ 
+ 
     public enum PocketStyle
     {
         XMinus = 0,
