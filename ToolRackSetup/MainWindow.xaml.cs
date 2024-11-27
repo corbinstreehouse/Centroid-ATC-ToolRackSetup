@@ -252,7 +252,7 @@ namespace ToolRackSetup
 
     }
 
-    public class ToolChangeSettings : MyObservableObject
+    public class ToolChangeSettings : ObservableObject
     {
 
         private bool _enableTestingMode = true;
@@ -264,30 +264,34 @@ namespace ToolRackSetup
         private double _rackAdjustment = 5.5;
 
         public bool EnableTestingMode { get => _enableTestingMode; 
-            set { 
-                _enableTestingMode = value; NotifyPropertyChanged(); 
+            set {
+                SetProperty(ref _enableTestingMode, value);
             } 
         }
-        public double ZBump { get => _zBump; set { _zBump = value; NotifyPropertyChanged();  } }
-        public double ZClearance { get => _zClearance; set { _zClearance = value; NotifyPropertyChanged(); } }
+        public double ZBump { get => _zBump; set { 
+                SetProperty(ref _zBump, value); 
+            } }
+        public double ZClearance { get => _zClearance; set { 
+                SetProperty(ref _zClearance, value);
+            } }
 
-        public double TestingFeed { get => _testingFeed; set { _testingFeed = value; NotifyPropertyChanged(); } }
+        public double TestingFeed { get => _testingFeed; set {
+                SetProperty(ref _testingFeed, value);
+            } }
 
         public double SlideDistance
         {
             get => _slideDistance;
             set
             {
-                if (_slideDistance != value)
-                {
-                    _slideDistance = value;
-                    NotifyPropertyChanged();
-                }
+                SetProperty(ref _slideDistance, value);
             }
         }
 
         public double RackOffset { get => _rackAdjustment;
-            set { _rackAdjustment = value; NotifyPropertyChanged(); }
+            set {
+                SetProperty(ref _rackAdjustment, value);
+            }
         }
 
         public ToolChangeSettings(bool isMetric)
