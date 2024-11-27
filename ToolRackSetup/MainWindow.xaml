@@ -7,7 +7,7 @@
         xmlns:properties="clr-namespace:ToolRackSetup.Properties"
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Collections.NonGeneric" xmlns:System="clr-namespace:System;assembly=netstandard" x:Name="mainWindow" x:Class="ToolRackSetup.MainWindow"
         mc:Ignorable="d"
-        Title="Tools" Height="666" Width="885" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed" Activated="mainWindow_Activated">
+        Title="Tools" Height="666" Width="900" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed" Activated="mainWindow_Activated">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
