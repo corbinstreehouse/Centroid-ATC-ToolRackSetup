@@ -15,7 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="CorbinsWorkshop.png" />
     <None Remove="tool_fork_x_minus.png" />
     <None Remove="tool_fork_x_plus.png" />
     <None Remove="tool_fork_y_minus.png" />
@@ -23,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="CorbinsWorkshop.png" />
     <Resource Include="hole.png" />
     <Resource Include="tool_fork_y_plus.png" />
   </ItemGroup>
