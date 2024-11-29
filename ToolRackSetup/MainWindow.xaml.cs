@@ -428,7 +428,7 @@ namespace ToolRackSetup
 
         private CNCPipe _pipe;
 
-        ToolController _toolController;
+        public ToolController _ToolController { get;  }
         ObservableCollection<ToolPocketItem> _toolPocketItems;
 
         private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
@@ -546,7 +546,7 @@ namespace ToolRackSetup
                 }
             }
 
-           _pipe.message_window.AddMessage("ATC Tools Connected");
+           _pipe.message_window.AddMessage("Tool Manager Connected");
 
             // TODO: Check if we are metric and flip default values if we are
             bool isMetric = false;
@@ -561,7 +561,9 @@ namespace ToolRackSetup
 
             // Convert toolInfoList into our own datastructure
             // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
-            _toolController = new ToolController(_pipe);
+            _ToolController = new ToolController(_pipe);
+            NotifyPropertyChanged(nameof(_ToolController));
+
             _toolPocketItems = new ObservableCollection<ToolPocketItem>();
 
             RefreshTools();
@@ -572,7 +574,12 @@ namespace ToolRackSetup
             lstviewPockets.ItemsSource = _toolPocketItems;
             lstviewPockets.UnselectAll();
 
-            lstvwTools.ItemsSource = _toolController.Tools;
+            lstvwTools.ItemsSource = _ToolController.Tools;
+            // Bindings; I am not sure why I can' get this to work in XAML
+
+            txtBxActiveToolNumber.DataContext = _ToolController;
+            lblActiveToolDescription.DataContext = _ToolController;
+
 
             Settings.PropertyChanged += SettingsPropertyChanged;
 
@@ -584,7 +591,7 @@ namespace ToolRackSetup
         }
         private void RefreshTools()
         {
-            _toolController.RefreshTools();
+            _ToolController.RefreshTools();
         }
 
         private void ReadSettings()
@@ -863,8 +870,8 @@ namespace ToolRackSetup
             int toolBinCount = _parameterSettings.PocketCount;
             for (int i = 1; i <= toolBinCount; i++)
             {
-                ToolInfo? toolInfo = _toolController.FindToolInfoForPocket(i);
-                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _toolController);
+                ToolInfo? toolInfo = _ToolController.FindToolInfoForPocket(i);
+                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _ToolController);
                 _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
             }
@@ -1096,7 +1103,7 @@ namespace ToolRackSetup
                 _parameterSettings.PocketCount = newCount;
 
                 Dirty = true;
-                ToolPocketItem tpi = new ToolPocketItem(newCount, null, _toolController);
+                ToolPocketItem tpi = new ToolPocketItem(newCount, null, _ToolController);
                 if (_toolPocketItems.Count > 0)
                 {
                     ToolPocketItem last = _toolPocketItems.Last()!;
@@ -1162,7 +1169,7 @@ namespace ToolRackSetup
         private void mainWindow_Closed(object sender, EventArgs e)
         {
             // ignore errors on this call..
-            _pipe.message_window.AddMessage("ATC Tools Disconnected");
+            _pipe.message_window.AddMessage("Tool Manager Disconnected");
         }
 
         private ToolInfo? ToolInfoFromSender(object sender)

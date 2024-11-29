@@ -27,11 +27,11 @@
         <SolidColorBrush  Color="#6c6c6c" x:Key="backgroundColor" />
 
         <SolidColorBrush  Color="#FF4E4D4D" x:Key="BorderColor" />
-        
+
         <SolidColorBrush  Color="#c6c6c6" x:Key="WindowBackgroundColor" />
         <SolidColorBrush  Color="#494949" x:Key="editBackgroundColor" />
         <SolidColorBrush  Color="#FF005ABE" x:Key="selectedRowBackgroundColor" />
-        <SolidColorBrush  Color="#7f7f7f" x:Key="menuUneditableColor" />
+        <SolidColorBrush  Color="#FFAFACAC" x:Key="menuUneditableColor" />
         <SolidColorBrush Color="#FFE0E0E0" x:Key="HoverBackgroundColor" />
         <SolidColorBrush Color="#FF005ABE" x:Key="ButtonPressedColor"/>
         <SolidColorBrush Color="Black" x:Key="ButtonTextColor"/>
@@ -149,8 +149,6 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        
-                    
 
                         <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{DynamicResource BorderColor}" CornerRadius="4,4,0,0" Margin="2,0">
                             <ContentPresenter x:Name="ContentSite"
@@ -159,15 +157,15 @@
                                         ContentSource="Header"
                                         Margin="10,2"/>
                         </Border>
-                        
+
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource backgroundColor}" />
                                 <Setter Property="Foreground" Value="{DynamicResource infoTextColor}"/>
-                              
+
                             </Trigger>
                             <Trigger Property="IsSelected" Value="False">
-                               
+
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -175,7 +173,7 @@
             </Setter>
             <Setter Property="FontSize" Value="16"/>
         </Style>
-        
+
         <Style x:Key="ToolTableListViewStyle"  TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MyListViewStyle}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsInSpindle}"
@@ -222,7 +220,7 @@
         </Style>
 
         <Style x:Key="TitleBarCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource TitleBarButtonStyle}">
-         
+
         </Style>
     </Window.Resources>
 
@@ -326,7 +324,13 @@
         <TabControl Margin="0,24,0,0">
             <TabItem Header="Tool Table" Style="{StaticResource TabItemStyle}">
                 <Grid>
-                    <ListView x:Name="lstvwTools" Margin="1,2,0,1" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}"
+
+                    <Label Content="Active Tool: T" HorizontalAlignment="Left" Margin="0,-2,0,0" VerticalAlignment="Top"/>
+
+                    <local:ClickSelectTextBox x:Name="txtBxActiveToolNumber" HorizontalAlignment="Left" Margin="115,3,0,0" VerticalAlignment="Top" Width="39" Height="24" Text="{Binding ActiveToolNumber, Mode=TwoWay, TargetNullValue=--, ValidatesOnExceptions=True}" KeyUp="txtBox_KeyUp" IsEnabled="False"/>
+
+                    <Label x:Name="lblActiveToolDescription" Margin="159,-2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Content="{Binding ActiveTool.Description, TargetNullValue='--'}"/>
+                    <ListView x:Name="lstvwTools" Margin="0,32,0,0" SelectionChanged="ListView_SelectionChanged" SelectionMode="Single" FontSize="16" d:ItemsSource="{d:SampleData ItemCount=5}"
                               ItemContainerStyle="{StaticResource ToolTableListViewStyle}">
 
                         <ListView.View>
@@ -395,6 +399,7 @@
 
 
                     </ListView>
+
                 </Grid>
             </TabItem>
 
@@ -559,9 +564,9 @@
 
                         </Grid>
 
-                        <Button x:Name="btnWriteChanges" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,13,93" Width="118" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
-                        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="0,0,0,132" Width="150" Height="25" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
-                        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="172,0,0,131" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="150" Height="28" VerticalAlignment="Bottom"/>
+                        <Button x:Name="btnWriteChanges" Content="Generate Macros" HorizontalAlignment="Right" Margin="0,0,0,93" Width="143" Click="btnWriteChanges_Click" Height="31" VerticalAlignment="Bottom"/>
+                        <Button x:Name="btnAddPocket" Content="Add Pocket" HorizontalAlignment="Left" Margin="0,0,0,130" Width="156" Height="28" VerticalAlignment="Bottom" Click="btnAddPocket_Click"/>
+                        <Button x:Name="btnRemoveLastPocket" Content="Remove Last Pocket" Margin="169,0,0,130" Click="btnRemoveLastPocket_Click" HorizontalAlignment="Left" Width="166" Height="28" VerticalAlignment="Bottom"/>
                         <Grid HorizontalAlignment="Left" Width="432" Margin="351,0,0,110" Height="48" VerticalAlignment="Bottom">
                             <Label Content="Assign Machine Coordinates:" HorizontalAlignment="Left" Margin="-1,-5,0,0" VerticalAlignment="Top" Width="262" HorizontalContentAlignment="Right"/>
                             <Button x:Name="btnAssignMachineCoordX" Content="X" HorizontalAlignment="Left" Margin="270,2,0,0" VerticalAlignment="Top" Height="24" Width="38" Click="btnAssignMachineCoordX_Click"/>
@@ -574,7 +579,7 @@
                             <CheckBox x:Name="chkbxCheckAirPressure" Content="Check Air Pressure" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.ShouldCheckAirPressure, ElementName=mainWindow, ValidatesOnExceptions=True}"  Width="182" Margin="0,21,0,0" />
                             <CheckBox x:Name="chkbxVirtualDrawbarButton" Content="Virtual Drawbar Button Support" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow, ValidatesOnExceptions=True}" Width="295" Margin="0,49,0,0" />
                             <Button x:Name="btnAddRemoveVCPButton" Content="Add Drawbar Button to VCP" HorizontalAlignment="Left" Margin="129,76,0,0" VerticalAlignment="Top" Width="212" Click="btnAddRemoveVCPButton_Click" IsEnabled="{Binding _parameterSettings.EnableVirtualDrawbar, ElementName=mainWindow}"/>
-                            <CheckBox x:Name="chkbxPromptForTouchPlate" Content="Prompt When Going to Touch Plate" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.PromptWhenGoingToTouchPlate, ElementName=mainWindow, Mode=TwoWay, ValidatesOnExceptions=True}"  Width="325" Margin="0,92,0,0" />
+                            <CheckBox x:Name="chkbxPromptForTouchPlate" Content="Prompt When Going to Touch Plate" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding _parameterSettings.PromptWhenGoingToTouchPlate, ElementName=mainWindow, Mode=TwoWay, ValidatesOnExceptions=True}"  Width="325" Margin="0,95,0,0" />
 
                         </Grid>
 
