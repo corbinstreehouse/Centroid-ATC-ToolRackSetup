@@ -53,6 +53,14 @@
 
 DEFINE <PREVENT_LOOK_AHEAD> IF #50001 
 
+DEFINE <OLD_POSITIONING_MODE> #131
+DEFINE <SAVED_X> #132
+DEFINE <SAVED_Y> #133
+DEFINE <OLD_TOOL> #134
+DEFINE <NEW_TOOL> #135
+DEFINE <OLD_TOOL_POCKET> #136
+
+
 <PREVENT_LOOK_AHEAD>
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
@@ -61,24 +69,25 @@ IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 ; #4120 is the tool requested
 ; #4203 is the tool in the spindle -- but this variable is wonky..see 16.) What is System Variable #4203'
 ; #150 also stores the same variable, but I like using the PLC one
-#134 = #9976;  #4203 ; old tool; tool in the spindle right now
-#135 = #4120 ; new tool, requested via Txx
+<OLD_TOOL> = #9976;  #4203 ; old tool; tool in the spindle right now
+<NEW_TOOL> = #4120 ; new tool, requested via Txx
+
 
 ; I think 0 and 255 can both mean "no tool in spindle", but 255 will show "--"
-if #135 < 0 THEN #135 = 0
-if #134 < 0 then #134 = 0
+if <NEW_TOOL> < 0 then <NEW_TOOL> = 0
+if <OLD_TOOL> < 0 then <OLD_TOOL> = 0
 
-#131 = #4003                     ;Save Positioning Mode
+<OLD_POSITIONING_MODE> = #4003                     ;Save Positioning Mode
 ;  5021–5028 MachinePosition (axis1=5021,axis2=5022,etc.
-#132 = #5021 ; saved x
-#133 = #5022 ; saved y
+<SAVED_X> = #5021 ; saved x
+<SAVED_Y> = #5022 ; saved y
 
-m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
+; m221 #140 "Tool change requested from %.0f to %.0f" <OLD_TOOL> <NEW_TOOL> ; Commenting these out for now! Because of a Centroid bug.
 
 DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
-DEFINE <OLD_TOOL_IS_LASER> [#134 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
-DEFINE <NEW_TOOL_IS_LASER> [#135 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
-DEFINE <TOOL_IS_THE_SAME> [#134 == #135]
+DEFINE <OLD_TOOL_IS_LASER> [<OLD_TOOL> == #9718 && #9718 != 0] ; 9718 is the laser tool number, and <OLD_TOOL> is the old tool
+DEFINE <NEW_TOOL_IS_LASER> [<NEW_TOOL> == #9718 && #9718 != 0] ; 9718 is the laser tool number
+DEFINE <TOOL_IS_THE_SAME> [<OLD_TOOL> == <NEW_TOOL>]
 
 ; GOTO targets
 DEFINE <END_LINE> 1000
@@ -103,7 +112,7 @@ IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 ;-----------------------------
 
 ; Same tool check
-IF <TOOL_IS_THE_SAME> m221 #140 "Tool change: same tool is in the spindle. Continuing..."
+;IF <TOOL_IS_THE_SAME> m221 #140 "Tool change: same tool is in the spindle. Continuing..."
 ; Always activate the laser; seems to be required
 IF [<TOOL_IS_THE_SAME> && <NEW_TOOL_IS_LASER>] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
 IF <TOOL_IS_THE_SAME> GOTO <SET_TOOL_LINE> ; Sets the tool, sets the height, measures if needed.
@@ -127,7 +136,7 @@ m109/1 ;disable feedrate override
 ;m225 #140 "Putting the old tool away"
 ; ------------------------ PUT OLD TOOL AWAY -----------------
 ;Skip Putaway if No Tool in Spindle
-IF [#134 <= 0]  THEN GOTO <GET_NEW_TOOL_LINE>
+IF [<OLD_TOOL> <= 0]  THEN GOTO <GET_NEW_TOOL_LINE>
 
 ; If the old tool is the laser, deactivate and skip put away
 if <OLD_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
@@ -140,19 +149,19 @@ if !<ATC_ENABLED> THEN GOTO <GET_NEW_TOOL_LINE>; // get the next tool
 
 ; Find the pocket for the old tool
 ; 17001-17200 tool bin numbers for tools 1-200
-#136 = #[#134 + 17000] ; Put away pocket # for the tool
+<OLD_TOOL_POCKET> = #[<OLD_TOOL> + 17000] ; Put away pocket # for the tool
 
-;m225 #140 "Pocket %f for tool %f" #136 #134
+;m225 #140 "Pocket %f for tool %f" <OLD_TOOL_POCKET> <OLD_TOOL>
 
 ; See if the pocket is past the # of pockets set by the user (#9161)
-IF #136 > #9161 THEN GOTO <ERROR_LINE> ; error
+IF <OLD_TOOL_POCKET> > #9161 THEN GOTO <ERROR_LINE> ; error
 
 ;m225 #140 "Calling put back"
 ; If the tool has a pocket, put it back
-IF #136 > 0 THEN G65 "\cncm\CorbinsWorkshop\tool_put_back.cnc" A#136 T#134
+IF <OLD_TOOL_POCKET> > 0 THEN G65 "\cncm\CorbinsWorkshop\tool_put_back.cnc" A<OLD_TOOL_POCKET> T<OLD_TOOL>
 
 ; If the tool has no pocket, request the user to remove it
-IF #136 <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_remove.cnc" T#134
+IF <OLD_TOOL_POCKET> <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_remove.cnc" T<OLD_TOOL>
 ;---------------------------------------------------
 
 ; ------------------------ GET NEW TOOL ------------------
@@ -161,50 +170,50 @@ N<GET_NEW_TOOL_LINE>
 ;m225 #140 "Getting the new tool"
 
 ; if don't have a tool, skip stuff
-IF [#135 <= 0] THEN GOTO <SET_TOOL_LINE>
+IF [<NEW_TOOL> <= 0] THEN GOTO <SET_TOOL_LINE>
 
 ; if the new tool is the laser, activate it and skip stuff
 if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
 if <NEW_TOOL_IS_LASER> THEN GOTO <SET_TOOL_LINE> 
 
 ; If ATC Support is not enabled, just ask the user to put in the new tool, if it isn't the laser
-IF [!<ATC_ENABLED>] && ![<NEW_TOOL_IS_LASER>] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
+IF [!<ATC_ENABLED>] && ![<NEW_TOOL_IS_LASER>] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" <NEW_TOOL> ;don't stop if we're on laser
 IF [!<ATC_ENABLED>] GOTO <HEIGHT_CHECK_LINE> ; goto height measurement, if needed...
 
 ;----------------- ATC fetch tool ------------------- 
 
 ; Find the pocket for the new tool
-#137 = #[#135 + 17000] 
+#137 = #[<NEW_TOOL> + 17000] 
 
 if #137 > #9161 THEN GOTO <ERROR_LINE>; error out of range
 ; If the tool has no pocket, ask the user for it
-IF #137 <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_install.cnc" A#135
+IF #137 <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_install.cnc" A<NEW_TOOL>
 
 <PREVENT_LOOK_AHEAD>
 
 ; Otherwise, fetch it from the pocket
-IF #137 > 0 THEN G65 "\cncm\CorbinsWorkshop\tool_get_from_pocket.cnc" A#137 B#134 C#135
+IF #137 > 0 THEN G65 "\cncm\CorbinsWorkshop\tool_get_from_pocket.cnc" A#137 B<OLD_TOOL> C<NEW_TOOL>
 
 ;--------------------------------------
 ; Set Tool
 N<SET_TOOL_LINE>
 
-G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T#135
+G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T<NEW_TOOL>
 
 ; ------------------------------------------ TOOL HEIGHT
 N<HEIGHT_CHECK_LINE>
 
-; m200 "checking height tool %.0f/%.0f table height %f" #4120 #135 #[10000 + #135]
+; m200 "checking height tool %.0f/%.0f table height %f" #4120 <NEW_TOOL> #[10000 + <NEW_TOOL>]
 
 ; Check the tool length and measure it if it is zero
 ; #10001 is first height for tool 1, etc.
-if [#135 <= 0 || #135 >= 200] then GOTO <RESTORE_LINE> ; no tool, goto restore
-if [#[10000 + #135] != 0] then GOTO <RESTORE_LINE>  ; height is already set, goto restore
+if [<NEW_TOOL> <= 0 || <NEW_TOOL> >= 200] then GOTO <RESTORE_LINE> ; no tool, goto restore
+if [#[10000 + <NEW_TOOL>] != 0] then GOTO <RESTORE_LINE>  ; height is already set, goto restore
 
-m221 #140 "Going to the touch plate and measuring the height of Tool %.0f" #135
+;m221 #140 "Going to the touch plate and measuring the height of Tool %.0f" <NEW_TOOL>
 
 G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
-G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#135
+G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T<NEW_TOOL>
 
 
 GOTO <RESTORE_LINE>
@@ -236,16 +245,16 @@ N<RESTORE_LINE>
 
 <PREVENT_LOOK_AHEAD>
 
-m221 #140 "End tool change: Restoring position to X%f Y%f" #132 #133
+m221 #140 "End tool change: Restoring position to X%f Y%f" <SAVED_X> <SAVED_Y>
 
 ; Go back to the original X/Y
 G53 Z0 ; should be there..but have it here just in case
-G53 X#132 Y#133 ; restore position
+G53 X<SAVED_X> Y<SAVED_Y> ; restore position
 
-G#131 ;Restore Positioning Mode
+G<OLD_POSITIONING_MODE> ;Restore Positioning Mode
 
 ; cleanup the tool table if no ATC
-if  !<ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#135
+if  !<ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T<NEW_TOOL>
 
 If #9753 GT 0 THEN G22 K[#10000 + [#9753 * -1]] ELSE G23 ;If we have spoilboard anti dig in enabled set work envelope for z axis, else do nothing.
 
