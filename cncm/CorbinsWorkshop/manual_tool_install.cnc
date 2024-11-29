@@ -4,7 +4,10 @@
 ; Parameters
 ; [#9776 and 4]  if we need a virtual drawbar support
 
-IF #50001                        ;Prevent lookahead from parsing past here
+
+DEFINE <PREVENT_LOOK_AHEAD> if #50001
+
+<PREVENT_LOOK_AHEAD>
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
 G53 Z0 ; go to z-zero to clear everything
@@ -37,7 +40,12 @@ m225 #130 "Drawbar clamped. Continuing..."
 GOTO 1000
 ;------------------------------------------------------------------------------
 N900
+
+
 M200 "Install Tool %.0f into the spindle and press Cycle Start to Continue." #1   ; prompt for input
+
+<PREVENT_LOOK_AHEAD> ; Maybe? Stops the message from going away early
+
 GOTO 1000
 ;------------------------------------------------------------------------------
 
