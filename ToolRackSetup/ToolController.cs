@@ -6,6 +6,7 @@ using static CentroidAPI.CNCPipe.Tool;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Xml.Linq;
+using System.Configuration;
 
 namespace ToolRackSetup {
 
@@ -149,10 +150,11 @@ namespace ToolRackSetup {
         }
     }
 
-    public class ToolController
+    public class ToolController : ObservableObject
 	{
         private CNCPipe _pipe;
         ObservableCollection<ToolInfo> _toolInfoLibrary;
+        private ToolInfo ?_activeTool;
 
         public ToolController(CNCPipe pipe)
 		{
@@ -182,6 +184,75 @@ namespace ToolRackSetup {
 
         }
 
+        private const string macroPathTemplate = "C:\\cncm\\CorbinsWorkshop\\{0}";
+
+
+        // seperate setter so we can change the active tool based on setting it, instead of changing the numbrer of the tool
+        public int ActiveToolNumber
+        {
+            get
+            {
+                if (_activeTool != null) return _activeTool!.Number;
+
+                return 0;
+            } 
+            set
+            {
+
+
+                if (value != this.ActiveToolNumber)
+                {
+
+                    // Just do a set and measure if needed
+                    CNCPipe.Job job = new CNCPipe.Job(_pipe);
+
+                    string filename1 = string.Format(macroPathTemplate, "tool_set.cnc");
+                    string gcode = String.Format("G65 \"{0}\" T{1}\n", filename1, value);
+                    string filename2 = string.Format(macroPathTemplate, "tool_measure_if_needed.cnc");
+                    string gcode2 = String.Format("G65 \"{0}\" T{1}", filename2, value);
+
+                    job.RunCommand(String.Format("{0}\n{1}", gcode, gcode2), "c:\\cncm", false);
+
+                    Task.Delay(1000).ContinueWith(_ =>
+                    {
+                        // Update the active tool numbers...maybe on a delay to let the work get done?
+                        RefreshActiveTool();                        
+                    } );
+                }
+            }
+        }
+ 
+
+        public ToolInfo? ActiveTool
+        {
+            get
+            {
+                return _activeTool;
+            }
+            set
+            {
+                if (_activeTool != value)
+                {
+                    if (_activeTool != null)
+                    {
+                        _activeTool.IsInSpindle = false;
+                    }
+                    SetProperty(ref _activeTool, value);
+                    OnPropertyChanged(nameof(ActiveToolNumber));
+                    if (_activeTool != null)
+                    {
+                        _activeTool.IsInSpindle = true;
+                    }
+                }
+            }
+        }
+
+        private void RefreshActiveTool()
+        {
+            int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
+            ActiveTool = toolInSpindle > 0 ? _toolInfoLibrary[toolInSpindle - 1] : null;
+        }
+
         public void RefreshTools()
         {
 
@@ -194,6 +265,7 @@ namespace ToolRackSetup {
             // Pockets are pointing to tools; it would be better to just update the existing ones if they are there..
             // going to assume the tool count won't ever change..
             bool useExisting = _toolInfoLibrary.Count > 0;
+            ToolInfo? activeTool = null;
 
             int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
 
@@ -221,8 +293,14 @@ namespace ToolRackSetup {
                     }
                 }
                 item.IsInSpindle = item.Number == toolInSpindle;
+                if (item.IsInSpindle)
+                {
+                    activeTool = item;
+                }
 
             }
+            this.ActiveTool = activeTool;
+
 
         }
 
