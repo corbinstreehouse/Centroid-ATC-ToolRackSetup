@@ -40,19 +40,17 @@ GOTO 950 ; goto where we update the value.
 
 ;-------------------------------------------------------------
 N900
+
 M200 "Remove Tool %.0f from the spindle and press Cycle Start to Continue." #20   ; prompt for input ; #20 is T, #T doesn't work
+
 ;-------------------------------------------------------------
 
 ;-------------------------------------------------------------
 N950
 
-IF #50001 
-; mark that nothing is in the spindle because it is gone at this point
-G10 P976 R0 ; set the tool number in the PLC
-g4 p0.2 ; wait for the update
-T0 
-#150 = 0 ; store here too, as Avid uses this in cncm.hom, and I don't want to edit that file.
-;-------------------------------------------------------------
+IF #50001 ; prevent look ahead ? Not sure why we'd need this..
+; mark that nothing is in the spindle because it is gone at this point, and the logic should reflect that.
+G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T0
 
 
 N1000
