@@ -21,13 +21,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_07B50E586AC24DB082722F6B3DE033BD"
+        "MsmKey" = "8:_0B7B26577073426FB216FFCFABA17509"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_11BD0A82BD00493AA24C8EC0CFB6F4F1"
+        "MsmKey" = "8:_0C077CCC3D244D6C8838DF677AFD97FD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_16093498066749FEBF57F967DDBE46A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,7 +45,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1DBFD9B5ABFB4E7392EFE8ACC9F01014"
+        "MsmKey" = "8:_2DF9A691B85F4F29BE7B36B4ABFBAEA9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -57,13 +63,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3B37C2680EAF48F5B049DCC53C43D64D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3F573C0160AD4147B65D45562CA0ECA4"
+        "MsmKey" = "8:_3B72FF449DC5450F99EE77062AB9717D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -75,13 +75,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_41D29302F0D84C4E8FAD84B69FB2C26F"
+        "MsmKey" = "8:_4127212B868E4F84927F8FA7092E04F1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_427EB307EACB44A187353C8E61930493"
+        "MsmKey" = "8:_41D29302F0D84C4E8FAD84B69FB2C26F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -111,7 +111,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_55289C021A0746ED8A765E4248284BD8"
+        "MsmKey" = "8:_5E40F06BD4954479813744D87FEC3ABA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_606CC3B77A0D4CFF86A353E9152F7043"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_667C8112889C44FEBE2F6916EF2C8390"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -123,19 +135,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_68106FFF5BDF439CBB450297F0991C07"
+        "MsmKey" = "8:_6D6DF5F05E544D8F836E6C698E9387B0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_80BC52AE16B6454BAEB524AF54D95A8F"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8A96F1DEA1B14113BAF679BF650DA50E"
+        "MsmKey" = "8:_6EACD9F094894AF4A21923ECC371098F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -159,6 +165,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9AD5DCF989124478A6F43F87A9288081"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9F99CB97FE1B4223956747641FC4AED0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A0020C5F51FC4495994D5002BF2F7685"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AB0FD2DE655D480FAC83F0B891D80616"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -171,13 +195,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B249583625B54978B6E0DB798D085E19"
+        "MsmKey" = "8:_C2C7CE60C1394D1E8290E4E15FDCD8EE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BEF67F1020364C6E93C099FDBFFB9AE4"
+        "MsmKey" = "8:_CE6A35665FB54C09A4ED5866F2A9DE73"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -189,31 +213,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E5FE270DE2414906B74F936A60CB31E1"
+        "MsmKey" = "8:_DAB9985195634535AF9798042083C333"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DF1CFD6046234D8D80A25CDD11DD1427"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_E62A10692799464D861B1D76323EE357"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F1FD83AD9B78487BAB08A37DE7276B87"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F7C937DCA60044C8A2A7C40C2BBB2B69"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F9C0E84E88A64BF5BEAC220BB976F216"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -340,10 +352,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_07B50E586AC24DB082722F6B3DE033BD"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0B7B26577073426FB216FFCFABA17509"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\manual_tool_install.cnc"
-            "TargetName" = "8:manual_tool_install.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_fetch.mac"
+            "TargetName" = "8:tool_fetch.mac"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -360,10 +372,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_11BD0A82BD00493AA24C8EC0CFB6F4F1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0C077CCC3D244D6C8838DF677AFD97FD"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_manual_drawbar.cnc"
-            "TargetName" = "8:tool_manual_drawbar.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\laser_deactivate.cnc"
+            "TargetName" = "8:laser_deactivate.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_16093498066749FEBF57F967DDBE46A8"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\manual_tool_remove.cnc"
+            "TargetName" = "8:manual_tool_remove.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -400,7 +432,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1DBFD9B5ABFB4E7392EFE8ACC9F01014"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2DF9A691B85F4F29BE7B36B4ABFBAEA9"
             {
             "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\goto_touch_plate.cnc"
             "TargetName" = "8:goto_touch_plate.cnc"
@@ -460,30 +492,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3B37C2680EAF48F5B049DCC53C43D64D"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3B72FF449DC5450F99EE77062AB9717D"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_measure_height.cnc"
-            "TargetName" = "8:tool_measure_height.cnc"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3F573C0160AD4147B65D45562CA0ECA4"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_set.mac"
-            "TargetName" = "8:tool_set.mac"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_put_back_button.mac"
+            "TargetName" = "8:tool_put_back_button.mac"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -520,6 +532,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4127212B868E4F84927F8FA7092E04F1"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_set_button.mac"
+            "TargetName" = "8:tool_set_button.mac"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_41D29302F0D84C4E8FAD84B69FB2C26F"
             {
             "SourcePath" = "8:..\\cncm\\mfunc15.mac"
@@ -533,26 +565,6 @@
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
             "Permanent" = "11:TRUE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_427EB307EACB44A187353C8E61930493"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\check_air_pressure.cnc"
-            "TargetName" = "8:check_air_pressure.cnc"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
@@ -620,10 +632,50 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_55289C021A0746ED8A765E4248284BD8"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5E40F06BD4954479813744D87FEC3ABA"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc"
-            "TargetName" = "8:pocket_position_template.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\check_air_pressure.cnc"
+            "TargetName" = "8:check_air_pressure.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_606CC3B77A0D4CFF86A353E9152F7043"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\laser_activate.cnc"
+            "TargetName" = "8:laser_activate.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_667C8112889C44FEBE2F6916EF2C8390"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_set.cnc"
+            "TargetName" = "8:tool_set.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -660,10 +712,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_68106FFF5BDF439CBB450297F0991C07"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6D6DF5F05E544D8F836E6C698E9387B0"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\manual_tool_remove.cnc"
-            "TargetName" = "8:manual_tool_remove.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\manual_tool_install.cnc"
+            "TargetName" = "8:manual_tool_install.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -680,30 +732,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_80BC52AE16B6454BAEB524AF54D95A8F"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6EACD9F094894AF4A21923ECC371098F"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\mfunc6_corbin.mac"
-            "TargetName" = "8:mfunc6_corbin.mac"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A96F1DEA1B14113BAF679BF650DA50E"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\laser_deactivate.cnc"
-            "TargetName" = "8:laser_deactivate.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_manual_drawbar.cnc"
+            "TargetName" = "8:tool_manual_drawbar.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -780,6 +812,66 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9AD5DCF989124478A6F43F87A9288081"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_table_cleanup.cnc"
+            "TargetName" = "8:tool_table_cleanup.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9F99CB97FE1B4223956747641FC4AED0"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\mfunc6_corbin.mac"
+            "TargetName" = "8:mfunc6_corbin.mac"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A0020C5F51FC4495994D5002BF2F7685"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_get_from_pocket.cnc"
+            "TargetName" = "8:tool_get_from_pocket.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AB0FD2DE655D480FAC83F0B891D80616"
             {
             "SourcePath" = "8:..\\cncm\\AvidMacros\\mantoolmeasure.mac"
@@ -820,10 +912,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B249583625B54978B6E0DB798D085E19"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C2C7CE60C1394D1E8290E4E15FDCD8EE"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_put_back.cnc"
-            "TargetName" = "8:tool_put_back.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_measure_height.cnc"
+            "TargetName" = "8:tool_measure_height.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -840,10 +932,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BEF67F1020364C6E93C099FDBFFB9AE4"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CE6A35665FB54C09A4ED5866F2A9DE73"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_table_cleanup.cnc"
-            "TargetName" = "8:tool_table_cleanup.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc"
+            "TargetName" = "8:pocket_position_template.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -880,10 +972,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E5FE270DE2414906B74F936A60CB31E1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DAB9985195634535AF9798042083C333"
             {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_get_from_pocket.cnc"
-            "TargetName" = "8:tool_get_from_pocket.cnc"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_measure_if_needed.cnc"
+            "TargetName" = "8:tool_measure_if_needed.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DF1CFD6046234D8D80A25CDD11DD1427"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_put_back.cnc"
+            "TargetName" = "8:tool_put_back.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -906,66 +1018,6 @@
             "TargetName" = "8:tool_run_atc_tools.xml"
             "Tag" = "8:"
             "Folder" = "8:_1FC770F85C504F4E8A3E326C4A23FD4F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F1FD83AD9B78487BAB08A37DE7276B87"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_put_back_button.mac"
-            "TargetName" = "8:tool_put_back_button.mac"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F7C937DCA60044C8A2A7C40C2BBB2B69"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\laser_activate.cnc"
-            "TargetName" = "8:laser_activate.cnc"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F9C0E84E88A64BF5BEAC220BB976F216"
-            {
-            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_fetch.mac"
-            "TargetName" = "8:tool_fetch.mac"
-            "Tag" = "8:"
-            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1168,7 +1220,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ATC Tools"
         "ProductCode" = "8:{E541D7CD-2008-4CC3-911E-00890F0E94F0}"
-        "PackageCode" = "8:{36EE71CE-16A3-4121-8405-00FA72FB7E01}"
+        "PackageCode" = "8:{6B7235BE-AD5B-4D70-9880-31EDD38E8B4E}"
         "UpgradeCode" = "8:{34E826E8-0848-405D-A734-FAC0C9187189}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
