@@ -48,11 +48,12 @@
 ; #150 = current tool; persists, but we also store it in ; #9976 
 ; #151 = the time the spindle stop command was given, M5, mfunc5.mac sets this value to #25012
 
-
-
 ;
 ;------------------------------------------------------------------------------
-IF #50001                        ;Prevent lookahead from parsing past here
+
+DEFINE <PREVENT_LOOK_AHEAD> IF #50001 
+
+<PREVENT_LOOK_AHEAD>
 IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
 #140 = 3 ; //message time in seconds
@@ -68,8 +69,7 @@ if #135 < 0 THEN #135 = 0
 if #134 < 0 then #134 = 0
 
 #131 = #4003                     ;Save Positioning Mode
-;  5021–5028 MachinePosition
-; (axis1=5021,axis2=5022,etc.
+;  5021–5028 MachinePosition (axis1=5021,axis2=5022,etc.
 #132 = #5021 ; saved x
 #133 = #5022 ; saved y
 
@@ -78,6 +78,16 @@ m221 #140 "Tool change requested from %.0f to %.0f" #134 #135
 DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
 DEFINE <OLD_TOOL_IS_LASER> [#134 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
 DEFINE <NEW_TOOL_IS_LASER> [#135 == #9718 && #9718 != 0] ; 9718 is the laser tool number, and #134 is the old tool
+DEFINE <TOOL_IS_THE_SAME> [#134 == #135]
+
+; GOTO targets
+DEFINE <END_LINE> 1000
+DEFINE <RESTORE_LINE> 900
+DEFINE <ERROR_LINE> 800
+DEFINE <HEIGHT_CHECK_LINE> 600
+DEFINE <SET_TOOL_LINE> 300
+DEFINE <GET_NEW_TOOL_LINE> 250
+DEFINE <TOOLS_DIFFERENT_LINE> 100
 
 
 ; OKAY, if the ATC is enabled (9776 and 1), then I'm going to disable Centroid's ATC Installed.
@@ -92,24 +102,13 @@ IF #9702 EQ 0 THEN GOTO 801 ;bail if touch plate not setup
 IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 ;-----------------------------
 
-; If we have the *same* tool, skip everything, but do a message first
-IF #134 != #135 THEN GOTO 100
+; Same tool check
+IF <TOOL_IS_THE_SAME> m221 #140 "Tool change: same tool is in the spindle. Continuing..."
+; Always activate the laser; seems to be required
+IF [<TOOL_IS_THE_SAME> && <NEW_TOOL_IS_LASER>] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
+IF <TOOL_IS_THE_SAME> GOTO <SET_TOOL_LINE> ; Sets the tool, sets the height, measures if needed.
 
-; ...but always activate the laser; seems to be required
-if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
-
-m221 #140 "Tool change: same tool is in the spindle. Continuing..."
-
-; Check the tool length and measure it if it is zero
-; #10001 is first height for tool 1, etc.
-if [#135 <= 0 || #135 > 200] then GOTO 1000 ; no tool; goto the end without doing anything
-if [#[10000 + #135] != 0] then GOTO 1000 ; height is set; go to the end without doing anything
-
-GOTO 600 ; check height
-
-;------------------------------
-N100
-
+; Doing a tool change
 ; m225 #140 "Checking air"
 M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc"
 
@@ -128,14 +127,14 @@ m109/1 ;disable feedrate override
 ;m225 #140 "Putting the old tool away"
 ; ------------------------ PUT OLD TOOL AWAY -----------------
 ;Skip Putaway if No Tool in Spindle
-IF [#134 <= 0]  THEN GOTO 250
+IF [#134 <= 0]  THEN GOTO <GET_NEW_TOOL_LINE>
 
 ; If the old tool is the laser, deactivate and skip put away
 if <OLD_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
-if <OLD_TOOL_IS_LASER> THEN GOTO 250 ; get next tool to get; skip put back
+if <OLD_TOOL_IS_LASER> THEN GOTO <GET_NEW_TOOL_LINE> ; get next tool to get; skip put back
 
 ; If ATC is not enabled, skip put back and get the next tool
-if !<ATC_ENABLED> THEN GOTO 250; // get the next tool
+if !<ATC_ENABLED> THEN GOTO <GET_NEW_TOOL_LINE>; // get the next tool
 
 ; --------------- ATC tool put back -------------
 
@@ -146,7 +145,7 @@ if !<ATC_ENABLED> THEN GOTO 250; // get the next tool
 ;m225 #140 "Pocket %f for tool %f" #136 #134
 
 ; See if the pocket is past the # of pockets set by the user (#9161)
-IF #136 > #9161 THEN GOTO 800 ; error
+IF #136 > #9161 THEN GOTO <ERROR_LINE> ; error
 
 ;m225 #140 "Calling put back"
 ; If the tool has a pocket, put it back
@@ -157,51 +156,50 @@ IF #136 <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_remove.cnc" T#134
 ;---------------------------------------------------
 
 ; ------------------------ GET NEW TOOL ------------------
-N250
+N<GET_NEW_TOOL_LINE>
 
 ;m225 #140 "Getting the new tool"
 
 ; if don't have a tool, skip stuff
-IF [#135 <= 0] THEN GOTO 300 ; set tool
+IF [#135 <= 0] THEN GOTO <SET_TOOL_LINE>
 
 ; if the new tool is the laser, activate it and skip stuff
 if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
-if <NEW_TOOL_IS_LASER> THEN GOTO 300 ; set tool & check height
+if <NEW_TOOL_IS_LASER> THEN GOTO <SET_TOOL_LINE> 
 
 ; If ATC Support is not enabled, just ask the user to put in the new tool, if it isn't the laser
 IF [!<ATC_ENABLED>] && ![<NEW_TOOL_IS_LASER>] THEN m200 "Manual Tool Change\nInsert tool number %.0f and then press Cycle Start" #135 ;don't stop if we're on laser
-IF [!<ATC_ENABLED>] GOTO 600 ; goto height measurement, if needed...
+IF [!<ATC_ENABLED>] GOTO <HEIGHT_CHECK_LINE> ; goto height measurement, if needed...
 
 ;----------------- ATC fetch tool ------------------- 
 
 ; Find the pocket for the new tool
 #137 = #[#135 + 17000] 
 
-if #137 > #9161 THEN GOTO 800; error out of range
+if #137 > #9161 THEN GOTO <ERROR_LINE>; error out of range
 ; If the tool has no pocket, ask the user for it
 IF #137 <= 0 THEN G65 "\cncm\CorbinsWorkshop\manual_tool_install.cnc" A#135
+
+<PREVENT_LOOK_AHEAD>
 
 ; Otherwise, fetch it from the pocket
 IF #137 > 0 THEN G65 "\cncm\CorbinsWorkshop\tool_get_from_pocket.cnc" A#137 B#134 C#135
 
-N300 ; set tool
+;--------------------------------------
+; Set Tool
+N<SET_TOOL_LINE>
 
-IF #50001
-; Set the tool that is in the spindle; could be 0 (no tool)
-G10 P976 R#135 ; set the tool number in the PLC
-G4 P.2 ; Dwell to ensure PLC Updates Putback Position
-T#135
-#150 = #135 ; store here too, as Avid uses this in cncm.hom, and I don't want to edit that file.
+G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T#135
 
 ; ------------------------------------------ TOOL HEIGHT
-N600
+N<HEIGHT_CHECK_LINE>
 
 ; m200 "checking height tool %.0f/%.0f table height %f" #4120 #135 #[10000 + #135]
 
 ; Check the tool length and measure it if it is zero
 ; #10001 is first height for tool 1, etc.
-if [#135 <= 0 || #135 >= 200] then GOTO 900 ; no tool, goto restore
-if [#[10000 + #135] != 0] then GOTO 900 ; height is already set, goto restore
+if [#135 <= 0 || #135 >= 200] then GOTO <RESTORE_LINE> ; no tool, goto restore
+if [#[10000 + #135] != 0] then GOTO <RESTORE_LINE>  ; height is already set, goto restore
 
 m221 #140 "Going to the touch plate and measuring the height of Tool %.0f" #135
 
@@ -209,7 +207,7 @@ G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T#135
 
 
-GOTO 900 ; goto restore
+GOTO <RESTORE_LINE>
 ; ----------------------------------
 
 
@@ -217,10 +215,10 @@ GOTO 900 ; goto restore
 ; ----------------------------------
 ; Errors
 ; ----------------------------------
-N800 ;Errors
+N<ERROR_LINE> ;Errors
 #100 = 0
 M225 #100 "Error or Invalid Tool Requested\nCycle Stop to Abort"
-GOTO 800 ; infinite loop
+GOTO <ERROR_LINE> ; infinite loop
 ; ----------------------------------
 n801
 m200 "Fixed touch plate not setup. Please set it up in the UTILS menu. Cycle Stop to Abort."
@@ -234,9 +232,9 @@ GOTO 802
 ; ----------------------------------
 ; Restore
 ; ----------------------------------
-N900 
+N<RESTORE_LINE> 
 
-if #50001
+<PREVENT_LOOK_AHEAD>
 
 m221 #140 "End tool change: Restoring position to X%f Y%f" #132 #133
 
@@ -255,6 +253,7 @@ m108/1 ;re-enable feedrate override
 
 ;----------------------------------------------
 
-GOTO 1000
 
-N1000                            ;End of Macro
+
+
+N<END_LINE>                            ;End of Macro
