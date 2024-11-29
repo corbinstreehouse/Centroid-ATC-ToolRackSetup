@@ -1,0 +1,25 @@
+;------------------------------------------------------------------------------
+; Filename: tool_set_button.mac
+; Called by the "Set Tool" button, and prompts for a tool number
+; corbin dunn
+;------------------------------------------------------------------------------
+IF #50001                        ;Prevent lookahead from parsing past here
+IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+
+N100 
+
+M224 #101 "Enter the tool number currently in the spindle.\nEnter 0 for no tool."
+; #101 = requested tool
+
+if [#101 <0 || #101 > 200] THEN GOTO 800
+
+G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T#101
+G65 "\cncm\CorbinsWorkshop\tool_measure_if_needed.cnc" T#101
+
+GOTO 1000
+
+;------------ error
+N800
+M200 "Invalid tool # %.0f. Press Cycle Start to Continue." #101
+
+N1000                            ;End of Macro

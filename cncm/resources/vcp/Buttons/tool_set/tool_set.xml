@@ -1,5 +1,5 @@
 <vcp_button>
   <run>
-    <macro>c:\cncm\CorbinsWorkshop\tool_set.mac</macro>
+    <macro>c:\cncm\CorbinsWorkshop\tool_set_button.mac</macro>
   </run>
 </vcp_button>
