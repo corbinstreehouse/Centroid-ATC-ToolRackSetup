@@ -44,8 +44,6 @@ N900
 M200 "Remove Tool %.0f from the spindle and press Cycle Start to Continue." #20   ; prompt for input ; #20 is T, #T doesn't work
 
 ;-------------------------------------------------------------
-
-;-------------------------------------------------------------
 N950
 
 IF #50001 ; prevent look ahead ? Not sure why we'd need this..
