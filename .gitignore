@@ -361,7 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-cncm/CorbinsWorkshop/ToolPocketPositions.xml
 cncm/ToolRackSetup.deps.json
 cncm/ToolRackSetup.dll
 cncm/ToolRackSetup.exe
