@@ -430,14 +430,20 @@ namespace ToolRackSetup
 
         public ToolController _ToolController { get;  }
         ObservableCollection<ToolPocketItem> _toolPocketItems;
+        private const string cncmPath = "c:\\cncm\\";
+        private const string vcpPath = cncmPath + "resources\\vcp\\";
+        private const string corbinsWorkshopPath = cncmPath + "CorbinsWorkshop\\";
+        private const string centroidWizardSettingsPath = cncmPath + "wizardSettings.xml";
 
-        private const string settingsPath = "C:\\cncm\\CorbinsWorkshop\\ToolPocketPositions.xml";
-        private const string systemSettingsPath = "C:\\cncm\\RackMountBin.xml"; // If the file above isn't found we can attempt to load values from here, in case the user used the CNC script for ATC stuff.
-        private const string pocketTemplatePath = "c:\\cncm\\CorbinsWorkshop\\pocket_position_template.cnc";
-        private const string generatedMacroPath = "C:\\cncm\\CorbinsWorkshop\\Generated\\";
 
-        private const string vcpOptionsPath = "C:\\cncm\\resources\\vcp\\options.xml";
-        private const string vcpSkinPathFormat = "C:\\cncm\\resources\\vcp\\skins\\{0}.vcp";
+        private const string settingsPath = corbinsWorkshopPath + "ToolPocketPositions.xml";
+
+        private const string systemSettingsPath = cncmPath + "RackMountBin.xml"; // If the file above isn't found we can attempt to load values from here, in case the user used the CNC script for ATC stuff.
+        private const string pocketTemplatePath = corbinsWorkshopPath + "pocket_position_template.cnc";
+        private const string generatedMacroPath = corbinsWorkshopPath + "Generated\\";
+
+        private const string vcpOptionsPath = vcpPath + "options.xml";
+        private const string vcpSkinPathFormat = vcpPath + "skins\\{0}.vcp";
 
 
         public ToolChangeSettings Settings { get; }
@@ -586,9 +592,42 @@ namespace ToolRackSetup
             _dirty = false;
             _loading = false;
 
+        }
 
+        private void CheckForCentroidATCSetup()
+        {
+            // Warn the user if they have done this...as it keeps writing 160/06
+            if (!File.Exists(centroidWizardSettingsPath)) return;
+
+            try
+            {
+                XDocument doc = XDocument.Load(centroidWizardSettingsPath);
+                XAttribute? attr = doc.XPathSelectElement("/WizardSettings/ATCWritten")?.Attribute("value");
+                string? v = attr?.Value;
+                if (v != null && Boolean.TryParse(v, out bool result))
+                {
+                    if (result)
+                    {
+                        // Ask if we should turn it off
+                        MessageBoxResult r = MessageBox.Show("It looks like you ran the Centroid ATC Wizard.\n" +
+                            "This will cause the ATC Tool Rack settings to not work right due to Parameters 6 (Centroid ATC Enabled) and 160 (Centroid Enhanced ATC).\n" + 
+                            "Should I automatically reset these values to 0 and reset the wizard setting?", "ATC Warning", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                        if (r == MessageBoxResult.Yes)
+                        {
+                            attr!.Value = "False";
+                            doc.Save(centroidWizardSettingsPath);
+                            WriteCentroidATCParamsOff();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Checking XML file failed....Centroid ATC Setup");
+            }
 
         }
+
         private void RefreshTools()
         {
             _ToolController.RefreshTools();
@@ -666,11 +705,12 @@ namespace ToolRackSetup
   </Bin>
         */
 
-        private void WriteParameters()
+        private void WriteCentroidATCParamsOff()
         {
             try
-            {  
-
+            {
+                _pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0);
+                _pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0);
             }
             catch (Exception ex)
             {
@@ -1032,7 +1072,6 @@ namespace ToolRackSetup
 
         private void SaveAll()
         {
-            WriteParameters();
             WriteSettings();
             WriteMacros();
             Dirty = false;
@@ -1257,6 +1296,12 @@ namespace ToolRackSetup
         private void Window_(object sender, EventArgs e)
         {
 
+        }
+
+        private void chkbxEnableATC_Checked(object sender, RoutedEventArgs e)
+        {
+            // corbin, test!! I'm not sure if this is right; i need to test the wizard more...with aTC stuff
+            // CheckForCentroidATCSetup();
         }
     }
 

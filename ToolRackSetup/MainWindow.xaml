@@ -585,7 +585,7 @@
 
 
                     </Grid>
-                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,161" Width="334" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="25" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="chkbxEnableATC" Content="Enable Automatic Tool Changer (ATC)" HorizontalAlignment="Left" Margin="8,0,0,161" Width="334" IsChecked="{Binding _parameterSettings.EnableATC, ElementName=mainWindow}" Height="25" VerticalAlignment="Bottom" Checked="chkbxEnableATC_Checked"/>
                     <CheckBox x:Name="chkbxLockToolPocketSettings" Content="Lock Tool Pocket Settings" HorizontalAlignment="Left" Margin="279,0,0,162" Width="225" Height="15" VerticalAlignment="Bottom" IsChecked="{Binding LockToolPocketSettings, Mode=TwoWay, Source={x:Static properties:Settings.Default}, UpdateSourceTrigger=Default, ValidatesOnNotifyDataErrors=True}" Visibility="Hidden"/>
 
 
