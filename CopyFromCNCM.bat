@@ -8,6 +8,8 @@ xcopy /y c:\CNCM\mfunc16.mac CNCM\
 
 xcopy /y c:\CNCM\AvidMacros\mantoolmeasure.mac CNCM\AvidMacros\
 xcopy /y c:\CNCM\AvidMacros\mtc.mac CNCM\AvidMacros\
+xcopy /y c:\CNCM\AvidMacros\zplate.mac CNCM\AvidMacros\
+xcopy /y c:\CNCM\AvidMacros\utilsrouter.mac CNCM\AvidMacros\
 
 xcopy /y c:\CNCM\resources\vcp\skins\avid_router.vcp CNCM\resources\vcp\skins\
 
