@@ -32,6 +32,9 @@ namespace ToolRackSetup
         //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
         SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
 
+
+        CentroidATCType = 830, // 0 = None, 7 = Rack type...; this needs to be 0! Otherwise the wizard keeps re-writing stuff.
+
         CurrentToolNumber = 976, // System, used by the PLC and I read/write it.
 
     }

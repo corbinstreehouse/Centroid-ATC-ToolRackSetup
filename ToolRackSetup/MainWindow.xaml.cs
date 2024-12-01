@@ -200,8 +200,22 @@ namespace ToolRackSetup
             }
         }
 
-        bool _enableATC = false;
+        private bool _enableATC = false;
         private bool _promptWhenGoingToTouchPlate;
+
+        public void WriteCentroidATCParamsOff()
+        {
+            try
+            {
+                _pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0);
+                _pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0);
+                _pipe.parameter.SetValue(ParameterKey.CentroidATCType, 0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Failed to write parameters");
+            }
+        }
 
         public bool EnableATC
         {
@@ -211,14 +225,11 @@ namespace ToolRackSetup
                 {
 
                     _pipe.parameter.SetToolOptionValue(ATCToolOptions.EnableATC, value);
-                    // We have other bits that *must* be zero for now.
-                    // I'm now settings these in mfunc6_corbin.mac instead
-                    // of doing it here, as one person had ran the wizard and it
-                    // re-wrote these values and caused problems.
-                    //_pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0); // needs to be zero!
-                    //_pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0); // needs to be zero!
-
                     SetProperty(ref _enableATC, value);
+                    if (value)
+                    {
+                        WriteCentroidATCParamsOff();
+                    }
                 }
 
             }
@@ -610,13 +621,18 @@ namespace ToolRackSetup
                     {
                         // Ask if we should turn it off
                         MessageBoxResult r = MessageBox.Show("It looks like you ran the Centroid ATC Wizard.\n" +
-                            "This will cause the ATC Tool Rack settings to not work right due to Parameters 6 (Centroid ATC Enabled) and 160 (Centroid Enhanced ATC).\n" + 
+                            "This will cause the Tool Change Macro to have issues with tools not in the rack due to Parameters 6 (Centroid ATC Enabled) and 160 (Centroid Enhanced ATC).\n\n" + 
                             "Should I automatically reset these values to 0 and reset the wizard setting?", "ATC Warning", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Yes);
                         if (r == MessageBoxResult.Yes)
                         {
                             attr!.Value = "False";
+
+                            // Also do CustomToolChangeMacro
+                            XAttribute? customToolMacroAttr = doc.XPathSelectElement("/WizardSettings/CustomToolChangeMacro")?.Attribute("value");
+                            if (customToolMacroAttr != null) { customToolMacroAttr!.Value = "True";  }
+
                             doc.Save(centroidWizardSettingsPath);
-                            WriteCentroidATCParamsOff();
+                            _parameterSettings.WriteCentroidATCParamsOff();
                         }
                     }
                 }
@@ -705,18 +721,7 @@ namespace ToolRackSetup
   </Bin>
         */
 
-        private void WriteCentroidATCParamsOff()
-        {
-            try
-            {
-                _pipe.parameter.SetValue(ParameterKey.CentroidHasATC, 0);
-                _pipe.parameter.SetValue(ParameterKey.CentroidHasEnhancedATC, 0);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Failed to write parameters");
-            }
-        }
+    
 
         private void WriteSettings()
         {
@@ -1127,7 +1132,6 @@ namespace ToolRackSetup
                 }
             }
             Properties.Settings.Default.Save();
-
         }
 
 
@@ -1301,7 +1305,10 @@ namespace ToolRackSetup
         private void chkbxEnableATC_Checked(object sender, RoutedEventArgs e)
         {
             // corbin, test!! I'm not sure if this is right; i need to test the wizard more...with aTC stuff
-            // CheckForCentroidATCSetup();
+            if (!_loading && _parameterSettings.EnableATC)
+            {
+                CheckForCentroidATCSetup();
+            }
         }
     }
 
