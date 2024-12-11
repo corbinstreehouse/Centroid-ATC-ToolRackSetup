@@ -18,15 +18,20 @@ namespace ToolRackSetup {
         {
             _pipe = pipe;
             this.Number = info.number;
+            _isInSpindle = false;
+            RefreshFromInfo(info);
+        }
+
+        public void RefreshFromInfo(Info info)
+        {
             _pocket = info.bin;
             _heightOffset = info.height_offset;
             _description = info.description;
-            _isInSpindle = false;
             _diameter = info.diameter_offset;
             _heightNumber = info.h_number;
             _diameterNumber = info.d_number;
-
         }
+
         public int Number { get; }
 
         private int _pocket = -1;
@@ -131,7 +136,7 @@ namespace ToolRackSetup {
 
         //public int spindle_speed;
 
-        private string _description;
+        private string _description = "";
         private bool _isInSpindle;
         private double _heightOffset;
         private double _diameter;
@@ -273,8 +278,8 @@ namespace ToolRackSetup {
             {
                 ToolInfo item = useExisting ? _toolInfoLibrary[i] : new ToolInfo(_pipe, toolLibrary[i]);
 
+                if (!useExisting) _toolInfoLibrary.Add(item); else item.RefreshFromInfo(toolLibrary[i]);
 
-                if (!useExisting) _toolInfoLibrary.Add(item);
                 //  System.Diagnostics.Debug.WriteLine("Tool: {0} bin: {1}, {2}", toolLibrary[i].number, toolLibrary[i].bin, toolLibrary[i].description);
                 if (item.Pocket > toolBinCount)
                 {
