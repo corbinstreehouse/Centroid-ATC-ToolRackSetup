@@ -306,116 +306,6 @@ namespace ToolRackSetup
         }
     }
 
-    // I suppose this is the model object
-    public class ToolPocketItem : ObservableObject
-    {
-        private double x;
-        private double y;
-        private double z;
-        private PocketStyle style = PocketStyle.YPlus;
-
-        public int Pocket { get; }
-
-        public double X { get => x; set {
-                SetProperty(ref x, value);
-            } 
-        }
-        public double Y { get => y; set { SetProperty(ref y, value); } }
-        public double Z { get => z; set { SetProperty(ref z, value);  } }
-        public PocketStyle Style
-        {
-            get { return style;  }
-            set
-            {
-                SetProperty(ref style, value);
-            }
-        }
-
-        private ToolInfo? _toolInfo = null;
-        public ToolInfo? ToolInfo {
-            get
-            {
-                return _toolInfo;
-            }
-
-            set
-            {
-                if (_toolInfo != value)
-                {
-                    OnPropertyChanging(nameof(IsToolEnabled));
-                    SetProperty(ref _toolInfo, value);                  
-                    OnPropertyChanged(nameof(IsToolEnabled));
-                }
-
-            }
-        }
-
-        public bool IsToolEnabled
-        {
-            get { return _toolInfo != null;  }
-        }
-
-        private ToolController _toolController;
-
-        public ToolPocketItem(int pocket, ToolInfo? toolInfo, ToolController toolController)
-        {
-            Pocket = pocket;
-            ToolInfo = toolInfo;
-            _toolController = toolController;
-        }
-
-        public int ToolNumber
-        {
-            get
-            {
-                if (ToolInfo != null)
-                {
-                    return ToolInfo.Number;
-                } else
-                {
-                    return 0;
-                }
-            }
-            set
-            {
-                int oldToolNumber = this.ToolNumber;
-                if (value != oldToolNumber)
-                {
-                    OnPropertyChanging();
-                    // Do some quick validation
-                    if (value > 0)
-                    {
-                        // If we have a valid new tool index (should check max 200 too)
-                        ToolInfo tInfo = _toolController.Tools[value - 1];
-                        // If it is already in a pocket, just move it here
-                        if (tInfo.Pocket > 0)
-                        {
-                            throw new Exception(String.Format("Remove tool from pocket {0} before assigning to another pocket", tInfo.Pocket));
-                        }
-                    }
-
-                    if (ToolInfo != null)
-                    {
-                        // We have to unassociate the old one first
-                        ToolInfo.Pocket = -1;
-                        ToolInfo = null;
-                    }
-                    if (value > 0)
-                    {
-                        // If we have a valid new tool index (should check max 200 too)
-                        ToolInfo = _toolController.Tools[value - 1];
-                        ToolInfo.Pocket = Pocket;
-                    }
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-  
-    }
-
-
-
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // I should use a 3d party framework to do this silly boiler plate code that should be built in.
@@ -429,7 +319,6 @@ namespace ToolRackSetup
         private CNCPipe _pipe;
 
         public ToolController _ToolController { get;  }
-        ObservableCollection<ToolPocketItem> _toolPocketItems;
         private const string cncmPath = "c:\\cncm\\";
         private const string vcpPath = cncmPath + "resources\\vcp\\";
         private const string corbinsWorkshopPath = cncmPath + "CorbinsWorkshop\\";
@@ -565,19 +454,13 @@ namespace ToolRackSetup
             _vcpHasVirtualDrawbarButton = GetIfVCPHasVirtualdrawbarButton();
             UpdateAddRemoveVCPButtonTitle();
 
-            // Convert toolInfoList into our own datastructure
-            // fixup tools to be in one bin at a time (mainly because of how I messed it up when testing)
-            _ToolController = new ToolController(_pipe);
+            _ToolController = new ToolController(_pipe, _parameterSettings);
             NotifyPropertyChanged(nameof(_ToolController));
-
-            _toolPocketItems = new ObservableCollection<ToolPocketItem>();
-
-            RefreshTools();
 
             InitializeToolPocketItems();
             ReadSettings();
 
-            lstviewPockets.ItemsSource = _toolPocketItems;
+            lstviewPockets.ItemsSource = _ToolController.ToolPocketItems;
             lstviewPockets.UnselectAll();
 
             lstvwTools.ItemsSource = _ToolController.Tools;
@@ -673,7 +556,7 @@ namespace ToolRackSetup
                 Settings.RackOffset = ReadDouble(nameof(Settings.RackOffset), Settings.RackOffset);
 
                 // probably not the fastest way to do this.
-                foreach (ToolPocketItem item in _toolPocketItems)
+                foreach (ToolPocketItem item in _ToolController.ToolPocketItems)
                 {
 
                     XElement? element = doc.XPathSelectElement(String.Format("/Table/Bin/BinNumber[text()='{0}']", item.Pocket));
@@ -727,7 +610,7 @@ namespace ToolRackSetup
             topLevel.Add(new XElement(nameof(Settings.SlideDistance), Settings.SlideDistance.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.RackOffset), Settings.RackOffset.ToString(CultureInfo.InvariantCulture)));
 
-            foreach (ToolPocketItem item in _toolPocketItems)
+            foreach (ToolPocketItem item in _ToolController.ToolPocketItems)
             {
                 // The names are copied from what the initial stuff did.
                 XElement child = new XElement("Bin");
@@ -776,10 +659,10 @@ namespace ToolRackSetup
             // Chad was hitting a case where the slide was too large and put it outside where his machine could go. I can check for that..
 
 
-            for (int i = 0; i < _toolPocketItems.Count; i++)
+            for (int i = 0; i < _ToolController.ToolPocketItems.Count; i++)
             {
 
-                ToolPocketItem item = _toolPocketItems[i];
+                ToolPocketItem item = _ToolController.ToolPocketItems[i];
                 StringBuilder stringBuilder = new StringBuilder(fileContents);
 
                 double xPos = item.X;
@@ -897,19 +780,16 @@ namespace ToolRackSetup
         //String command = String.Format("G10 P{0} R{1}", CMaxToolBins, 50);
         //job.RunCommand(command, "c:\\cncm", false);
 
-        public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return _toolPocketItems; } }
+        // Did I have a binding to this?
+        public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return _ToolController.ToolPocketItems; } }
 
         private void InitializeToolPocketItems()
         {
-            int toolBinCount = _parameterSettings.PocketCount;
-            for (int i = 1; i <= toolBinCount; i++)
+            foreach(ToolPocketItem tpi in _ToolController.ToolPocketItems)
             {
-                ToolInfo? toolInfo = _ToolController.FindToolInfoForPocket(i);
-                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, _ToolController);
-                _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
-            }
 
+            }
         }
 
         private bool _dirty = false; // only for changes that are not immediate, which require new files to be written.
@@ -1080,15 +960,9 @@ namespace ToolRackSetup
 
         private void btnRemoveLastPocket_Click(object sender, RoutedEventArgs e)
         {
-            if (_toolPocketItems.Count > 0)
+            if (_ToolController.ToolPocketItems.Count > 0)
             {
-                // Attempt the API call first; if it fails an exception will be thrown and our UI won't update and have a bad state
-                int lastIndex = _toolPocketItems.Count - 1;
-                _parameterSettings.PocketCount = lastIndex;
-
-                ToolPocketItem? item = _toolPocketItems.Last();
-                item.ToolNumber = 0; /// make sure it doesn't have a tool..
-                _toolPocketItems.RemoveAt(lastIndex);
+                _ToolController.RemoveLastPocket();
                 Dirty = true;
             }
         }
@@ -1130,26 +1004,10 @@ namespace ToolRackSetup
             // Update the parameter right away
             try
             {
-                // Make sure we aren't running first!! otherwise we get to a strange state. Attempting to set the pocket count will do it.
-                int newCount = _toolPocketItems.Count + 1;
-                _parameterSettings.PocketCount = newCount;
-
+                ToolPocketItem tpi = _ToolController.AddToolPocket();
                 Dirty = true;
-                ToolPocketItem tpi = new ToolPocketItem(newCount, null, _ToolController);
-                if (_toolPocketItems.Count > 0)
-                {
-                    ToolPocketItem last = _toolPocketItems.Last()!;
-
-                    tpi.X = last.X;
-                    tpi.Y = last.Y;
-                    tpi.Z = last.Z;
-                    tpi.Style = last.Style;
-                }
-
-                _toolPocketItems.Add(tpi);
                 tpi.PropertyChanged += Tpi_PropertyChanged;
                 lstviewPockets.SelectedItem = tpi;
-
             }
             catch (Exception ex)
             {

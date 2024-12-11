@@ -155,25 +155,191 @@ namespace ToolRackSetup {
         }
     }
 
+    public class ToolPocketItem : ObservableObject
+    {
+        private double x;
+        private double y;
+        private double z;
+        private PocketStyle style = PocketStyle.YPlus;
+
+        public int Pocket { get; }
+
+        public double X
+        {
+            get => x; set
+            {
+                SetProperty(ref x, value);
+            }
+        }
+        public double Y { get => y; set { SetProperty(ref y, value); } }
+        public double Z { get => z; set { SetProperty(ref z, value); } }
+        public PocketStyle Style
+        {
+            get { return style; }
+            set
+            {
+                SetProperty(ref style, value);
+            }
+        }
+
+        private ToolInfo? _toolInfo = null;
+        public ToolInfo? ToolInfo
+        {
+            get
+            {
+                return _toolInfo;
+            }
+
+            set
+            {
+                if (_toolInfo != value)
+                {
+                    OnPropertyChanging(nameof(IsToolEnabled));
+                    SetProperty(ref _toolInfo, value);
+                    OnPropertyChanged(nameof(IsToolEnabled));
+                }
+
+            }
+        }
+
+        public bool IsToolEnabled
+        {
+            get { return _toolInfo != null; }
+        }
+
+        private ToolController _toolController; // weak reference? loops and GC?
+
+        public ToolPocketItem(int pocket, ToolInfo? toolInfo, ToolController toolController)
+        {
+            Pocket = pocket;
+            ToolInfo = toolInfo;
+            _toolController = toolController;
+        }
+
+        public int ToolNumber
+        {
+            get
+            {
+                if (ToolInfo != null)
+                {
+                    return ToolInfo.Number;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                int oldToolNumber = this.ToolNumber;
+                if (value != oldToolNumber)
+                {
+                    OnPropertyChanging();
+                    // Do some quick validation
+                    if (value > 0)
+                    {
+                        // If we have a valid new tool index (should check max 200 too)
+                        ToolInfo tInfo = _toolController.Tools[value - 1];
+                        // If it is already in a pocket, just move it here
+                        if (tInfo.Pocket > 0)
+                        {
+                            throw new Exception(String.Format("Remove tool from pocket {0} before assigning to another pocket", tInfo.Pocket));
+                        }
+                    }
+
+                    if (ToolInfo != null)
+                    {
+                        // We have to unassociate the old one first
+                        ToolInfo.Pocket = -1;
+                        ToolInfo = null;
+                    }
+                    if (value > 0)
+                    {
+                        // If we have a valid new tool index (should check max 200 too)
+                        ToolInfo = _toolController.Tools[value - 1];
+                        ToolInfo.Pocket = Pocket;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+    }
+
     public class ToolController : ObservableObject
 	{
         private CNCPipe _pipe;
-        ObservableCollection<ToolInfo> _toolInfoLibrary;
+        private ObservableCollection<ToolInfo> _toolInfoLibrary;
         private ToolInfo ?_activeTool;
+        private ObservableCollection<ToolPocketItem> _toolPocketItems;
+        private ParameterSettings _parameterSettings;
 
-        public ToolController(CNCPipe pipe)
+        public ToolController(CNCPipe pipe, ParameterSettings parameterSettings)
 		{
             _pipe = pipe;
+            _parameterSettings = parameterSettings;
             _toolInfoLibrary = new ObservableCollection<ToolInfo>();
-
+            _toolPocketItems = new ObservableCollection<ToolPocketItem>();
+            RefreshTools();
+            InitializeToolPocketItems();
         }
+
+        public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return _toolPocketItems; } }
+
+        private void InitializeToolPocketItems()
+        {
+            int toolBinCount = _parameterSettings.PocketCount;
+            for (int i = 1; i <= toolBinCount; i++)
+            {
+                ToolInfo? toolInfo = FindToolInfoForPocket(i);
+                ToolPocketItem tpi = new ToolPocketItem(i, toolInfo, this);
+                _toolPocketItems.Add(tpi);
+            }
+        }
+
+        public void RemoveLastPocket()
+        {
+            if (_toolPocketItems.Count > 0)
+            {
+                // Attempt the API call first; if it fails an exception will be thrown and our UI won't update and have a bad state
+                int lastIndex = _toolPocketItems.Count - 1;
+                _parameterSettings.PocketCount = lastIndex;
+
+                ToolPocketItem? item = _toolPocketItems.Last();
+                item.ToolNumber = 0; /// make sure it doesn't have a tool..
+                _toolPocketItems.RemoveAt(lastIndex);
+            }
+        }
+
+        public ToolPocketItem AddToolPocket()
+        {
+            // Make sure we aren't running first!! otherwise we get to a strange state. Attempting to set the pocket count will do it.
+            int newCount = _toolPocketItems.Count + 1;
+            _parameterSettings.PocketCount = newCount;
+
+            ToolPocketItem tpi = new ToolPocketItem(newCount, null, this);
+            if (_toolPocketItems.Count > 0)
+            {
+                ToolPocketItem last = _toolPocketItems.Last()!;
+
+                tpi.X = last.X;
+                tpi.Y = last.Y;
+                tpi.Z = last.Z;
+                tpi.Style = last.Style;
+            }
+
+            _toolPocketItems.Add(tpi);
+            return tpi;
+        }
+
 
         public ObservableCollection<ToolInfo> Tools
         {
             get { return _toolInfoLibrary; }
         }
 
-        public ToolInfo? FindToolInfoForPocket(int pocketIndex)
+        private ToolInfo? FindToolInfoForPocket(int pocketIndex)
         {
 
             // this is not the right way to do this; I should sort _toolInfoLibrary once into a new variable by bin, but this should be fast enough for finding stuff.
