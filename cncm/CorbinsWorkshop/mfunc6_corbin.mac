@@ -102,6 +102,9 @@ DEFINE <TOOLS_DIFFERENT_LINE> 100
 ; OKAY, if the ATC is enabled (9776 and 1), then I'm going to disable Centroid's ATC Installed.
 ; As it makes things...different, for when tool values are updated and the PLC updates.
 ;  I might change my mind about this later. Param 160 really has to be 0 to allow a 0 or -1 tool or a tool not  in a bin.
+; I also realized the Wizard keep re-writing these if param 830 (ATC Type) is non 0!
+; My app now sets these all to 0 when the ATC is turned on, which I think fixes the issue.
+; But having it here too probably doesn't hurt.
 IF <ATC_ENABLED> G10 P6 R0 ; Param 6 = ATC Installed, set to 0
 IF <ATC_ENABLED> G10 P160 R0 ; Paaram 160 = Enhanced ATC, set to 0
 
