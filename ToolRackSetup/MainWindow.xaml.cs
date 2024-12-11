@@ -122,16 +122,6 @@ namespace ToolRackSetup
     }
 
 
-    public  class MyObservableObject : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
     // Settings that write parameter values
     public class ParameterSettings : ObservableObject
     {
@@ -317,7 +307,7 @@ namespace ToolRackSetup
     }
 
     // I suppose this is the model object
-    public class ToolPocketItem : MyObservableObject
+    public class ToolPocketItem : ObservableObject
     {
         private double x;
         private double y;
@@ -326,19 +316,18 @@ namespace ToolRackSetup
 
         public int Pocket { get; }
 
-        public double X { get => x; set {   x = value; NotifyPropertyChanged(); } }
-        public double Y { get => y; set {  y = value; NotifyPropertyChanged(); } }
-        public double Z { get => z; set {  z = value; NotifyPropertyChanged(); } }
+        public double X { get => x; set {
+                SetProperty(ref x, value);
+            } 
+        }
+        public double Y { get => y; set { SetProperty(ref y, value); } }
+        public double Z { get => z; set { SetProperty(ref z, value);  } }
         public PocketStyle Style
         {
             get { return style;  }
             set
             {
-                if (value != style)
-                {
-                    style = value;
-                    NotifyPropertyChanged();
-                }
+                SetProperty(ref style, value);
             }
         }
 
@@ -353,10 +342,9 @@ namespace ToolRackSetup
             {
                 if (_toolInfo != value)
                 {
-                    _toolInfo = value;
-                    
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged(nameof(IsToolEnabled));
+                    OnPropertyChanging(nameof(IsToolEnabled));
+                    SetProperty(ref _toolInfo, value);                  
+                    OnPropertyChanged(nameof(IsToolEnabled));
                 }
 
             }
@@ -393,6 +381,7 @@ namespace ToolRackSetup
                 int oldToolNumber = this.ToolNumber;
                 if (value != oldToolNumber)
                 {
+                    OnPropertyChanging();
                     // Do some quick validation
                     if (value > 0)
                     {
@@ -417,7 +406,7 @@ namespace ToolRackSetup
                         ToolInfo = _toolController.Tools[value - 1];
                         ToolInfo.Pocket = Pocket;
                     }
-                    NotifyPropertyChanged();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -622,7 +611,7 @@ namespace ToolRackSetup
                         // Ask if we should turn it off
                         MessageBoxResult r = MessageBox.Show("It looks like you ran the Centroid ATC Wizard.\n" +
                             "This will cause the Tool Change Macro to have issues with tools not in the rack due to Parameters 6 (Centroid ATC Enabled) and 160 (Centroid Enhanced ATC).\n\n" + 
-                            "Should I automatically reset these values to 0 and reset the wizard setting?", "ATC Warning", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                            "Should I automatically reset these values to 0 and reset the wizard setting?", "ATC Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
                         if (r == MessageBoxResult.Yes)
                         {
                             attr!.Value = "False";
@@ -1045,9 +1034,9 @@ namespace ToolRackSetup
         private void Tpi_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (_loading) return;
-            if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber)) // ignore changing the tool number..we set that dynamically all the time.
+            if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber) && e.PropertyName != nameof(ToolPocketItem.IsToolEnabled)) // ignore changing the tool number..we set that dynamically all the time.
             {
-                Dirty = true; // only dirty when something is changed that needs to cause us to write the macros..                   
+                Dirty = true; // only dirty when something is changed that needs to cause us to write the macros. (which is??? anything here?).                   
             }
             WriteSettings(); // save the xml files
         }
