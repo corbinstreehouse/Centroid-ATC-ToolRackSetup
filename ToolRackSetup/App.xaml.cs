@@ -16,10 +16,12 @@ namespace ToolRackSetup
     public partial class App : Application
     {
 
-        private static Assembly CurrentDomain_AssemblyResolve(object? sender, ResolveEventArgs args)
+        // This let's the app be in any location and still find the Centroid DLL's
+        // Which is essential for me to debug.
+        private static Assembly? CurrentDomain_AssemblyResolve(object? sender, ResolveEventArgs args)
         {
             // Extract the assembly name
-            string assemblyName = new AssemblyName(args.Name).Name;
+            string? assemblyName = new AssemblyName(args.Name).Name;
 
             // Define the path to the assembly
             string assemblyPath = Path.Combine("C:\\CNCM", $"{assemblyName}.dll");
