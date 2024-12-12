@@ -10,6 +10,15 @@ using System.Configuration;
 
 namespace ToolRackSetup {
 
+    public enum PocketStyle
+    {
+        XMinus = 0,
+        XPlus = 1,
+        YMinus = 2,
+        YPlus = 3,
+        Hole = 4,
+    }
+
     public class ToolInfo : ObservableObject
     {
         private CNCPipe _pipe;
