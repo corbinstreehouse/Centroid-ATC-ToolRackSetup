@@ -49,11 +49,9 @@ namespace ToolRackSetup
 
         static string ArgShowToolWindow = "-showToolSetupWindow";
         static string ArgShowFetchToolWindow = "-showFetchToolWindow";
-
-
         private void MakeSingleInstance()
         {
-            if (AlreadyProcessedOnThisInstance)
+            if (AlreadyProcessedOnThisInstance) // Probably not needed; copied from some example
             {
                 return;
             }
@@ -159,7 +157,7 @@ namespace ToolRackSetup
             MainWindow mw = (MainWindow)this.MainWindow;
             if (_fetchToolPopup == null)
             {
-                _fetchToolPopup = new FetchToolPopup(mw._pipe, mw._ToolController);
+                _fetchToolPopup = new FetchToolPopup();
             }
 
             _fetchToolPopup.Popup();

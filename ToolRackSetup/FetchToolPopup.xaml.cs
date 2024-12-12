@@ -26,14 +26,10 @@ namespace ToolRackSetup
     /// </summary>
     public partial class FetchToolPopup : Window
     {
-        private CNCPipe pipe;
-        private ToolController toolController;
-        public FetchToolPopup(CNCPipe pipe, ToolController toolController)
+        public FetchToolPopup()
         {
-            this.pipe = pipe;
-            this.toolController = toolController;
             InitializeComponent();
-            lstvwPockets.ItemsSource = toolController.ToolPocketItems;
+            lstvwPockets.ItemsSource = ConnectionManager.Instance.ToolController.ToolPocketItems;
         }
 
         private bool _closing = false;
