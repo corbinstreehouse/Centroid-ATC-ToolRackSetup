@@ -39,11 +39,7 @@ namespace ToolRackSetup
         public App() : base() 
         {
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
-
-
-
         }
-
 
         private static bool AlreadyProcessedOnThisInstance;
 
@@ -105,7 +101,10 @@ namespace ToolRackSetup
             // Main instance!!
             RegisterForCallback(showToolWindowEventName, ShowToolWindowCallback);
             RegisterForCallback(showFetchToolWindowEventName, ShowToolFetcWindowCallback);
+
+            // TODO: minimize the window on launch...
         }
+
 
         private void RegisterForCallback(string eventName, WaitOrTimerCallback callBack)
         {
@@ -125,7 +124,7 @@ namespace ToolRackSetup
             App app = (App)state;
             app.Dispatcher.BeginInvoke(new Action(() =>
             {
-                app.ShowToolWindow();
+                app.ShowToolManagerWindow();
             }));
         }
 
@@ -140,21 +139,26 @@ namespace ToolRackSetup
 
 
 
-        private void ShowToolWindow()
+        public void ShowToolManagerWindow()
         {
-            // Currently the main window..
-            Window w = Application.Current.MainWindow;
-            w.Activate();
+            // If it is still around, then bring it forwards, otherwise create a new one
+            ToolManagerWindow? window = ToolManagerWindow.Instance;
+            if (window == null)
+            {
+                window = new ToolManagerWindow();
+            }
+
+            window.Activate();
             // force it up...the batch file opening it doesn't always work due to it closing
-            w.Topmost = true;
-            w.Topmost = false;
+            window.Topmost = true;
+            window.Topmost = false;
         }
 
         private FetchToolPopup? _fetchToolPopup;
         private void ShowToolFetchWindow()
         {
             // TODO: keep the pipe and tool controller somewhere else (IE: globals or here)
-            MainWindow mw = (MainWindow)this.MainWindow;
+            ToolManagerWindow mw = (ToolManagerWindow)this.MainWindow;
             if (_fetchToolPopup == null)
             {
                 _fetchToolPopup = new FetchToolPopup();
