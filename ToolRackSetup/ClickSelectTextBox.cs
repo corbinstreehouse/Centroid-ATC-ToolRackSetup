@@ -53,7 +53,7 @@ namespace ToolRackSetup
 {
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ToolManagerWindow.xaml
     /// </summary>
     /// 
     public class ClickSelectTextBox : TextBox
