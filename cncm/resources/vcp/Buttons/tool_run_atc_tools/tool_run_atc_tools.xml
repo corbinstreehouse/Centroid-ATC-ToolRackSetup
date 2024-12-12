@@ -1,5 +1,5 @@
 <vcp_button>
   <run>
-    <line>M130 "C:\CNCM\ToolRackSetup.exe"</line>
+    <line>M130 "C:\CNCM\ToolRackSetup.exe\ -showToolSetupWindow"</line>
   </run>
 </vcp_button>

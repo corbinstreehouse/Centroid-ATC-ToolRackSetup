@@ -1,5 +1,5 @@
 <vcp_button>
   <run>
-    <macro>c:\cncm\CorbinsWorkshop\tool_fetch.mac</macro>
+    <line>M130 "C:\CNCM\ToolRackSetup.exe\ -showFetchToolWindow"</line>
   </run>
 </vcp_button>
