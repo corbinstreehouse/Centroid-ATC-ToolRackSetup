@@ -84,17 +84,6 @@ namespace ToolRackSetup
         #endregion
     }
 
- 
- 
-    public enum PocketStyle
-    {
-        XMinus = 0,
-        XPlus = 1,
-        YMinus = 2,
-        YPlus = 3,
-        Hole = 4,
-    }
-
     public class PocketStyleConverter : IValueConverter
     {
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -175,7 +164,7 @@ namespace ToolRackSetup
         }
     }
 
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class ToolManagerWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
  
@@ -190,7 +179,7 @@ namespace ToolRackSetup
             get { return ConnectionManager.Instance.Pipe; }
         }
 
-        public ToolController _ToolController { get { return ConnectionManager.Instance.ToolController; }  }
+        public ToolController ToolController { get { return ConnectionManager.Instance.ToolController; }  }
         private const string cncmPath = "c:\\cncm\\";
         private const string vcpPath = cncmPath + "resources\\vcp\\";
         private const string corbinsWorkshopPath = cncmPath + "CorbinsWorkshop\\";
@@ -281,44 +270,34 @@ namespace ToolRackSetup
 
         }
 
-        
 
-        public MainWindow()
+        public static ToolManagerWindow? Instance = null;
+        public ToolManagerWindow()
         {
 
+            Instance = this;
             InitializeComponent();
 
             LoadTheme();
-            // Variables for the API Connection MessageBox
-            var messageBoxText = "Can't connect to CNC12. Make sure it is running! Would you like to retry the connection?";
-            var messageBoxTitle = "Error Connecting to CNC12!";
-            var messageBoxType = MessageBoxButton.YesNo;
 
             // TODO: Check if we are metric and flip default values if we are
             bool isMetric = false;
             Settings = new ToolChangeSettings(isMetric);
             NotifyPropertyChanged(nameof(Settings));
-            ////_parameterSettings = new ParameterSettings(_pipe);
-            //NotifyPropertyChanged(nameof(_parameterSettings));
-
+            
             // Don't use the property, which has side effects
             _vcpHasVirtualDrawbarButton = GetIfVCPHasVirtualdrawbarButton();
             UpdateAddRemoveVCPButtonTitle();
 
-//            _ToolController = new ToolController(_pipe, _parameterSettings);
-         //   NotifyPropertyChanged(nameof(_ToolController));
-
-            InitializeToolPocketItems();
+            StartWatchingToolPocketItems();
             ReadSettings();
 
-            lstviewPockets.ItemsSource = _ToolController.ToolPocketItems;
+            lstviewPockets.ItemsSource = ToolController.ToolPocketItems;
             lstviewPockets.UnselectAll();
 
-            lstvwTools.ItemsSource = _ToolController.Tools;
-            // Bindings; I am not sure why I can' get this to work in XAML
-
-            txtBxActiveToolNumber.DataContext = _ToolController;
-            lblActiveToolDescription.DataContext = _ToolController;
+            lstvwTools.ItemsSource = ToolController.Tools;
+            txtBxActiveToolNumber.DataContext = ToolController;
+            lblActiveToolDescription.DataContext = ToolController;
 
 
             Settings.PropertyChanged += SettingsPropertyChanged;
@@ -369,7 +348,7 @@ namespace ToolRackSetup
 
         private void RefreshTools()
         {
-            _ToolController.RefreshTools();
+            ToolController.RefreshTools();
         }
 
         private void ReadSettings()
@@ -407,7 +386,7 @@ namespace ToolRackSetup
                 Settings.RackOffset = ReadDouble(nameof(Settings.RackOffset), Settings.RackOffset);
 
                 // probably not the fastest way to do this.
-                foreach (ToolPocketItem item in _ToolController.ToolPocketItems)
+                foreach (ToolPocketItem item in ToolController.ToolPocketItems)
                 {
 
                     XElement? element = doc.XPathSelectElement(String.Format("/Table/Bin/BinNumber[text()='{0}']", item.Pocket));
@@ -461,7 +440,7 @@ namespace ToolRackSetup
             topLevel.Add(new XElement(nameof(Settings.SlideDistance), Settings.SlideDistance.ToString(CultureInfo.InvariantCulture)));
             topLevel.Add(new XElement(nameof(Settings.RackOffset), Settings.RackOffset.ToString(CultureInfo.InvariantCulture)));
 
-            foreach (ToolPocketItem item in _ToolController.ToolPocketItems)
+            foreach (ToolPocketItem item in ToolController.ToolPocketItems)
             {
                 // The names are copied from what the initial stuff did.
                 XElement child = new XElement("Bin");
@@ -510,10 +489,10 @@ namespace ToolRackSetup
             // Chad was hitting a case where the slide was too large and put it outside where his machine could go. I can check for that..
 
 
-            for (int i = 0; i < _ToolController.ToolPocketItems.Count; i++)
+            for (int i = 0; i < ToolController.ToolPocketItems.Count; i++)
             {
 
-                ToolPocketItem item = _ToolController.ToolPocketItems[i];
+                ToolPocketItem item = ToolController.ToolPocketItems[i];
                 StringBuilder stringBuilder = new StringBuilder(fileContents);
 
                 double xPos = item.X;
@@ -632,13 +611,22 @@ namespace ToolRackSetup
         //job.RunCommand(command, "c:\\cncm", false);
 
         // Did I have a binding to this?
-        public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return _ToolController.ToolPocketItems; } }
+        public ObservableCollection<ToolPocketItem> ToolPocketItems { get { return ToolController.ToolPocketItems; } }
 
-        private void InitializeToolPocketItems()
+        private void StartWatchingToolPocketItems()
         {
-            foreach(ToolPocketItem tpi in _ToolController.ToolPocketItems)
+            foreach(ToolPocketItem tpi in ToolController.ToolPocketItems)
             {
                 tpi.PropertyChanged += Tpi_PropertyChanged;
+
+            }
+        }
+
+        private void StopWatchingToolPocketItems()
+        {
+            foreach (ToolPocketItem tpi in ToolController.ToolPocketItems)
+            {
+                tpi.PropertyChanged -= Tpi_PropertyChanged;
 
             }
         }
@@ -811,9 +799,9 @@ namespace ToolRackSetup
 
         private void btnRemoveLastPocket_Click(object sender, RoutedEventArgs e)
         {
-            if (_ToolController.ToolPocketItems.Count > 0)
+            if (ToolController.ToolPocketItems.Count > 0)
             {
-                _ToolController.RemoveLastPocket();
+                ToolController.RemoveLastPocket();
                 Dirty = true;
             }
         }
@@ -855,7 +843,7 @@ namespace ToolRackSetup
             // Update the parameter right away
             try
             {
-                ToolPocketItem tpi = _ToolController.AddToolPocket();
+                ToolPocketItem tpi = ToolController.AddToolPocket();
                 Dirty = true;
                 tpi.PropertyChanged += Tpi_PropertyChanged;
                 lstviewPockets.SelectedItem = tpi;
@@ -902,13 +890,12 @@ namespace ToolRackSetup
         private void btnAddRemoveVCPButton_Click(object sender, RoutedEventArgs e)
         {
             VCPHasVirtualDrawbarButton = !VCPHasVirtualDrawbarButton;
-
         }
 
         private void mainWindow_Closed(object sender, EventArgs e)
         {
-            // ignore errors on this call..
-
+            StopWatchingToolPocketItems();
+            Instance = null;
         }
 
         private ToolInfo? ToolInfoFromSender(object sender)

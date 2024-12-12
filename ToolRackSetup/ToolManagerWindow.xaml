@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToolRackSetup"
         xmlns:properties="clr-namespace:ToolRackSetup.Properties"
-        xmlns:Collections="clr-namespace:System.Collections;assembly=System.Collections.NonGeneric" xmlns:System="clr-namespace:System;assembly=netstandard" x:Name="mainWindow" x:Class="ToolRackSetup.MainWindow"
+        xmlns:Collections="clr-namespace:System.Collections;assembly=System.Collections.NonGeneric" xmlns:System="clr-namespace:System;assembly=netstandard" x:Name="mainWindow" x:Class="ToolRackSetup.ToolManagerWindow"
         mc:Ignorable="d"
         Title="Tool Management" Height="666" Width="900" Closing="window_Closing" MinWidth="885" MinHeight="600" Closed="mainWindow_Closed" 
           Activated="mainWindow_Activated"
