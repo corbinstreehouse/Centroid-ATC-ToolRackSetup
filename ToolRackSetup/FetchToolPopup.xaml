@@ -1,0 +1,31 @@
+﻿<Window x:Class="ToolRackSetup.FetchToolPopup" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ToolRackSetup"
+        Title="Test"
+        
+        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" d:DesignHeight="344.96" d:DesignWidth="225" Left="100" Top="100" Width="225" SizeToContent="Height" >
+    <Grid Width="225">
+        <ListView x:Name="lstvwPockets" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,0"
+                  >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="215">
+                        <GridViewColumn.CellTemplate >
+                            <DataTemplate>
+                                <Button Content="{Binding FetchButtonTitle}"  Height="50" Width="200"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+
+    </Grid>
+
+</Window>

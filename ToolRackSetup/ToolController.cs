@@ -195,10 +195,12 @@ namespace ToolRackSetup {
                 if (_toolInfo != value)
                 {
                     OnPropertyChanging(nameof(IsToolEnabled));
+                    OnPropertyChanging(nameof(FetchButtonTitle));
                     SetProperty(ref _toolInfo, value);
                     OnPropertyChanged(nameof(IsToolEnabled));
-                }
+                    OnPropertyChanged(nameof(FetchButtonTitle));
 
+                }
             }
         }
 
@@ -206,6 +208,22 @@ namespace ToolRackSetup {
         {
             get { return _toolInfo != null; }
         }
+
+        public string FetchButtonTitle
+        {
+            get
+            {
+                if (_toolInfo != null)
+                {
+                    return String.Format("T{0} - {1}", _toolInfo.Number, _toolInfo.Description);
+                } else
+                {
+                    return "Empty";
+                }
+            }
+
+        }
+
 
         private ToolController _toolController; // weak reference? loops and GC?
 

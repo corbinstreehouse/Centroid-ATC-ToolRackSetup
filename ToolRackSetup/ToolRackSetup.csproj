@@ -12,6 +12,7 @@
     <Version>0.0.12</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <StartupObject>ToolRackSetup.App</StartupObject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

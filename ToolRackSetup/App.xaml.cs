@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -12,9 +13,7 @@ namespace ToolRackSetup
     /// Interaction logic for App.xaml
     /// </summary>
     /// 
-
-
-
+    
     public partial class App : Application
     {
 
@@ -36,16 +35,154 @@ namespace ToolRackSetup
             return null;
         }
 
-
         public App() : base() 
         {
-                AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+
+
+
+        }
+
+
+        private static bool AlreadyProcessedOnThisInstance;
+
+        static string ArgShowToolWindow = "-showToolSetupWindow";
+        static string ArgShowFetchToolWindow = "-showFetchToolWindow";
+
+
+        private void MakeSingleInstance()
+        {
+            if (AlreadyProcessedOnThisInstance)
+            {
+                return;
+            }
+            AlreadyProcessedOnThisInstance = true;
+
+            Application app = Application.Current;
+
+            string showToolWindowEventName = "ToolRacksetup" + ArgShowToolWindow;
+            string showFetchToolWindowEventName = "ToolRackSetup" + ArgShowFetchToolWindow;
+
+            bool isSecondaryInstance = true;
+
+            EventWaitHandle? showToolWindowEventHandle = null;
+            EventWaitHandle? showFetchToolWindowEventHandle = null;
+            try
+            {
+                showToolWindowEventHandle = EventWaitHandle.OpenExisting(showToolWindowEventName);
+                showFetchToolWindowEventHandle = EventWaitHandle.OpenExisting(showFetchToolWindowEventName);
+            }
+            catch
+            {
+                // This code only runs on the first instance.
+                isSecondaryInstance = false;
+            }
+
+            if (isSecondaryInstance)
+            {
+                // See what parameters we are passsing
+
+                string[] args = Environment.GetCommandLineArgs();
+                for (int index = 1; index < args.Length; index += 1)
+                {
+                    if (String.Equals(args[index], ArgShowToolWindow, StringComparison.OrdinalIgnoreCase))
+                    {
+                        showToolWindowEventHandle!.Set();
+                        Environment.Exit(0);
+                    }
+                    if (String.Equals(args[index], ArgShowFetchToolWindow, StringComparison.OrdinalIgnoreCase))
+                    {
+                        showFetchToolWindowEventHandle!.Set();
+                        Environment.Exit(0);
+                    }
+                }
+
+
+                showToolWindowEventHandle!.Set();
+
+                Environment.Exit(0);
+            }
+
+            // Main instance!!
+            RegisterForCallback(showToolWindowEventName, ShowToolWindowCallback);
+            RegisterForCallback(showFetchToolWindowEventName, ShowToolFetcWindowCallback);
+        }
+
+        private void RegisterForCallback(string eventName, WaitOrTimerCallback callBack)
+        {
+            EventWaitHandle eventWaitHandle = new EventWaitHandle(
+                false,
+                EventResetMode.AutoReset,
+                eventName);
+
+            ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, callBack, this, Timeout.Infinite, false);
+
+            eventWaitHandle.Close();
+        }
+
+
+        private static void ShowToolWindowCallback(object state, bool timedOut)
+        {
+            App app = (App)state;
+            app.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                app.ShowToolWindow();
+            }));
+        }
+
+        private static void ShowToolFetcWindowCallback(object state, bool timedOut)
+        {
+            App app = (App)state;
+            app.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                app.ShowToolFetchWindow();
+            }));
+        }
+
+
+
+        private void ShowToolWindow()
+        {
+            // Currently the main window..
+            Window w = Application.Current.MainWindow;
+            w.Activate();
+            // force it up...the batch file opening it doesn't always work due to it closing
+            w.Topmost = true;
+            w.Topmost = false;
+        }
+
+        private FetchToolPopup? _fetchToolPopup;
+        private void ShowToolFetchWindow()
+        {
+            // TODO: keep the pipe and tool controller somewhere else (IE: globals or here)
+            MainWindow mw = (MainWindow)this.MainWindow;
+            if (_fetchToolPopup == null)
+            {
+                _fetchToolPopup = new FetchToolPopup(mw._pipe, mw._ToolController);
+            }
+
+            _fetchToolPopup.Popup();
         }
 
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            WpfSingleInstance.Make("ToolRackSetup");
+            MakeSingleInstance();
+
+            // TODO: commonize this code a bit more..
+            string[] args = Environment.GetCommandLineArgs();
+            for (int index = 1; index < args.Length; index += 1)
+            {
+                if (String.Equals(args[index], ArgShowToolWindow, StringComparison.OrdinalIgnoreCase))
+                {
+                    // ShowToolFetchWindow // currently the default
+                }
+                if (String.Equals(args[index], ArgShowFetchToolWindow, StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowToolFetchWindow();
+                }
+            }
+
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(HandleException);
             base.OnStartup(e);
         }
@@ -56,6 +193,7 @@ namespace ToolRackSetup
             // e.Handled = true;
 
         }
+
     }
 
 }

@@ -308,7 +308,6 @@ namespace ToolRackSetup
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        // I should use a 3d party framework to do this silly boiler plate code that should be built in.
         public event PropertyChangedEventHandler? PropertyChanged;
  
         protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -316,7 +315,7 @@ namespace ToolRackSetup
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private CNCPipe _pipe;
+        public CNCPipe _pipe;
 
         public ToolController _ToolController { get;  }
         private const string cncmPath = "c:\\cncm\\";
