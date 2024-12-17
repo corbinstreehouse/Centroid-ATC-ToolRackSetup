@@ -4,18 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToolRackSetup"
+         WindowStyle="None"
         Title="Test"
         
-        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" d:DesignHeight="344.96" d:DesignWidth="225" Left="100" Top="100" Width="225" SizeToContent="Height" >
+        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" Left="100" Top="100" Width="232" SizeToContent="Height" >
+
+    <Window.Resources>
+        <Style x:Key="myHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+    </Window.Resources>
     <Grid Width="225">
         <ListView x:Name="lstvwPockets" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,0"
                   >
             <ListView.View>
-                <GridView>
+                <GridView ColumnHeaderContainerStyle="{StaticResource myHeaderStyle}">
+
                     <GridViewColumn Width="215">
                         <GridViewColumn.CellTemplate >
                             <DataTemplate>
-                                <Button Content="{Binding FetchButtonTitle}"  Height="50" Width="200"/>
+                                <Button Content="{Binding FetchButtonTitle}" IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200" Click="FetchButtonClick"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

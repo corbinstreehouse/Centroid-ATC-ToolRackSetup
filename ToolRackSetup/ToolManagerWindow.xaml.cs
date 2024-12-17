@@ -753,9 +753,10 @@ namespace ToolRackSetup
         private void Tpi_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (_loading) return;
-            if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber) && e.PropertyName != nameof(ToolPocketItem.IsToolEnabled)) // ignore changing the tool number..we set that dynamically all the time.
+            if (e.PropertyName != nameof(ToolPocketItem.ToolInfo) && e.PropertyName != nameof(ToolPocketItem.ToolNumber) && e.PropertyName != nameof(ToolPocketItem.IsToolEnabled) &&
+                e.PropertyName != nameof(ToolPocketItem.FetchButtonTitle)) // ignore changing the tool number..we set that dynamically all the time.
             {
-                Dirty = true; // only dirty when something is changed that needs to cause us to write the macros. (which is??? anything here?).                   
+                Dirty = true; // only dirty when something is changed that needs to cause us to write the macros
             }
             WriteSettings(); // save the xml files
         }

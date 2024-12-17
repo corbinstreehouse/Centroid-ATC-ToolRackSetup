@@ -148,6 +148,7 @@ namespace ToolRackSetup
                 window = new ToolManagerWindow();
             }
 
+            window.Show();
             window.Activate();
             // force it up...the batch file opening it doesn't always work due to it closing
             window.Topmost = true;
@@ -157,8 +158,6 @@ namespace ToolRackSetup
         private FetchToolPopup? _fetchToolPopup;
         private void ShowToolFetchWindow()
         {
-            // TODO: keep the pipe and tool controller somewhere else (IE: globals or here)
-            ToolManagerWindow mw = (ToolManagerWindow)this.MainWindow;
             if (_fetchToolPopup == null)
             {
                 _fetchToolPopup = new FetchToolPopup();

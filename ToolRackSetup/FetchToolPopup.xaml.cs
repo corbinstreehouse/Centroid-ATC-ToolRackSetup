@@ -30,21 +30,24 @@ namespace ToolRackSetup
         {
             InitializeComponent();
             lstvwPockets.ItemsSource = ConnectionManager.Instance.ToolController.ToolPocketItems;
+            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Hide();
+            }
         }
 
         private bool _closing = false;
-
 
         public void Popup()
         {
 
             _closing = false;
-            // Figure out our location..
-            //int x, y = 0;
-            //int width, height = 0;
-            //pipe.state.GetScreenPosition(out x, out y);
-            //pipe.state.GetScreenSize(out width, out height);
-            //System.Diagnostics.Debug.WriteLine("{0}", x);            
+     
             Point p = MouseUtilities.GetMousePos();
 
             System.Diagnostics.Debug.WriteLine("{0}", p);
@@ -69,6 +72,35 @@ namespace ToolRackSetup
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
+            Hide();
+        }
+
+        private ToolInfo? ToolInfoFromSender(object sender)
+        {
+            Button? b = sender as Button;
+            ToolInfo? toolInfo = null;
+            if (b?.DataContext is ToolPocketItem)
+            {
+                ToolPocketItem item = (ToolPocketItem)b.DataContext;
+                toolInfo = item.ToolInfo;
+            }
+            else if (b?.DataContext is ToolInfo)
+            {
+                toolInfo = (ToolInfo)b.DataContext;
+            }
+            return toolInfo;
+        }
+
+        private void FetchButtonClick(object sender, RoutedEventArgs e)
+        {
+            ToolInfo? toolInfo = ToolInfoFromSender(sender);
+            if (toolInfo != null)
+            {
+                // Do a m6 on it..
+                CNCPipe.Job job = new CNCPipe.Job(ConnectionManager.Instance.Pipe);
+                String command = String.Format("M6 T{0}\nG43 H{0}", toolInfo.Number);
+                job.RunCommand(command, "c:\\cncm", false);
+            }
             Hide();
         }
     }
