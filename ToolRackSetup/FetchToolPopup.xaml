@@ -13,9 +13,24 @@
         <Style x:Key="myHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="Visibility" Value="Collapsed" />
         </Style>
+
+        <Style x:Key="FetchListViewStyle"  TargetType="{x:Type ListViewItem}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ToolInfo.IsInSpindle}"
+                 Value="True">
+                    <Setter Property="Background"
+                     Value="DarkGreen" />
+                    <Setter Property="IsEnabled"
+                            Value="False">
+                        
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid Width="225">
         <ListView x:Name="lstvwPockets" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,0"
+                  ItemContainerStyle="{StaticResource FetchListViewStyle}"
                   >
             <ListView.View>
                 <GridView ColumnHeaderContainerStyle="{StaticResource myHeaderStyle}">
