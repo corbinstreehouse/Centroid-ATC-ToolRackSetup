@@ -33,12 +33,27 @@ namespace ToolRackSetup {
 
         public void RefreshFromInfo(Info info)
         {
+
+            OnPropertyChanging(nameof(this.Diameter));
+            OnPropertyChanging(nameof(this.HeightNumber));
+            OnPropertyChanging(nameof(this.HeightOffset));
+            OnPropertyChanging(nameof(this.DiameterNumber));
+            OnPropertyChanging(nameof(this.Description));
+            OnPropertyChanging(nameof(this.Pocket));
+
             _pocket = info.bin;
             _heightOffset = info.height_offset;
             _description = info.description;
             _diameter = info.diameter_offset;
             _heightNumber = info.h_number;
             _diameterNumber = info.d_number;
+
+            OnPropertyChanged(nameof(this.Diameter));
+            OnPropertyChanged(nameof(this.HeightNumber));
+            OnPropertyChanged(nameof(this.HeightOffset));
+            OnPropertyChanged(nameof(this.DiameterNumber));
+            OnPropertyChanged(nameof(this.Description));
+            OnPropertyChanged(nameof(this.Pocket));
         }
 
         public int Number { get; }

@@ -1,8 +1,11 @@
 ; corbin dunn
 ; Ask's the user for the gauge block height and sets the tool length based on the height from their current z-zero 
 ;
-IF #50001                        ;Prevent lookahead from parsing past here
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 DEFINE <NEW_TOOL> #101
 DEFINE <GAUGE_BLOCK_HEIGHT> #102
@@ -49,11 +52,11 @@ G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T<NEW_TOOL>
 m200 "Enter T%.0f into the spindle and jog the bit to the top of your gauge block.\n Press Cycle Start to measure the tool length when you are ready." <NEW_TOOL>
 
 <HEIGHT_DIFF> = <MACHINE_Z> - <STARTING_MACHINE_Z> - <GAUGE_BLOCK_HEIGHT>
-m200 "HEIGHT_DIFF: %f, STARTING_MACHINE_Z:%f, MACHINE_Z: %f, GAUGE_BLOCK_HEIGHT: %f" <HEIGHT_DIFF> <STARTING_MACHINE_Z> <MACHINE_Z> <GAUGE_BLOCK_HEIGHT>
+;m200 "HEIGHT_DIFF: %f, STARTING_MACHINE_Z:%f, MACHINE_Z: %f, GAUGE_BLOCK_HEIGHT: %f" <HEIGHT_DIFF> <STARTING_MACHINE_Z> <MACHINE_Z> <GAUGE_BLOCK_HEIGHT>
 
 <NEW_TOOL_HEIGHT> = <OLD_TOOL_HEIGHT> + <HEIGHT_DIFF>
 ; TODO: save it!
-m200 "NEW_TOOL_HEIGHT: %f" <NEW_TOOL_HEIGHT>
+;m200 "NEW_TOOL_HEIGHT: %f" <NEW_TOOL_HEIGHT>
 #[<HEIGHT_TABLE_START> + <NEW_TOOL>] = <NEW_TOOL_HEIGHT>
 
 M221 <ALERT_DURATION> "Tool height set saved for T%.0f!" <NEW_TOOL>
@@ -61,16 +64,16 @@ GOTO 1000
 
 ;------------------ errors
 N<ERROR_LINE_NO_TOOL>
-m200 "Abort: You must enter a starting tool!"
-GOTO ERROR_LINE_NO_TOOL
+m200 "Abort: You must enter a starting tool that is already measured. Cycle Stop to abort."
+GOTO <ERROR_LINE_NO_TOOL>
 
 N<ERROR_LINE_NO_HEIGHT>
-m200 "Abort: The starting tool needs to already be measured!"
-GOTO ERROR_LINE_NO_HEIGHT
+m200 "Abort: The starting tool needs to already be measured. Cycle Stop to abort."
+GOTO <ERROR_LINE_NO_HEIGHT>
 
 N<ERROR_BAD_TOOL_NUMBER>
 m200 "Abort: Bad tool number!"
-GOTO ERROR_BAD_TOOL_NUMBER
+GOTO <ERROR_BAD_TOOL_NUMBER>
 
 
 N1000

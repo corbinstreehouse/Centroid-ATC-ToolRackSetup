@@ -4,17 +4,16 @@
 ; Parameters
 ; [#9776 and 4]  if we need a virtual drawbar support
 
-
-DEFINE <PREVENT_LOOK_AHEAD> if #50001
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
 
 <PREVENT_LOOK_AHEAD>
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 G53 Z0 ; go to z-zero to clear everything
 
 G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 
-if [#9776 and 4] == 0 then GOTO 900 ; Skip if a virtual draw bar support is not enabled
+if !<VIRTUAL_DRAWBAR_ENABLED> then GOTO 900 ; Skip if a virtual draw bar support is not enabled
 
 ;------------------------------------------------------------------------------
 ; Virtual drawbar button support

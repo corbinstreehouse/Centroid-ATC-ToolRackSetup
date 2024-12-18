@@ -1,5 +1,9 @@
 ; #T = requested tool
 ; TODO: mabye pass the old tool too..
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1200 ;Skip macro if graphing or searching
 
 #110 = #T
 

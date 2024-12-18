@@ -104,8 +104,6 @@ namespace ToolRackSetup
             // Main instance!!
             RegisterForCallback(showToolWindowEventName, ShowToolWindowCallback);
             RegisterForCallback(showFetchToolWindowEventName, ShowToolFetcWindowCallback);
-
-            // TODO: minimize the window on launch...
         }
 
 
@@ -180,6 +178,8 @@ namespace ToolRackSetup
         protected override void OnStartup(StartupEventArgs e)
         {
             MakeSingleInstance();
+
+            _ = ConnectionManager.Instance; // start it up
 
             // TODO: commonize this code a bit more..
             string[] args = Environment.GetCommandLineArgs();

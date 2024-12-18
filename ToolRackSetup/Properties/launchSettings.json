@@ -1,8 +1,7 @@
 {
   "profiles": {
     "ToolRackSetup": {
-      "commandName": "Project",
-      "commandLineArgs": "-showFetchToolWindow"
+      "commandName": "Project"
     }
   }
 }

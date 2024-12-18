@@ -11,11 +11,13 @@
 ; #125 = tool diameter
 ; #106 = touch feed
 
-IF #50001                        ;Prevent lookahead from parsing past here
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 #110 = #T
-#125 = #[11000 + #110] ; diameter
+#125 = #[<C_DIA_OFFSET> + #110] ; diameter
 
 ; m225 #140 "Tool height measure for %.0f diameter %f" #110 #125
 
@@ -26,25 +28,28 @@ if #125 > 0 THEN GOTO 100
 if #110 == #9718 THEN GOTO 100
 
 m224 #125 "TOOL HEIGHT\nWhat's the DIAMETER of the tool %.0f?" #110 ;This will be the diameter of the tool unless it's a laser
-#[11000+#110] = #125 ;set entered diameter into the tool libary if its not a laser
+#[<C_DIA_OFFSET>+#110] = #125 ;set entered diameter into the tool libary if its not a laser
 
 ; --------------------
 
 N100
 
-; variables copied from Avid's code.
+;Tool touch off needs to be configured to input 5 and set to "open on triggered" for this to work
 #111 = .4  ;what we consider a large tool when the touch plate is below the spoilboard
-IF #4006 EQ 20 THEN #111 = #111 ELSE #111 = [#111 * 25.4] ;change max tool diameter to metric if we're in metric
+IF <IN_INCHES> THEN #111 = #111 ELSE #111 = [#111 * 25.4] ;change max tool diameter to metric if we're in metric
 #104 = .75 ;what we consider a large tool when the touch plate is above the spoilboard
-IF #4006 EQ 20 THEN #104 = #104 ELSE #104 = [#104 * 25.4] ;change max tool diameter to metric if we're in metric
+IF <IN_INCHES> THEN #104 = #104 ELSE #104 = [#104 * 25.4] ;change max tool diameter to metric if we're in metric
 #105 = 5 ;slow feedrate
-IF #4006 EQ 20 THEN #105 = #105 ELSE #105 = [#105 * 25.4] ;change slow feedrate to metric
+IF <IN_INCHES> THEN #105 = #105 ELSE #105 = [#105 * 25.4] ;change slow feedrate to metric
 #106 = 40 ;fast feedrate
-IF #4006 EQ 20 THEN #106 = #106 ELSE #106 = [#106 * 25.4] ;change fast feedrate to metric
+IF <IN_INCHES> THEN #106 = #106 ELSE #106 = [#106 * 25.4] ;change fast feedrate to metric
 #107 = .25 ;amount we pop up between probes
-IF #4006 EQ 20 THEN #107 = #107 ELSE #107 = [#107 * 25.4] ;change fast feedrate to metric
+IF <IN_INCHES> THEN #107 = #107 ELSE #107 = [#107 * 25.4] ;change fast feedrate to metric
+
+g65 "\cncm\AvidMacros\metrictoimperial.mac" ;this flips all Avid stored values to imperial or metric depending on users settings
 
 ; The rest is copied from Avid's m6 subprogram O9105; Probe tool length, with the CORBIN mods marked
+
 
 
 
@@ -55,8 +60,9 @@ IF #[50000 + #9706] EQ 0 THEN GOTO 51 ELSE GOTO 50;1 is clear 0 is triggered
 N51
 
 ;CORBIN - added #A check to avoid dialog
-IF [#110 NE #9718 && #A == 0] THEN m200 "Insert tool number %.0f and then press Cycle Start" #110 ;don't stop if we're on laser
-IF #110 EQ #9718 THEN G53 x[#9708-#9715] y[#9709-#9716] ELSE G53 X#9708 Y#9709 ;get back to touch plate if we have jogged away
+IF [#110 NE <AVID_LASER_TOOL> && #A == 0] THEN m200 "Insert tool number %.0f and then press Cycle Start" #110 ;don't stop if we're on laser
+
+G53 X<AVID_TOFF_X> Y<AVID_TOFF_Y> ;get back to touch plate if we have jogged away
 
 ;large tool with touch plate below spoilboard
 If #[11000+#110] GE #111 && #9713 GE 0 THEN GOTO 52

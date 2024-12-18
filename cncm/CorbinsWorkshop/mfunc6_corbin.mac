@@ -14,7 +14,7 @@
 ; #4003 = Positioning Mode (G90/G91)
 ; #4120 = Requested Tool
 ; #25012 = current time
-; #9976 parameter 976 is used by the PLC for ATC; I store the value here...but we don't need to. #151 would be fine
+; #9976 parameter 976 is used by the PLC for ATC; I store the value here...but we don't need to.
 
 ; #9006 ATC Enabled (Centroid): needs to be 0. This Requires PLC logic, so I made a new parameter
 ; #9160 Enhanced ATC (Centroid): needs to be 0. Also requires PLC logic and affects the time the Txx is updated in the UI
@@ -30,10 +30,7 @@
 
 ; #9778 = Wait time for the spindle to stop. (Corbin added)
 ; #9724 = Should check air pressure; 1=should check, 0=skip checking. (Avid added)
-; #9718 = laser tool number (Avid added)
 
-; PLC Variables:
-;
 ; User Variables:
 ; #131 = Saved Positioning Mode (G90/G91)
 ; #132 = saved x
@@ -45,13 +42,10 @@
 ; #138 - time since spindle was turned off
 ; #140 - time to show messages: NOTE change from m221 to m225 to make them modal (stop) vs non modal (no stop)
 
-; #150 = current tool; persists, but we also store it in ; #9976 
-; #151 = the time the spindle stop command was given, M5, mfunc5.mac sets this value to #25012
-
-;
 ;------------------------------------------------------------------------------
 
-DEFINE <PREVENT_LOOK_AHEAD> IF #50001 
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+g65 "\cncm\AvidMacros\metrictoimperial.mac" ;this flips all Avid stored values to imperial or metric depending on users settings
 
 DEFINE <OLD_POSITIONING_MODE> #131
 DEFINE <SAVED_X> #132
@@ -62,7 +56,7 @@ DEFINE <OLD_TOOL_POCKET> #136
 
 
 <PREVENT_LOOK_AHEAD>
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 #140 = 3 ; //message time in seconds
 
@@ -77,16 +71,15 @@ IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 if <NEW_TOOL> < 0 then <NEW_TOOL> = 0
 if <OLD_TOOL> < 0 then <OLD_TOOL> = 0
 
-<OLD_POSITIONING_MODE> = #4003                     ;Save Positioning Mode
+<OLD_POSITIONING_MODE> = <C_POSITIONING_MODE>          ;Save Positioning Mode
 ;  5021–5028 MachinePosition (axis1=5021,axis2=5022,etc.
-<SAVED_X> = #5021 ; saved x
-<SAVED_Y> = #5022 ; saved y
+<SAVED_X> = <C_MACHINE_X> ; saved x
+<SAVED_Y> = <C_MACHINE_Y> ; saved y
 
-; m221 #140 "Tool change requested from %.0f to %.0f" <OLD_TOOL> <NEW_TOOL> ; Commenting these out for now! Because of a Centroid bug.
+m221 #140 "Tool change requested from %.0f to %.0f" <OLD_TOOL> <NEW_TOOL> 
 
-DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
-DEFINE <OLD_TOOL_IS_LASER> [<OLD_TOOL> == #9718 && #9718 != 0] ; 9718 is the laser tool number, and <OLD_TOOL> is the old tool
-DEFINE <NEW_TOOL_IS_LASER> [<NEW_TOOL> == #9718 && #9718 != 0] ; 9718 is the laser tool number
+DEFINE <OLD_TOOL_IS_LASER> [<OLD_TOOL> == <AVID_LASER_TOOL> && <AVID_LASER_TOOL> != 0] ; 9718 is the laser tool number, and <OLD_TOOL> is the old tool
+DEFINE <NEW_TOOL_IS_LASER> [<NEW_TOOL> == <AVID_LASER_TOOL> && <AVID_LASER_TOOL> != 0] ; 9718 is the laser tool number
 DEFINE <TOOL_IS_THE_SAME> [<OLD_TOOL> == <NEW_TOOL>]
 
 ; GOTO targets
@@ -110,15 +103,17 @@ IF <ATC_ENABLED> G10 P160 R0 ; Paaram 160 = Enhanced ATC, set to 0
 
 ;-----------------------------
 ; Check that the touch plate is setup
-IF #9702 EQ 0 THEN GOTO 801 ;bail if touch plate not setup
-IF #9701 EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
+IF <AVID_TOFF_PLATE_SET> EQ 0 THEN GOTO 801 ;bail if TOUCH OFF plate not setup
+IF <AVID_SPOILBOARD_CALIBRATED> EQ 0 THEN GOTO 802 ;bail out if our spoilboard location isn't set.
 ;-----------------------------
 
 ; Same tool check
-;IF <TOOL_IS_THE_SAME> m221 #140 "Tool change: same tool is in the spindle. Continuing..."
+; IF <TOOL_IS_THE_SAME> m221 #140 "Tool change: same tool is in the spindle. Continuing..."
 ; Always activate the laser; seems to be required
 IF [<TOOL_IS_THE_SAME> && <NEW_TOOL_IS_LASER>] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
 IF <TOOL_IS_THE_SAME> GOTO <SET_TOOL_LINE> ; Sets the tool, sets the height, measures if needed.
+
+IF <NEW_TOOL_IS_LASER> then <AVID_LASER_PRIOR_T> = <OLD_TOOL> ; Avid has a utility to switch to the prior tool, so support that
 
 ; Doing a tool change
 ; m225 #140 "Checking air"
@@ -230,14 +225,20 @@ GOTO <RESTORE_LINE>
 N<ERROR_LINE> ;Errors
 #100 = 0
 M225 #100 "Error or Invalid Tool Requested\nCycle Stop to Abort"
+m103/1 ;start a timer for 1 second. When it ends the script (and G code job) will stop
+
 GOTO <ERROR_LINE> ; infinite loop
 ; ----------------------------------
 n801
-m200 "Fixed touch plate not setup. Please set it up in the UTILS menu. Cycle Stop to Abort."
+m200 "Fixed tool touch off plate not setup. Please set it up in the UTILS menu. Cycle Stop to Abort."
+m103/1 ;start a timer for 1 second. When it ends the script (and G code job) will stop
+
 goto 801
 ; ----------------------------------
 n802
 m200 "Your spoilboard location isn't calibrated. Please calibrate it in the UTILS menu. Cycle Stop to Abort."
+m103/1 ;start a timer for 1 second. When it ends the script (and G code job) will stop
+
 GOTO 802
 ; ----------------------------------
 
@@ -257,7 +258,7 @@ G53 X<SAVED_X> Y<SAVED_Y> ; restore position
 G<OLD_POSITIONING_MODE> ;Restore Positioning Mode
 
 ; cleanup the tool table if no ATC
-if  !<ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T<NEW_TOOL>
+if !<ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T<NEW_TOOL>
 
 If #9753 GT 0 THEN G22 K[#10000 + [#9753 * -1]] ELSE G23 ;If we have spoilboard anti dig in enabled set work envelope for z axis, else do nothing.
 

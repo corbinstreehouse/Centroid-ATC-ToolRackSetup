@@ -1,61 +1,133 @@
-; mantoolmeasure.mac
-;
-;full manual tool measure
-;this script will allow you to measure a tool on your worksurface
-;This can be useful if you have an oddball tool like a slab slayer or a dragknife
+;==============================================
+; Manual Tool Measurement Setup
+; Purpose: Measure any tool using work surface
+;==============================================
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
 
-#130 = 2 ;dialog timer
+IF #50001 
+; Convert units to match user settings
+g65 "\cncm\AvidMacros\metrictoimperial.mac"
 
-IF #9701 EQ 0 THEN GOTO 1000 ;bail out if our spoilboard location isn't set.
+; Initialize variables
+#130 = 2                    ;Dialog timer
 
+; Check prerequisites
+IF #9701 EQ 0 THEN GOTO 1000    ;Check if spoilboard location is set
+IF #A EQ 1 THEN GOTO 100        ;Skip prompts if called from M6
 
-IF #A EQ 1 then goto 100 ;if this is being called from m6 then skip the prompts
-
-
+; Initial user prompts
 m200 "This utility will let you measure any tool off of your work surface\nThis can be useful if you have an odd or large tool that can't work with the touch plate"
+
+N10 
+m222 q0 #125 "Do you have an ATC spindle with a drawbar?\nIf so press Y, if not press N" 
+IF #125 EQ 110 THEN GOTO 20 ;N
+IF #125 EQ 121 THEN GOTO 15 ;Y
+GOTO 10
+
+N15
+;IF #A NE 1 && #110 NE #9718 && #4120 NE #9718 THEN m200 "Do you want to release the drawbar?\n(If you don't have a drawbar, press Cycle Start to continue)"
+IF #A NE 1 && #110 NE #9718 && #4120 NE #9718 THEN g65 "c:\cncm\mfunc15.mac" a1
+
+
+
+N20
 M224 #110 "What's the tool number you're inserting?"
 
+;==============================================
+; Tool Setup Section
+;==============================================
 N100
-If #A EQ 1 THEN #110 = #T ;set tool number to called tool number
-If #A EQ 1 THEN GOTO 101 ;skip diameter question
+; Handle M6 tool call
+IF #A EQ 1 THEN #110 = #4120    ;Set tool number to called tool number
+IF #A EQ 1 THEN GOTO 101        ;Skip diameter question if M6 call
 
-IF #110 NE #9718 THEN m224 #125 "What's the DIAMETER of the tool you're inserting?" ELSE ;This will as the diameter of the tool unless it's a laser
+; Tool diameter input
+IF #110 NE #9718 THEN m224 #125 "What's the DIAMETER of the tool you're inserting?" ELSE
+IF #110 EQ #9718 THEN GOTO 200  ;Branch to laser section if laser tool
+
 N101
-If #110 EQ #9718 THEN M81 ;deploy laser
-IF #110 NE #9718 THEN #[11000+#110]=#125;set entered diameter into the tool libary if its not a laser
-IF #110 EQ #9718 THEN #[11000+#9718]=#9719;set laser nozzle diameter to the tool diameter if we're on laser
+; Store tool diameter
+IF #110 NE #9718 THEN #[11000+#110]=#125    ;Save diameter to tool library if not laser
 
-; Don't do a g43 call - it isn't needed
-; G43h#110 ;sets the active tool height to the tool that you just picked
-#[10000 + #110] = 0 ; zeros that tool height. This is so you can remeasure the same tool number if you want.
+;==============================================
+; Manual Tool Measurement Macro
+; Purpose: Measure tool height using work surface
+;==============================================
 
+;Initialize Tool Settings
+G43h#110                    ;Activate tool height offset
+#10000=0                    ;Zero current tool height for remeasure
+#150=0                      ;Clear stored tool value
+T#110                       ;Set active tool number
 
+;==============================================
+; Branch to appropriate measurement routine
+;==============================================
+IF #110 EQ #9718 THEN GOTO 200 ELSE GOTO 300  ;Laser or standard tool
 
+;==============================================
+; N200: Laser Tool Measurement
+;==============================================
+N200
+G53 Z0                      ;Move to machine Z0
 
-IF #A NE 1 THEN m200 "Insert tool number %.0f and then press Cycle Start" #110;don't stop if we're on laser
+;Display initial message
+m200 "We are going to measure your laser by using your work surface as a reference. Press Cycle Start to continue"
 
-if #A == 1 THEN goto 150 ; skip if called from m6
-; #150=0 ;clears out the stored tool -- Not sure why this was done
-#150 = #110
-T#110 ;sets the tool number to the number that the user wants
-G43 H#110
-; set the PLC number for the active tool 
-G10 P976 R#110
+;Air pressure validation
+IF #9724 EQ 0 THEN GOTO 203      ;Skip if air check disabled
+IF #9763 EQ 0 THEN GOTO 203      ;Skip if no air pressure sensor
+IF #[50000+#9763] EQ 1 THEN GOTO 202 ELSE GOTO 203  ;Check pressure status
 
-N150
+N202
+#129=1                           ;Set dialog timer
+m225 #129 "Checking for air pressure..."
+m225 #129 "You have no air pressure. Please enable air so we can deploy the laser"
+IF #[50000+#9763] EQ 1 THEN GOTO 2 ELSE GOTO 3
 
-m200 "Jog so that your tool is just skimming the work surface\nPress Cycle Start when ready"
-m200 "Are you sure your tool is exactly on the work surface?\nPress Cycle Start to confirm"
+;Laser measurement procedure
+N203
+M61                             ;Deploy laser
+IF #110 EQ #9718 THEN #[11000+#9718]=#9719  ;Set laser nozzle diameter
 
-#[10000 + #110]=#5023 ;Set's tool height for active tool
+;User prompts for laser positioning
+m200 "Jog so that your laser is just skimming the work surface\nPress Cycle Start when ready"
+m200 "Are you sure your laser is exactly on the work surface?\nPress Cycle Start to confirm"
+
+;Set laser height and offset
+#10000=[#5023+#9717]           ;Set tool height for laser
+G91 Z#9717                     ;Move up by laser Z offset
+G90
+
+;Verify laser height
+N204
+M222 Q0 #120 "We have raised the laser up %f to show the offset it will have when cutting\nDoes this look accurate?\n(laser height can be changed in the wizard)\nPress Y to confirm, N to re-measure" #9717
+IF #120 EQ 121 THEN GOTO 300   ;Continue if confirmed
+IF #120 EQ 110 THEN GOTO 200   ;Remeasure if not
+#130 = 2
+m225 #130 "Ok, let's try again"
+GOTO 204
+;==============================================
+; N300: Standard Tool Measurement
+;==============================================
+N300
+IF #A NE 1 THEN m200 "Insert tool number %.0f and then press Cycle Start" #4120
+IF #110 NE #9718 THEN m200 "Jog so that your tool is just skimming the work surface\nPress Cycle Start when ready"
+IF #110 NE #9718 THEN m200 "Are you sure your tool is exactly on the work surface?\nPress Cycle Start to confirm"
+
+;Set tool height
+IF #110 NE #9718 THEN #10000=#5023  ;Set height for standard tool
 m225 #130 "New tool height set"
 
 If #A EQ 1 then GOTO 10000 ;end because M6 will clean the tools 
 
-; cleanup the tool table if no ATC
-if  [#9776 and 1] == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#135
+IF #4120 EQ #9718 THEN GOTO 1200 ;don't clean tools if laser is in use (this allows for fast laser/router bit switching)
 
-m61 ;retract laser
+; cleanup the tool table if no ATC
+if  <ATC_ENABLED> == 0 THEN  G65 "\cncm\CorbinsWorkshop\tool_table_cleanup.cnc" T#110
+
+
+m81 ;retract laser
 G53 z0
 GOTO 10000
 

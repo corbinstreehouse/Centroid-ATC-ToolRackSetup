@@ -1,8 +1,10 @@
 ; #T is the tool number to ask the user to remove manually (no pocket to go to)
 ; by corbin dunn
 
-IF #50001                        ;Prevent lookahead from parsing past here
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 G53 Z0 ; go to z-zero to clear everything
 
@@ -14,7 +16,7 @@ G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
 
 ;---------------------------------------
 
-if [#9776 and 4] == 0 then GOTO 900; ; skip if the virtual drawbar is not enabled
+if !<VIRTUAL_DRAWBAR_ENABLED> then GOTO 900 ; Skip if a virtual draw bar support is not enabled
 
 ;------------------------------------------------------------------------------
 ; Virtual drawbar button support

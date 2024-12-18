@@ -6,9 +6,6 @@ IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
 
 N100                             ;Insert your code between N100 and N1000
 
-;if #9976 == 0 then m221 #110 "There should be no tool in the spindle already. Doing nothing.."
-;if #9976 == 0 then goto 1000
-
 M6 T0
 G43 H0
 

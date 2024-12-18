@@ -9,6 +9,8 @@
 ; #151 to 0, if the spindle was off,else it sets #151 to #25012 - time in seconds
 ;-------
 
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
 ; CORBIN: I want to turn off relay 2 (air/case pressurization) when the spindle is off, not when the job is done.
 ; Add in [#9776 and 2] for that option
 IF [[#9776 and 2] && #9711 EQ 2] THEN m84 ;turns off relay 2 if set to do so in wizard
@@ -17,7 +19,7 @@ IF [[#9776 and 2] && #9711 EQ 3] THEN m84 ;turns off relay 2 if set to do so in 
 ; Record the time we stop the spindle so we can wait for it to spin down before doing the tool change
 ; Only record the time if the spindle is actually on.
 ; #60005 reads the PLC output 5 value - #151 is perm to store the current time #25012 in seconds
-if #60005 == 1 then #151 = #25012
+if <SPINDLE_STATUS> == 1 then <SPINDLE_STOP_TIME> = <C_TIME>
 
 M95 /1/2/19
 G4P.01 ;With Added Small delay for Laser

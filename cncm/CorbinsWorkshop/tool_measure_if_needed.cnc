@@ -3,8 +3,10 @@
 ; Parameters: T - the tool number
 ; corbin dunn
 ;------------------------------------------------------------------------------
-IF #50001                        ;Prevent lookahead from parsing past here
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
+
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 DEFINE <TOOL_NUMBER> #101
 <TOOL_NUMBER> = #T 

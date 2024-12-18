@@ -1,9 +1,10 @@
 ; #A is the pocket number
 ; #T is the tool (not really needed)
 ; this requires a valid pocket already to be checked
+G65 "\cncm\CorbinsWorkshop\defines.cnc"
 
-IF #50001                        ;Prevent lookahead from parsing past here
-IF #4201 || #4202 THEN GOTO 1000 ;Skip macro if graphing or searching
+<PREVENT_LOOK_AHEAD>
+IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 #107 = #A
 #108 = #T
@@ -14,7 +15,7 @@ G53 Z0 ; go to z-zero to clear everything
 #110 = 3 ; time to show the message (non modal)
 m221 #110 "Putting back tool %.0f into pocket %.0f" #108 #107
 
-#109 = #9778 ;set my custom parameter #9778 spindle wait time
+#109 = <SPINDLE_WAIT_DURATION> ;set my custom parameter #9778 spindle wait time
 if #109 <= 0 then #109 = 15 ; default wait
 
 ; First move to the front of the RACK
@@ -31,7 +32,7 @@ G65 "\cncm\CorbinsWorkshop\Generated\pocket_#107_position.cnc" A2 ; X/Y position
 
 ;wait for the spindle to stop -----------------------------
 ; wait for the spindle to stop: #151 = the time the spindle stop command was given, M5, mfunc5.mac sets this value to #25012 (now)
-if [#151 > 0] then #138 = #25012 - #151 else #138 = 100000 ; big number for time elapsed
+if [#151 > 0] then #138 = <C_TIME> - #151 else #138 = 100000 ; big number for time elapsed
 if [#138 < 0] then #138 = 100000 ; negative time? something was messed up
 #111 = #109 - #138 ; #111 is the time left to wait for it to stop; if it is negative, then we are good to go; make it really small...
 if #111 < 0 then GOTO 100 ; skip the wait
