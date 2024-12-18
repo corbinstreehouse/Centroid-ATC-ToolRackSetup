@@ -3,7 +3,9 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 
 namespace ToolRackSetup
@@ -36,10 +38,11 @@ namespace ToolRackSetup
             return null;
         }
 
-        public App() : base() 
+        public App() : base()
         {
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
         }
+
 
         private static bool AlreadyProcessedOnThisInstance;
 
@@ -151,7 +154,7 @@ namespace ToolRackSetup
             window.Show();
             window.Activate();
             // force it up...the batch file opening it doesn't always work due to it closing
-            window.Topmost = true;
+            window.Topmost = true; // I think we'll leave it top most
             window.Topmost = false;
         }
 
@@ -166,6 +169,13 @@ namespace ToolRackSetup
             _fetchToolPopup.Popup();
         }
 
+        public void CloseAllWindows()
+        {
+            _fetchToolPopup?.Close();
+            _fetchToolPopup = null;
+            ToolManagerWindow.Instance?.Close();
+        }
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -173,23 +183,41 @@ namespace ToolRackSetup
 
             // TODO: commonize this code a bit more..
             string[] args = Environment.GetCommandLineArgs();
+            bool minimizeApp = false;
+            Action? action = null;
             for (int index = 1; index < args.Length; index += 1)
             {
                 if (String.Equals(args[index], ArgShowToolWindow, StringComparison.OrdinalIgnoreCase))
                 {
-                    // ShowToolFetchWindow // currently the default
+                    action = new Action(() => ShowToolManagerWindow());
+                    minimizeApp = true;
                 }
                 if (String.Equals(args[index], ArgShowFetchToolWindow, StringComparison.OrdinalIgnoreCase))
                 {
-                    ShowToolFetchWindow();
+                    action = new Action(() => ShowToolFetchWindow());
+                    
+                    minimizeApp = true;
                 }
+            }
+
+            if (minimizeApp)
+            {
+                Task.Delay(5).ContinueWith(_ =>
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        MainWindow.WindowState = WindowState.Minimized;
+                        action!(); // works around issues with ordering..
+                    }));
+                }
+                );
             }
 
             Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(HandleException);
             base.OnStartup(e);
         }
 
-        void HandleException(object sender, DispatcherUnhandledExceptionEventArgs e)
+           void HandleException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             MessageBox.Show(e.Exception.Message, "Unhandled exception! App is going to crash...bye.");
             // e.Handled = true;

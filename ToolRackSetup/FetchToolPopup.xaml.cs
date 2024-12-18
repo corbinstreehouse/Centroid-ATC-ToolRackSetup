@@ -41,38 +41,40 @@ namespace ToolRackSetup
             }
         }
 
-        private bool _closing = false;
-
         public void Popup()
         {
 
-            _closing = false;
-     
             Point p = MouseUtilities.GetMousePos();
 
-            System.Diagnostics.Debug.WriteLine("{0}", p);
+//            System.Diagnostics.Debug.WriteLine("{0}", p);
             Left = p.X - Width / 2.0;
             Top = p.Y;
             Topmost = true;
             Show();
-            //SizeToContent();
             Activate();
+            // Sometimes it isn't active..%
+            Task.Delay(10).ContinueWith(_ =>
+            {
+                if (Visibility == Visibility.Visible)
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        Activate();
+                    }
+                    ));
+                    
+                }
+            });
         }
-
-        
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            if (!_closing) 
-            {
-                Hide();
-            }
+            Hide();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            e.Cancel = true;
-            Hide();
+            
         }
 
         private ToolInfo? ToolInfoFromSender(object sender)
@@ -102,6 +104,24 @@ namespace ToolRackSetup
                 job.RunCommand(command, "c:\\cncm", false);
             }
             Hide();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CNCPipe.Job job = new CNCPipe.Job(ConnectionManager.Instance.Pipe);
+            String command = String.Format("G65 \"c:\\cncm\\CorbinsWorkshop\\tool_fetch.mac\"");
+            job.RunCommand(command, "c:\\cncm", false);
+            Hide();
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+
         }
     }
 }

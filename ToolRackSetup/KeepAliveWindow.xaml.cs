@@ -33,5 +33,20 @@ namespace ToolRackSetup
         {
             System.Environment.Exit(0);
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            ((App)App.Current).CloseAllWindows();
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+
+        }
     }
 }

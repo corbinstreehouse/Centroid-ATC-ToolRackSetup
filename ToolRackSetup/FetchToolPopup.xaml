@@ -7,7 +7,7 @@
          WindowStyle="None"
         Title="Test"
         
-        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" Left="100" Top="100" Width="232" SizeToContent="Height" >
+        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" Left="100" Top="100" Width="232" SizeToContent="Height" Loaded="Window_Loaded" Height="341" Activated="Window_Activated" >
 
     <Window.Resources>
         <Style x:Key="myHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
@@ -22,14 +22,14 @@
                      Value="DarkGreen" />
                     <Setter Property="IsEnabled"
                             Value="False">
-                        
+
                     </Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
     <Grid Width="225">
-        <ListView x:Name="lstvwPockets" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,0"
+        <ListView x:Name="lstvwPockets" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,0,62"
                   ItemContainerStyle="{StaticResource FetchListViewStyle}"
                   >
             <ListView.View>
@@ -38,7 +38,7 @@
                     <GridViewColumn Width="215">
                         <GridViewColumn.CellTemplate >
                             <DataTemplate>
-                                <Button Content="{Binding FetchButtonTitle}" IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200" Click="FetchButtonClick"/>
+                                <Button Content="{Binding FetchButtonTitle}" ContentStringFormat="   {0}"  IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200" Click="FetchButtonClick" HorizontalContentAlignment="Left"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -46,6 +46,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <Button Content="Other..." IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200"  Margin="11,0,14,9" VerticalAlignment="Bottom" Click="Button_Click"/>
+
 
 
 
