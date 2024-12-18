@@ -109,6 +109,7 @@
   <button row="5" column="1">park</button>
   <button row="7" column="1">mpg</button>
   <button row="5" column="2">keyboardjog</button>
+  <button row="7" column="2">ctrl_arrows</button>
   <button row="8" column="2">incr_cont</button>
   <button row="8" column="1">tortoise_hare</button>
   <button row="8" column="3" group="incrx_group">x1</button>
