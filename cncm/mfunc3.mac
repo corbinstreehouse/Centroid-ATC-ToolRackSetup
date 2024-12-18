@@ -1,7 +1,6 @@
 ;-------
 ;M3 macro
 ; Displays message to select auto spindle mode if it is not set
-;
 ;-------
 #140 = 1.5 ;dialog timer
 IF #4202 || #4201 THEN GOTO 200
@@ -13,7 +12,14 @@ IF #9711 EQ 2 THEN m64 ;turns on relay 2 if set to do so in wizard
 
 ;spoilboard dig in 
 IF #9703 EQ 1 THEN G22 K[#10000 - ABS[#9753]] ELSE ;will set the Z work envelope to the current tool length + the spoilboard dig in if the user has this turned on
+if #50010
+m108/1 ;re-enable feedrate override
+;feedrate override & spindle override warning
+;IF #25015 NE 100 && #25016 NE 100 && #9704 EQ 1 THEN M200 "Feedrate and spindle override is on!\nAdjust if needed and press Cycle Start to continue"
+g4p.25 ;pause to get the next two lines to take properly
 
+If #25015 NE 100 && #9704 EQ 1 THEN m200 "Feedrate override is on!\nAdjust if needed and press Cycle Start to continue"
+IF #25016 NE 100 && #9704 EQ 1 THEN m200 "Spindle override is on!\nAdjust if needed and press Cycle Start to continue"
 
 IF #4120 EQ #9718 && #9722 EQ 1 THEN m200 "Laser about to fire!\nPut on safety gear\nPress Cycle Start to fire"
 N10
