@@ -83,6 +83,7 @@ namespace ToolRackSetup
 
         ~ConnectionManager()
         {
+            /// message is never shown...I need to move it somewhere else...
             _pipe.message_window.AddMessage("Tool Manager Disconnected");
         }
 
