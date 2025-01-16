@@ -46,14 +46,13 @@ namespace ToolRackSetup
 
             Point p = MouseUtilities.GetMousePos();
 
-//            System.Diagnostics.Debug.WriteLine("{0}", p);
             Left = p.X - Width / 2.0;
             Top = p.Y;
             Topmost = false;
             Topmost = true;
             Show();
             Activate();
-            // Sometimes it isn't active..%
+            // Sometimes it isn't active....
             Task.Delay(10).ContinueWith(_ =>
             {
                 if (Visibility == Visibility.Visible)
