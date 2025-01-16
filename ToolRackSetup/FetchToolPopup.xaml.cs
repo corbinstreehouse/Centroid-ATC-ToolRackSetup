@@ -49,6 +49,7 @@ namespace ToolRackSetup
 //            System.Diagnostics.Debug.WriteLine("{0}", p);
             Left = p.X - Width / 2.0;
             Top = p.Y;
+            Topmost = false;
             Topmost = true;
             Show();
             Activate();
@@ -59,6 +60,8 @@ namespace ToolRackSetup
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
+                        Topmost = false;
+                        Topmost = true;
                         Activate();
                     }
                     ));
