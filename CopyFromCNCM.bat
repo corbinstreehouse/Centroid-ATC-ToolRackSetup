@@ -7,10 +7,10 @@ xcopy /y c:\CNCM\mfunc15.mac CNCM\
 xcopy /y c:\CNCM\mfunc16.mac CNCM\
 
 :: Avid files I had to fix up a bit..
-xcopy /y c:\CNCM\AvidMacros\mantoolmeasure.mac CNCM\AvidMacros\ :: fixed to not clear tools
+::mantoolmeasure was fixed to not clear tools
+xcopy /y c:\CNCM\AvidMacros\mantoolmeasure.mac CNCM\AvidMacros\
 xcopy /y c:\CNCM\AvidMacros\mtc.mac CNCM\AvidMacros\
-:: xcopy /y c:\CNCM\AvidMacros\zplate.mac CNCM\AvidMacros\ :: still wrong...but not used according to eric
-xcopy /y c:\CNCM\AvidMacros\utilsrouter.mac CNCM\AvidMacros\ :: added an option 8
+xcopy /y c:\CNCM\AvidMacros\utilsrouter.mac CNCM\AvidMacros\
 
 xcopy /y c:\CNCM\resources\vcp\skins\avid_router.vcp CNCM\resources\vcp\skins\
 

@@ -2,7 +2,7 @@
 ;Utilities Menu
 N1
 
-M224 #111 "Which Utility Do You Want To Run?\n#)1: Calibrate Work Surface Location\n#)2: Calibrate Tool Height Setter Location\n#)3: Manual Tool Measure\n#)4: Travel Limit Setter\n#)5: Diode Laser Utilities\n#)6: Probe Stylus Calibration\n#)7: Export Parameters\n#)8: Manual Tool Measure with Gauge Block\n#)" #111
+M224 #111 "Which Utility Do You Want To Run?\n#)1: Calibrate Work Surface Location\n#)2: Calibrate Tool Height Setter Location\n#)3: Manual Tool Measure\n#)4: Travel Limit Setter\n#)5: Diode Laser Utilities\n#)6: Probe Stylus Calibration\n#)7: Manual Tool Measure with Gauge Block\n#)" #111
 IF #111 EQ 1 THEN GOTO 100 ELSE 
 IF #111 EQ 2 THEN GOTO 200 ELSE 
 IF #111 EQ 3 THEN GOTO 300 ELSE 
@@ -10,7 +10,6 @@ IF #111 EQ 4 THEN GOTO 400 ELSE
 IF #111 EQ 5 THEN GOTO 500 ELSE
 IF #111 EQ 6 THEN GOTO 600 ELSE  
 IF #111 EQ 7 THEN GOTO 700 ELSE
-IF #111 EQ 8 THEN GOTO 800 ELSE
 GOTO 1
 
 N100
@@ -38,10 +37,6 @@ G65 "\cncm\AvidMacros\probe_stylus_calibration.cnc"
 GOTO 1000; end
 
 N700
-G65 "\cncm\AvidMacros\exportparms.mac"
-GOTO 1000; end
-
-N800
 G65 "\cncm\CorbinsWorkshop\tool_gauge_block_measure.cnc"
 GOTO 1000; end
 
