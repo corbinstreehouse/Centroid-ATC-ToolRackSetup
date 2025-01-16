@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0F6E2D20FB164F0EBA31FC0B4850BD07"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_16093498066749FEBF57F967DDBE46A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -147,6 +153,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7E25B62984B54348A74A773836845D46"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8D944070F95C4DB395802805147527D4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -231,7 +243,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_FEC70B94AC9941CDB5FD7768CE0A60E6"
+        "MsmKey" = "8:_E657B4C8D6994F309602B1B1781D45B2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -376,6 +388,26 @@
             {
             "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\laser_deactivate.cnc"
             "TargetName" = "8:laser_deactivate.cnc"
+            "Tag" = "8:"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0F6E2D20FB164F0EBA31FC0B4850BD07"
+            {
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\tool_gauge_block_measure.cnc"
+            "TargetName" = "8:tool_gauge_block_measure.cnc"
             "Tag" = "8:"
             "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
@@ -752,6 +784,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7E25B62984B54348A74A773836845D46"
+            {
+            "SourcePath" = "8:..\\cncm\\AvidMacros\\utilsrouter.mac"
+            "TargetName" = "8:utilsrouter.mac"
+            "Tag" = "8:"
+            "Folder" = "8:_6AFA4F3F65FA4094831EB8FD88470963"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8D944070F95C4DB395802805147527D4"
             {
             "SourcePath" = "8:..\\cncm\\mfunc16.mac"
@@ -1032,19 +1084,19 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FEC70B94AC9941CDB5FD7768CE0A60E6"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E657B4C8D6994F309602B1B1781D45B2"
             {
-            "SourcePath" = "8:..\\cncm\\mfunc3.mac"
-            "TargetName" = "8:mfunc3.mac"
+            "SourcePath" = "8:..\\cncm\\CorbinsWorkshop\\defines.cnc"
+            "TargetName" = "8:defines.cnc"
             "Tag" = "8:"
-            "Folder" = "8:_8677C593DEC74C67A2799F812B19D500"
+            "Folder" = "8:_0DEACED20EF54C8FBAE7FF699346A2DC"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
+            "Permanent" = "11:FALSE"
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
