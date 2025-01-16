@@ -115,7 +115,7 @@ IF <AVID_SPOILBOARD_CALIBRATED> EQ 0 THEN GOTO 802 ;bail out if our spoilboard l
 IF [<TOOL_IS_THE_SAME> && <NEW_TOOL_IS_LASER>] THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
 IF <TOOL_IS_THE_SAME> GOTO <SET_TOOL_LINE> ; Sets the tool, sets the height, measures if needed.
 
-IF <NEW_TOOL_IS_LASER> then <AVID_LASER_PRIOR_T> = <OLD_TOOL> ; Avid has a utility to switch to the prior tool, so support that
+IF [<NEW_TOOL_IS_LASER> && !<OLD_TOOL_IS_LASER>] then <AVID_LASER_PRIOR_T> = <OLD_TOOL> ; Avid has a utility to switch to the prior tool, so support that
 
 ; Doing a tool change
 ; m225 #140 "Checking air"

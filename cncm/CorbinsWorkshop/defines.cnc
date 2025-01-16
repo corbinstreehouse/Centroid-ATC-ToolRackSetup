@@ -39,7 +39,7 @@ DEFINE <SPINDLE_STATUS> #60005 ; PLC output value 5 for the spindle status (1 is
 
 ; Avid defines
 DEFINE <AVID_SAVED_TOOL> #150 
-DEFINE <AVID_LASER_PRIOR_T> #157 ; store the last tool before switching from the laser; only for calibration
+DEFINE <AVID_LASER_PRIOR_T> #157 ; store the last tool before switching from the laser
 DEFINE <AVID_LASER_OFFSET_STATE> #158 ; 1 if active, 0 if not active
 DEFINE <AVID_LASER_OFFSET_ACTIVE> [#158 == 1]
 
