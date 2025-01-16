@@ -309,7 +309,6 @@ namespace ToolRackSetup
 
         private void CheckForCentroidATCSetup()
         {
-            // Warn the user if they have done this...as it keeps writing 160/06
             if (!File.Exists(centroidWizardSettingsPath)) return;
 
             try
@@ -384,6 +383,23 @@ namespace ToolRackSetup
                 Settings.TestingFeed = ReadDouble(nameof(Settings.TestingFeed), Settings.TestingFeed);
                 Settings.SlideDistance = ReadDouble(nameof(Settings.SlideDistance), Settings.SlideDistance);
                 Settings.RackOffset = ReadDouble(nameof(Settings.RackOffset), Settings.RackOffset);
+
+                // If we have a bunch of pocket items, but the system things we have 0, then we are probably importing them,
+                // and we should assign the pockets to the value..
+
+                if (ConnectionManager.Instance.Parameters.PocketCount == 0)
+                {
+                    int count = doc.XPathSelectElements("/Table/Bin").Count();
+                    if (count > 0)
+                    {
+                        // Yeah, we have some, so restore them for the user to see them.
+                        ConnectionManager.Instance.Parameters.PocketCount = count;
+                        ToolController.RefreshToolPocketItems();
+
+                    }
+                }
+                
+
 
                 // probably not the fastest way to do this.
                 foreach (ToolPocketItem item in ToolController.ToolPocketItems)
@@ -988,7 +1004,7 @@ namespace ToolRackSetup
 
         private void chkbxEnableATC_Checked(object sender, RoutedEventArgs e)
         {
-            // corbin, test!! I'm not sure if this is right; i need to test the wizard more...with aTC stuff
+            // corbin, test!! I'm not sure if this is right; i need to test the wizard more...with ATC stuff
             if (!_loading && _parameterSettings.EnableATC)
             {
                 CheckForCentroidATCSetup();

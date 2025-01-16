@@ -340,6 +340,13 @@ namespace ToolRackSetup {
             }
         }
 
+        public void RefreshToolPocketItems()
+        {
+            RefreshTools();
+            _toolPocketItems.Clear();
+            InitializeToolPocketItems();
+        }
+
         public void RemoveLastPocket()
         {
             if (_toolPocketItems.Count > 0)
