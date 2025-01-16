@@ -25,7 +25,7 @@ IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 if #125 > 0 THEN GOTO 100
 
 ; if it is the laser, then skip that? Set it to the diameter of the thingy?
-if #110 == #9718 THEN GOTO 100
+if #110 == <AVID_LASER_TOOL> THEN GOTO 54 ; manual tool measure always for the laser!
 
 m224 #125 "TOOL HEIGHT\nWhat's the DIAMETER of the tool %.0f?" #110 ;This will be the diameter of the tool unless it's a laser
 #[<C_DIA_OFFSET>+#110] = #125 ;set entered diameter into the tool libary if its not a laser

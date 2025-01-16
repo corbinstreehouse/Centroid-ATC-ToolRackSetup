@@ -211,7 +211,9 @@ if [#[10000 + <NEW_TOOL>] != 0] then GOTO <RESTORE_LINE>  ; height is already se
 
 ;m221 #140 "Going to the touch plate and measuring the height of Tool %.0f" <NEW_TOOL>
 
-G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
+; The laser no longer uses the touch plate, so only go there if it isn't the laser
+if [<NEW_TOOL> != <AVID_LASER_TOOL>] then G65 "\cncm\CorbinsWorkshop\goto_touch_plate.cnc"
+
 G65 "\cncm\CorbinsWorkshop\tool_measure_height.cnc" A1 T<NEW_TOOL>
 
 

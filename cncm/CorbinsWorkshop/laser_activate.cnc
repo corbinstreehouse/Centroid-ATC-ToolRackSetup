@@ -52,10 +52,10 @@ IF !<AVID_LASER_OFFSET_ACTIVE> THEN <C_ACTIVE_WCS_Y> = [<C_ACTIVE_WCS_Y> - <AVID
 #130 = 1
 m225 #130 "Laser XY offset applied"
 
-
-;g52 x-#9715 y-#9716     		;offest to account for location of laser relative to spindle
 M37								;enable laser			 			
 m61 							;deploy laser
+G43 H<AVID_LASER_TOOL> 						;set tool height to current tool (in this case the laser)
+<AVID_SAVED_TOOL>=<AVID_LASER_TOOL>						;set tool number for laser
 ;IF #10000 EQ 0 THEN M34 ELSE 	;set laser height if we need to
 <C_ACTIVE_DIA> = <AVID_LASER_DIA>					;set laser nozzle diameter
 
