@@ -76,6 +76,8 @@ if <OLD_TOOL> < 0 then <OLD_TOOL> = 0
 <SAVED_X> = <C_MACHINE_X> ; saved x
 <SAVED_Y> = <C_MACHINE_Y> ; saved y
 
+G90 ; absolute position mode
+
 m221 #140 "Tool change requested from %.0f to %.0f" <OLD_TOOL> <NEW_TOOL> 
 
 DEFINE <OLD_TOOL_IS_LASER> [<OLD_TOOL> == <AVID_LASER_TOOL> && <AVID_LASER_TOOL> != 0] ; 9718 is the laser tool number, and <OLD_TOOL> is the old tool
@@ -121,7 +123,6 @@ M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc"
 
 ; =============================================================================
 
-G90 ; absolute position mode
 G94                              ;Disable Inverse Time
 g23 ;cancel work envelope (avid uses this for anti-dig)
 M5                               ;Turn off Spindle - normally this would already be called
