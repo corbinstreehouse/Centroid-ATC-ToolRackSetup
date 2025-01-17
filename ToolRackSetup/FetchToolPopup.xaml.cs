@@ -43,7 +43,7 @@ namespace ToolRackSetup
 
         public void Popup()
         {
-
+            ConnectionManager.Instance.ToolController.RefreshTools();
             Point p = MouseUtilities.GetMousePos();
 
             Left = p.X - Width / 2.0;
