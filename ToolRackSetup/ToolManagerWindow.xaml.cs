@@ -357,7 +357,7 @@ namespace ToolRackSetup
             {
                 doc = XDocument.Load(settingsPath);
             } else if (File.Exists(systemSettingsPath)) {
-                doc = XDocument.Load(systemSettingsPath);
+             //   doc = XDocument.Load(systemSettingsPath); // don't import these...it is always there :(
             }
             if (doc != null)
             {

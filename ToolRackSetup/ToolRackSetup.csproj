@@ -9,7 +9,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Authors>Corbin Dunn</Authors>
     <Company>Corbin's Workshop</Company>
-    <Version>0.0.15</Version>
+    <Version>0.0.16</Version>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <StartupObject>ToolRackSetup.App</StartupObject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
