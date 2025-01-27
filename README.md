@@ -2,9 +2,9 @@
 
 These are macros and a tool library mangement program for Centroid CNC12, designed to work with Avid CNC's EX Controller.
 
-Currently in beta.
+Video Directions: https://youtu.be/ubGuQ4TON-M
 
-Directions: https://www.corbinstreehouse.com/blog/atc-automatic-tool-changer-for-centroid-cnc12/
+Textual Directions with Photos: https://www.corbinstreehouse.com/blog/atc-automatic-tool-changer-for-centroid-cnc12/
 
 Goals:
 * Full ATC support for rack style tool pockets
@@ -17,8 +17,4 @@ Goals:
 
 Click on Releases and get the latest one: https://github.com/corbinstreehouse/Centroid-ATC-ToolRackSetup/releases
 
-Quick and dirty video on it: https://youtu.be/DErdoOmF-W0
-
-I'm actively developing it right now.
-
--Corbin / corbin@corbinsworkshop dot com
+-Corbin Dunn / corbin@corbinsworkshop dot com
