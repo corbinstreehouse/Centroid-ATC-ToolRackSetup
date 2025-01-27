@@ -10,18 +10,29 @@ IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 
 N100 
 
-M224 #101 "Enter the tool number currently in the spindle.\nEnter 0 for no tool."
-; #101 = requested tool
+DEFINE <OLD_TOOL> #134
+DEFINE <NEW_TOOL> #101
 
-if [#101 <0 || #101 > 200] THEN GOTO 800
+<OLD_TOOL> = #9976
 
-G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T#101
-G65 "\cncm\CorbinsWorkshop\tool_measure_if_needed.cnc" T#101
+M224 <NEW_TOOL> "Enter the tool number currently in the spindle.\nEnter 0 for no tool."
+
+if [<NEW_TOOL> <0 || <NEW_TOOL> > 200] THEN GOTO 800
+
+DEFINE <OLD_TOOL_IS_LASER> [<OLD_TOOL> == <AVID_LASER_TOOL> && <AVID_LASER_TOOL> != 0]
+DEFINE <NEW_TOOL_IS_LASER> [<NEW_TOOL> == <AVID_LASER_TOOL> && <AVID_LASER_TOOL> != 0]
+
+; Support the laser with Set Tool
+if <OLD_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_deactivate.cnc"
+if <NEW_TOOL_IS_LASER> THEN G65 "\cncm\CorbinsWorkshop\laser_activate.cnc"
+
+G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T<NEW_TOOL>
+G65 "\cncm\CorbinsWorkshop\tool_measure_if_needed.cnc" T<NEW_TOOL>
 
 GOTO 1000
 
 ;------------ error
 N800
-M200 "Invalid tool # %.0f. Press Cycle Start to Continue." #101
+M200 "Invalid tool # %.0f. Press Cycle Start to Continue." <NEW_TOOL>
 
 N1000                            ;End of Macro
