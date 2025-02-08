@@ -30,6 +30,7 @@ DEFINE <IN_MM> [<C_UNITS_OF_MEASURE> EQ 21]
 
 
 ; Corbin's Workshop defines
+DEFINE <SAVED_TOOL> #9976 ; I used this because it is what some of the Centroid ATC code uses
 DEFINE <ATC_ENABLED> [#9776 and 1]   ; 9776 and 1 means it is enabled
 DEFINE <VIRTUAL_DRAWBAR_ENABLED> [#9776 and 4]
 DEFINE <SPINDLE_WAIT_DURATION> #9778

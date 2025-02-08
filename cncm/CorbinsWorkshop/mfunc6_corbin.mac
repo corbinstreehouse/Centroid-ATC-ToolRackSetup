@@ -63,7 +63,7 @@ IF <GRAPHING_OR_SEARCHING> THEN GOTO 1000 ;Skip macro if graphing or searching
 ; #4120 is the tool requested
 ; #4203 is the tool in the spindle -- but this variable is wonky..see 16.) What is System Variable #4203'
 ; #150 also stores the same variable, but I like using the PLC one
-<OLD_TOOL> = #9976;  #4203 ; old tool; tool in the spindle right now
+<OLD_TOOL> = <SAVED_TOOL> ; #9976 ; #4203 ; old tool; tool in the spindle right now. Using 9976 because that is what centroid used in other spots
 <NEW_TOOL> = #4120 ; new tool, requested via Txx
 
 

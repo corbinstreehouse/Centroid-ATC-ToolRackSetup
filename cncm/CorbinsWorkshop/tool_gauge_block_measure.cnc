@@ -26,30 +26,30 @@ DEFINE <ACTIVE_WCS_Z> #2700
 DEFINE <MACHINE_Z> #5023
 DEFINE <HEIGHT_TABLE_START> 10000
 
-<OLD_TOOL> = #9976;  #4203 ??? 
+<OLD_TOOL> = <SAVED_TOOL>
 <ALERT_DURATION> = 2.0 ; seconds
 
 
 <OLD_TOOL_HEIGHT> = #[<HEIGHT_TABLE_START> + <OLD_TOOL>]
 
 ; Check the current tool's height..it has to be set for things to work correctly!
-if <OLD_TOOL> <= 0 then GOTO <ERROR_LINE_NO_TOOL> 
-if <OLD_TOOL_HEIGHT> == 0 then GOTO <ERROR_LINE_NO_HEIGHT>
+; if <OLD_TOOL> <= 0 then GOTO <ERROR_LINE_NO_TOOL> 
+; if <OLD_TOOL_HEIGHT> == 0 then GOTO <ERROR_LINE_NO_HEIGHT>
 
 ; save this current tool's WCS Z-zero in machine coordinates
 <STARTING_MACHINE_Z> = <ACTIVE_WCS_Z> + <OLD_TOOL_HEIGHT>
 
-m224 <GAUGE_BLOCK_HEIGHT> "Tool Height Setter\nActive Tool: T%.0f\nZ-zero should already be set with your active tool.\nWhat's the height of your gauge block?" <OLD_TOOL>
+m224 <GAUGE_BLOCK_HEIGHT> "Tool Height Setter\nActive Tool: T%.0f\nZ-zero should be set to under your gauge block.\nWhat's the height of your gauge block?" <OLD_TOOL>
 
 ; Save off the current offset's z-zero
 
-m224 <NEW_TOOL> "What is the new tool you are measuring the height of?"
-if [<NEW_TOOL> <= 0 || <NEW_TOOL> > 200] GOTO <ERROR_BAD_TOOL_NUMBER>
+;m224 <NEW_TOOL> "What is the new tool you are measuring the height of?"
+;if [<NEW_TOOL> <= 0 || <NEW_TOOL> > 200] GOTO <ERROR_BAD_TOOL_NUMBER>
 
 ; Activate that tool and the height for it..
-G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T<NEW_TOOL>
-
-m200 "Enter T%.0f into the spindle and jog the bit to the top of your gauge block.\n Press Cycle Start to measure the tool length when you are ready." <NEW_TOOL>
+; G65 "\cncm\CorbinsWorkshop\tool_set.cnc" T<NEW_TOOL>
+<NEW_TOOL> = <OLD_TOOL> ; Making things simplier than what I had before.
+m200 "Jog the bit to the top of your gauge block.\n Press Cycle Start to measure the tool length when you are ready." <NEW_TOOL>
 
 <HEIGHT_DIFF> = <MACHINE_Z> - <STARTING_MACHINE_Z> - <GAUGE_BLOCK_HEIGHT>
 ;m200 "HEIGHT_DIFF: %f, STARTING_MACHINE_Z:%f, MACHINE_Z: %f, GAUGE_BLOCK_HEIGHT: %f" <HEIGHT_DIFF> <STARTING_MACHINE_Z> <MACHINE_Z> <GAUGE_BLOCK_HEIGHT>
