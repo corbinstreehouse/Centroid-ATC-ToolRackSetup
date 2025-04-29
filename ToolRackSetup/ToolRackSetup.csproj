@@ -37,11 +37,11 @@
 
   <ItemGroup>
     <Reference Include="CentroidAPI">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Avid CNC\AvidCNC Centroid Profile Manager\Profiles\User\Avid 4x8 Pro\cncm\CentroidAPI.dll</HintPath>
+      <HintPath>c:\cncm\CentroidAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="CentroidAPIUserControls">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Avid CNC\AvidCNC Centroid Profile Manager\Profiles\User\Avid 4x8 Pro\cncm\CentroidAPIUserControls.dll</HintPath>
+      <HintPath>c:\cncm\CentroidAPIUserControls.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
