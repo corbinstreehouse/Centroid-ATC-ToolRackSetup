@@ -8,9 +8,9 @@ xcopy /y c:\CNCM\mfunc16.mac CNCM\
 
 :: Avid files I had to fix up a bit..
 ::mantoolmeasure was fixed to not clear tools
-xcopy /y c:\CNCM\AvidMacros\mantoolmeasure.mac CNCM\AvidMacros\
-xcopy /y c:\CNCM\AvidMacros\mtc.mac CNCM\AvidMacros\
-xcopy /y c:\CNCM\AvidMacros\utilsrouter.mac CNCM\AvidMacros\
+xcopy /y c:\CNCM\AvidMacros\mantoolmeasure.mac CNCM\AvidMacros\ :: fixed reset of tool library
+::xcopy /y c:\CNCM\AvidMacros\mtc.mac CNCM\AvidMacros\ :: not used by my stuff, so don't bother
+xcopy /y c:\CNCM\AvidMacros\utilsrouter.mac CNCM\AvidMacros\ ::adds one more thing for me
 
 xcopy /y c:\CNCM\resources\vcp\skins\avid_router.vcp CNCM\resources\vcp\skins\
 
