@@ -467,7 +467,7 @@ namespace ToolRackSetup {
             }
         }
 
-        private void RefreshActiveTool()
+        public void RefreshActiveTool()
         {
             int toolInSpindle = (int)_pipe.parameter.GetValue(ParameterKey.CurrentToolNumber);
             ActiveTool = toolInSpindle > 0 ? _toolInfoLibrary[toolInSpindle - 1] : null;
