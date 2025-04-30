@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -16,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CentroidAPI;
+using static CentroidAPI.CNCPipe;
 using Point = System.Windows.Point;
 
 namespace ToolRackSetup
@@ -40,6 +42,23 @@ namespace ToolRackSetup
                 Hide();
             }
         }
+        
+
+        private void AdjustSizeToFitScreen()
+        {
+            // Make sure it doesn't go taller than the screen
+            double maxY = SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
+            double windowMaxY = this.Top + this.Height;
+
+            if (windowMaxY > maxY)
+            {
+                double diff = windowMaxY - maxY;
+                this.SizeToContent = SizeToContent.Manual;
+                Height = Height - diff - 20;
+            }
+        }
+
+
 
         public void Popup()
         {
@@ -50,7 +69,13 @@ namespace ToolRackSetup
             Top = p.Y;
             Topmost = false;
             Topmost = true;
+            this.SizeToContent = SizeToContent.Height;
+
+            AdjustSizeToFitScreen();
+
             Show();
+
+
             Activate();
             // Sometimes it isn't active...if we do this in a delay it seems to fix that. Super hacky.
             // Original delay was 10ms, and I increased it to 100ms as I still was seeing it inactive.
@@ -113,7 +138,7 @@ namespace ToolRackSetup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            AdjustSizeToFitScreen();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -127,6 +152,12 @@ namespace ToolRackSetup
         private void Window_Activated(object sender, EventArgs e)
         {
 
+        }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            // Testing..corbin
+         //   Debug.WriteLine("Content Rendered");
         }
     }
 }

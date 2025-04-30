@@ -7,7 +7,7 @@
          WindowStyle="None"
         Title="Test"
         
-        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" Left="100" Top="100" Width="232" SizeToContent="Height" Loaded="Window_Loaded" Height="341" Activated="Window_Activated" >
+        mc:Ignorable="d" Deactivated="Window_Deactivated" Closing="Window_Closing" Left="100" Top="100" Width="232" SizeToContent="Height" Loaded="Window_Loaded" Height="341" Activated="Window_Activated" ShowInTaskbar="False" ContentRendered="Window_ContentRendered" >
 
     <Window.Resources>
         <Style x:Key="myHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
