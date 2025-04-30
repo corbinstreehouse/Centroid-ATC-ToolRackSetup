@@ -65,9 +65,14 @@ namespace ToolRackSetup
 
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 1);
+            dispatcherTimer.Interval = GetPollingTimeInterval(); // 1 second polling
             dispatcherTimer.Start();
 
+        }
+
+        private static TimeSpan GetPollingTimeInterval()
+        {
+            return new TimeSpan(0, 0, 0, 1);
         }
 
         private void dispatcherTimer_Tick(object? sender, EventArgs e)
@@ -76,9 +81,11 @@ namespace ToolRackSetup
             var rc = Pipe.plc.GetPcSystemVariableBit(CentroidAPI.PcToMpuSysVarBit.SV_JOB_IN_PROGRESS, out plcState);
             if (rc == CNCPipe.ReturnCode.ERROR_PIPE_IS_BROKEN)
             {
-                // Quit; nothing we can do..
+                // Hard quit; nothing we can do..
                 Environment.Exit(0);
             }
+            _controller?.RefreshActiveTool();
+
         }
 
         public void OnExit()
