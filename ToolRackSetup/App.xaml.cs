@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
@@ -14,7 +15,7 @@ namespace ToolRackSetup
     /// Interaction logic for App.xaml
     /// </summary>
     /// 
-    
+
     public partial class App : Application
     {
 
@@ -37,6 +38,8 @@ namespace ToolRackSetup
             // Return null if the assembly cannot be found
             return null;
         }
+
+
 
         public App() : base()
         {
@@ -167,6 +170,11 @@ namespace ToolRackSetup
             _fetchToolPopup.Popup();
         }
 
+        public void DropFetchToolPopupInstance()
+        {
+            _fetchToolPopup = null;
+        }
+
         public void CloseAllWindows()
         {
             _fetchToolPopup?.Close();
@@ -177,6 +185,7 @@ namespace ToolRackSetup
 
         protected override void OnStartup(StartupEventArgs e)
         {
+
             MakeSingleInstance();
 
             _ = ConnectionManager.Instance; // start it up
@@ -195,7 +204,7 @@ namespace ToolRackSetup
                 if (String.Equals(args[index], ArgShowFetchToolWindow, StringComparison.OrdinalIgnoreCase))
                 {
                     action = new Action(() => ShowToolFetchWindow());
-                    
+
                     minimizeApp = true;
                 }
             }
@@ -217,13 +226,18 @@ namespace ToolRackSetup
             base.OnStartup(e);
         }
 
-           void HandleException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        void HandleException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             MessageBox.Show(e.Exception.Message, "Unhandled exception! App is going to crash...bye.");
             // e.Handled = true;
 
         }
 
-    }
+        protected override void OnExit(ExitEventArgs e)
+        {
+            ConnectionManager.Instance.OnExit();
+
+        }
+    }   
 
 }

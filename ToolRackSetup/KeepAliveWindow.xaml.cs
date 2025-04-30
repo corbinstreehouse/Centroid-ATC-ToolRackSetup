@@ -31,7 +31,7 @@ namespace ToolRackSetup
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            System.Environment.Exit(0);
+            App.Current.Shutdown();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -42,7 +42,7 @@ namespace ToolRackSetup
         private void Window_Closed(object sender, EventArgs e)
         {
             /// message is never shown...I need to move it somewhere else...
-            ConnectionManager.Instance.Pipe.message_window.AddMessage("Tool Manager Disconnected");
+//            ConnectionManager.Instance.Pipe.message_window.AddMessage("Tool Manager Disconnected");
             ((App)App.Current).CloseAllWindows();
         }
 

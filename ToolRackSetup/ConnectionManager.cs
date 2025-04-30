@@ -81,10 +81,14 @@ namespace ToolRackSetup
             }
         }
 
-        ~ConnectionManager()
+        public void OnExit()
         {
             /// message is never shown...I need to move it somewhere else...
             _pipe.message_window.AddMessage("Tool Manager Disconnected");
+        }
+
+        ~ConnectionManager()
+        {
         }
 
         private static ConnectionManager? _instance;

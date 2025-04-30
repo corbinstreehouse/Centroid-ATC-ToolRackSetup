@@ -52,8 +52,9 @@ namespace ToolRackSetup
             Topmost = true;
             Show();
             Activate();
-            // Sometimes it isn't active....
-            Task.Delay(10).ContinueWith(_ =>
+            // Sometimes it isn't active...if we do this in a delay it seems to fix that. Super hacky.
+            // Original delay was 10ms, and I increased it to 100ms as I still was seeing it inactive.
+            Task.Delay(100).ContinueWith(_ =>
             {
                 if (Visibility == Visibility.Visible)
                 {
@@ -76,7 +77,9 @@ namespace ToolRackSetup
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            
+            // NOTE: when closed we need to delete the shared instance!
+            ((App)App.Current).DropFetchToolPopupInstance();
+
         }
 
         private ToolInfo? ToolInfoFromSender(object sender)
