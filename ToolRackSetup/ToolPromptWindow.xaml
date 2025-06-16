@@ -1,0 +1,20 @@
+﻿<Window x:Class="ToolRackSetup.ToolPromptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ToolRackSetup"
+        mc:Ignorable="d"
+        Title="Set Tool" Height="136" Width="432" Topmost="True" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
+        <local:ClickSelectTextBox HorizontalAlignment="Left" Margin="277,22,0,0" TextWrapping="Wrap" Text="ClickSelectTextBox" VerticalAlignment="Top" Width="120" Height="18"/>
+        <TextBlock HorizontalAlignment="Left" Margin="27,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Enter the tool currently in the spindle: " Height="16" Width="203"/>
+        <TextBlock HorizontalAlignment="Left" Margin="267,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="T" Height="16" Width="6"/>
+        <Button Content="Apply" HorizontalAlignment="Left" Margin="232,70,0,0" VerticalAlignment="Top" Height="28" Width="67"/>
+        <Button Content="Cancel" HorizontalAlignment="Left" Margin="316,69,0,0" VerticalAlignment="Top" Height="29" Width="68"/>
+
+    </Grid>
+</Window>
