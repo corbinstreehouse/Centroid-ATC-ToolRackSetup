@@ -113,6 +113,7 @@ namespace ToolRackSetup
                         // Validate the last mod time hasn't changed
                         if (File.Exists(jobFilename))
                         {
+                            // Todo: invariant culture for dates
                             if (DateTime.TryParse(element.XPathSelectElement("DateModified")?.Value, out var lastRuntimeDateMod))
                             {
                                 DateTime lastModified = File.GetLastWriteTime(jobFilename);

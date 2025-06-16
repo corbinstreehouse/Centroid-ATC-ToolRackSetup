@@ -29,7 +29,7 @@ namespace ToolRackSetup
         // Custom parameters by Corbin's Workshop. TODO: add a prefix of CW_
         ATCToolOptions = 776, // bitset, see ATCToolOptions enum
         CW_ShowRuntime = 777,
-        SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
+        SpindleWaitTime = 778, // spindle wait time, in seconds
 
 
 
