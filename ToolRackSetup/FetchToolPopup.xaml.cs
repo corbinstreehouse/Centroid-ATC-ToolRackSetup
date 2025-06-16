@@ -53,6 +53,7 @@ namespace ToolRackSetup
             if (windowMaxY > maxY)
             {
                 double diff = windowMaxY - maxY;
+                // We have to go from "Height" SizeToContent to manual, otherwise the changing of the height won't actually happen
                 this.SizeToContent = SizeToContent.Manual;
                 Height = Height - diff - 20;
             }
@@ -62,19 +63,22 @@ namespace ToolRackSetup
 
         public void Popup()
         {
-            ConnectionManager.Instance.ToolController.RefreshTools();
+            // Only refresh the active tool, as it is fastest..
+            ConnectionManager.Instance.ToolController.RefreshActiveTool();
+
+
             Point p = MouseUtilities.GetMousePos();
 
             Left = p.X - Width / 2.0;
             Top = p.Y;
             Topmost = false;
             Topmost = true;
+            // Start out with an auto-size to the height, in case the number of pockets changes (I tested this)
             this.SizeToContent = SizeToContent.Height;
 
-            AdjustSizeToFitScreen();
+            AdjustSizeToFitScreen(); // I'm probably doing this way too many times...Probably only has to be in one spot, but this seems to help catch it earlier on the second call to showing the window
 
             Show();
-
 
             Activate();
             // Sometimes it isn't active...if we do this in a delay it seems to fix that. Super hacky.
@@ -138,11 +142,13 @@ namespace ToolRackSetup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // We seem to have to do this in window loaded
             AdjustSizeToFitScreen();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_OtherClick(object sender, RoutedEventArgs e)
         {
+            // I could do this with a Gcode call, but I'm going to just use a dialog..
             CNCPipe.Job job = new CNCPipe.Job(ConnectionManager.Instance.Pipe);
             String command = String.Format("G65 \"c:\\cncm\\CorbinsWorkshop\\tool_fetch.mac\"");
             job.RunCommand(command, "c:\\cncm", false);
@@ -159,5 +165,6 @@ namespace ToolRackSetup
             // Testing..corbin
          //   Debug.WriteLine("Content Rendered");
         }
+
     }
 }

@@ -46,7 +46,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Content="Other..." IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200"  Margin="11,0,14,9" VerticalAlignment="Bottom" Click="Button_Click"/>
+        <Button Content="Other..." IsEnabled="{Binding IsToolEnabled}" Height="50" Width="200"  Margin="11,0,14,9" VerticalAlignment="Bottom" Click="Button_OtherClick"/>
 
 
 
