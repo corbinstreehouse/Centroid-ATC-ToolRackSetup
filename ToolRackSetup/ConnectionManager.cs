@@ -10,25 +10,26 @@ namespace ToolRackSetup
 {
     class ConnectionManager
     {
-
-
         private CNCPipe _pipe;
         public CNCPipe Pipe { get => _pipe; }
 
         private ParameterSettings _parameterSettings;
         public ParameterSettings Parameters { get => _parameterSettings; }
 
-        private ToolController? _controller;
+        private RuntimeController? _runtimeController;
+
+        private ToolController? _toolController;
+
         public ToolController ToolController
         {
             get
             {
-                if (_controller == null)
+                if (_toolController == null)
                 {
                     // Suppose the controller could just access these properties now...but isolation is kind of nice.
-                    _controller = new ToolController(_pipe, _parameterSettings);
+                    _toolController = new ToolController(_pipe, _parameterSettings);
                 }
-                return _controller;
+                return _toolController;
             }
 
         }
@@ -63,6 +64,8 @@ namespace ToolRackSetup
             _pipe.message_window.AddMessage("Tool Manager Connected");
             _parameterSettings = new ParameterSettings(_pipe);
 
+            _runtimeController = new RuntimeController(_pipe);
+
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.Interval = GetPollingTimeInterval(); // 1 second polling
@@ -84,13 +87,12 @@ namespace ToolRackSetup
                 // Hard quit; nothing we can do..
                 Environment.Exit(0);
             }
-            _controller?.RefreshActiveTool();
-
+            _toolController?.RefreshActiveTool();
+            _runtimeController?.Update();
         }
 
         public void OnExit()
         {
-            /// message is never shown...I need to move it somewhere else...
             _pipe.message_window.AddMessage("Tool Manager Disconnected");
         }
 

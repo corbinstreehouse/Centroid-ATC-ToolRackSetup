@@ -9,6 +9,14 @@ using System.Windows;
 
 namespace ToolRackSetup
 {
+    // Bitset values for ParameterKey.ATCToolOptions -- these are defined by me
+    public enum ATCToolOptions
+    {
+        EnableATC = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
+        TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job. This would be set manually and it is checked in the macro
+        EnableVirtualDrawbar = 4, // Enable vitual drawbar button
+    }
+
     // Settings that write parameter values
     public class ParameterSettings : ObservableObject
     {

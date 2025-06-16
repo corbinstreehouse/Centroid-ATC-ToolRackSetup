@@ -13,6 +13,8 @@ namespace ToolRackSetup
         CentroidHasEnhancedATC = 160, // Currently needs to be 0, can have variuous bits set which cause the PLC to be used for the tool number
         MaxToolBins = 161, // Read/written
 
+        // The "700" series of parameters are for end users (ie: Avid)
+
         // Custom parameters by Avid (see resetparams.mac)
         SpoilboardCalibrated = 701,
         TouchOffPlateSet = 702,
@@ -24,13 +26,12 @@ namespace ToolRackSetup
         PromptToGoToTouchPlate = 769,
 
 
-
-
-        // Custom parameters by Corbin
+        // Custom parameters by Corbin's Workshop. TODO: add a prefix of CW_
         ATCToolOptions = 776, // bitset, see ATCToolOptions enum
-
-        //  EnableVirtualDrawbar = 777, // virtual drawbar button support; prefer to be 0. (corbin)
+        CW_ShowRuntime = 777,
         SpindleWaitTime = 778, // spindle wait time, in seconds (corbin)
+
+
 
 
         CentroidATCType = 830, // 0 = None, 7 = Rack type...; this needs to be 0! Otherwise the wizard keeps re-writing stuff.
@@ -39,17 +40,25 @@ namespace ToolRackSetup
 
     }
 
-    // Bitset values
-    public enum ATCToolOptions
-    {
-        EnableATC = 1,  // 1 if it is enabled; checked in some code for clearing the tool table
-        TurnOffRelay2WithSpindle = 2, // Turn off relay 2 with the spindle instead of the end of the job
-        EnableVirtualDrawbar = 4, // Enable vitual drawbar button
-    }
 
 
     public static class CNCPipeExtensions
     {
+        public static bool IsJobRunning(this CNCPipe pipe)
+        {
+            CNCPipe.Plc.IOState plcState = CNCPipe.Plc.IOState.IO_STATE_UNKNOWN;
+            CNCPipe.ReturnCode rc = pipe.plc.GetPcSystemVariableBit(CentroidAPI.PcToMpuSysVarBit.SV_JOB_IN_PROGRESS, out  plcState);
+            if (rc == CNCPipe.ReturnCode.SUCCESS)
+            {
+                return plcState == CNCPipe.Plc.IOState.IO_LOGICAL_1;
+
+            } else
+            {
+                return false;
+            }
+
+
+        }
 
         public static bool GetToolOptionValue(this CNCPipe.Parameter parameter, ATCToolOptions option)
         {
