@@ -50,5 +50,10 @@ namespace ToolRackSetup
         {
 
         }
+
+        private void RuntimeWindowButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)App.Current).ShowRuntimeWindow();
+        }
     }
 }

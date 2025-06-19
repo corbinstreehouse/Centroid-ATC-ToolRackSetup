@@ -5,5 +5,20 @@
     <Setting Name="LockToolPocketSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="RuntimeWindowLeft" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">7</Value>
+    </Setting>
+    <Setting Name="RuntimeWindowTop" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">455</Value>
+    </Setting>
+    <Setting Name="RuntimeWindowVisible" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="RuntimeWindowWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">210</Value>
+    </Setting>
+    <Setting Name="RuntimeWindowHeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">85</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

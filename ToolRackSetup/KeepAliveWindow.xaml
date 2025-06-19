@@ -8,8 +8,9 @@
         Title="Tool Manager Application" Height="173" Width="800" Loaded="Window_Loaded" Closed="Window_Closed" Activated="Window_Activated">
     <Grid>
         <Button Content="Quit Application" HorizontalAlignment="Center" Margin="0,61,0,0" VerticalAlignment="Top" Height="29" Width="99" Click="Button_Click_1"/>
-        <Button Content="Tool Manager Window" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top"  Height="29" Width="168" Click="Button_Click"/>
+        <Button Content="Tool Manager Window" HorizontalAlignment="Left" Margin="182,15,0,0" VerticalAlignment="Top"  Height="29" Width="168" Click="Button_Click"/>
         <Label Content="This window keeps the Tool Manager application running. Close this window to exit the application." HorizontalAlignment="Center" Margin="0,101,0,0" VerticalAlignment="Top"/>
+        <Button Content="Runtime Window" Margin="416,15,216,0" VerticalAlignment="Top"  Height="29" Click="RuntimeWindowButton_Click"/>
 
     </Grid>
 </Window>

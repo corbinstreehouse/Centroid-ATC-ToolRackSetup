@@ -16,8 +16,6 @@ namespace ToolRackSetup
         private ParameterSettings _parameterSettings;
         public ParameterSettings Parameters { get => _parameterSettings; }
 
-        private RuntimeController? _runtimeController;
-
         private ToolController? _toolController;
 
         public ToolController ToolController
@@ -64,8 +62,6 @@ namespace ToolRackSetup
             _pipe.message_window.AddMessage("Tool Manager Connected");
             _parameterSettings = new ParameterSettings(_pipe);
 
-            _runtimeController = new RuntimeController(_pipe);
-
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.Interval = GetPollingTimeInterval(); // 1 second polling
@@ -88,7 +84,6 @@ namespace ToolRackSetup
                 Environment.Exit(0);
             }
             _toolController?.RefreshActiveTool();
-            _runtimeController?.Update();
         }
 
         public void OnExit()

@@ -8,6 +8,7 @@ using System.Transactions;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using ToolRackSetup.Properties;
 
 namespace ToolRackSetup
 {
@@ -141,7 +142,28 @@ namespace ToolRackSetup
             }));
         }
 
+        RuntimeWindow? _runtimeWindow = null;
+        public void ShowRuntimeWindow()
+        {
+            if (_runtimeWindow == null)
+            {
+                _runtimeWindow = new RuntimeWindow();
+            }
+            _runtimeWindow.Show();
+            // TODO: flip topmost on/off based on the centroid window being active or not..
+            _runtimeWindow.Topmost = true;
+            _runtimeWindow.Closed += _runtimeWindow_Closed;
+            Settings.Default.RuntimeWindowVisible = true;
+            Settings.Default.Save();
 
+        }
+
+        private void _runtimeWindow_Closed(object? sender, EventArgs e)
+        {
+            _runtimeWindow = null;
+            Settings.Default.RuntimeWindowVisible = false;
+            Settings.Default.Save();
+        }
 
         public void ShowToolManagerWindow()
         {
@@ -180,6 +202,13 @@ namespace ToolRackSetup
             _fetchToolPopup?.Close();
             _fetchToolPopup = null;
             ToolManagerWindow.Instance?.Close();
+            if (_runtimeWindow != null)
+            {
+                // unhook the event so we don't save the close state
+                _runtimeWindow.Closed -= _runtimeWindow_Closed;
+                _runtimeWindow?.Close();
+                _runtimeWindow = null;
+            }
         }
 
 
@@ -187,6 +216,7 @@ namespace ToolRackSetup
         {
 
             MakeSingleInstance();
+            Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(HandleException);
 
             _ = ConnectionManager.Instance; // start it up
 
@@ -222,7 +252,13 @@ namespace ToolRackSetup
                 );
             }
 
-            Application.Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(HandleException);
+
+            // If runtime window is to be shown, show it now..
+            if (Settings.Default.RuntimeWindowVisible)
+            {
+                ShowRuntimeWindow();
+            }
+
             base.OnStartup(e);
         }
 

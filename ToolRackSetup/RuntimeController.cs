@@ -9,33 +9,73 @@ using System.Xml.Linq;
 using System.IO;
 using System.Globalization;
 using System.Xml.XPath;
+using System.Windows.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ToolRackSetup
 {
-    class RuntimeController
+    public class RuntimeController : ObservableObject, IDisposable
     {
         CNCPipe _pipe;
 
         DateTime _startTime = DateTime.MinValue; // The actual time the job started running
         TimeSpan _lastActualRuntime = TimeSpan.Zero; // Will be .Zero if it hasn't been run
-        int _lineCount = 0;
         int _currentLineNumber = 0;
+        public int CurrentLineNumber
+        {
+            get => _currentLineNumber;
+            set => SetProperty(ref _currentLineNumber, value);
+        }
+
+        int _lineCount = 0;
+        public int LineCount
+        {
+            get => _lineCount;
+            set => SetProperty(ref _lineCount, value);
+        }
+
+
+
         bool _jobIsRunning = false;
         string _jobFilename = string.Empty;
-        double _percentageThrough = 0;
-
+        DispatcherTimer _dispatchTimer;
         public RuntimeController(CNCPipe pipe)
         {
             _pipe = pipe;
+            LoadCurrentJobDetails();
+            if (_pipe.IsJobRunning())
+            {
+                // Ugh..our stuff will be off! Not sure how to deal with this....
+                Update();
+            } else
+            {
+
+            }
+
+            _dispatchTimer = new System.Windows.Threading.DispatcherTimer();
+            _dispatchTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            _dispatchTimer.Interval = GetPollingTimeInterval(); // 1 second polling
+            _dispatchTimer.Start();
+        }
+
+        public void Dispose()
+        {
+            _dispatchTimer.Stop();
+            _pipe = null!;
+            Debug.WriteLine("RuntimeController disposed");
+        }
+
+        private static TimeSpan GetPollingTimeInterval()
+        {
+            return new TimeSpan(0, 0, 0, 1); // every 1 second...
+        }
+
+        private void dispatcherTimer_Tick(object? sender, EventArgs e)
+        {
             Update();
         }
 
-        private void UpdateState()
-        {
-
-        }
-
-        private static int GetLineCount(string filename)
+        private static int GetLineCountFromFilename(string filename)
         {
             if (filename.Length > 0 && File.Exists(filename))
             {
@@ -54,27 +94,46 @@ namespace ToolRackSetup
             }
         }
 
+        private bool HasCurrentJobChanged()
+        {
+            string tempFilename = "";
+            _pipe.state.GetFullPathJobNameCurrent(out tempFilename);
+            if (tempFilename != _jobFilename)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+
         private void LoadCurrentJobDetails()
         {
             _pipe.state.GetFullPathJobNameCurrent(out _jobFilename);
-            string currentJobName = "";
-            _pipe.state.GetJobNameCurrent(out currentJobName);
+            //string currentJobName = "";
+            //_pipe.state.GetJobNameCurrent(out currentJobName);
             
             // Synchronous load or async this on a background thread
-            _lineCount = GetLineCount(_jobFilename);
-            _currentLineNumber = 0;
+            this.LineCount = GetLineCountFromFilename(_jobFilename);
+            CurrentLineNumber = 0;
             _startTime = DateTime.Now;
             // If we already started, see what the time elapsed is..
 
-
-            _percentageThrough = 0;
+            this.PercentageThroughLines = 0.0;
             // See if we ran this job and load the runtime
-            _lastActualRuntime = LoadSavedRuntimeForJob(_jobFilename);            
+            _lastActualRuntime = LoadSavedRuntimeForJob(_jobFilename);
+            if (_lastActualRuntime != TimeSpan.Zero)
+            {
+                TimeLeft = _lastActualRuntime; // Set it to show the user how long it will take
+            } else
+            {
+                TimeLeft = TimeSpan.Zero;
+            }
 
-            Debug.Print("JobFileName: {0}, lineCount: {1} currentJobName : {2}", _jobFilename, _lineCount, currentJobName);
+            //Debug.Print("JobFileName: {0}, lineCount: {1}", _jobFilename, _lineCount);
 
         }
-
+        
         private bool GetIfLastJobRanSuccessfully()
         {
             string[] messages = new string[0];
@@ -147,6 +206,7 @@ namespace ToolRackSetup
             if (File.Exists(savedRuntimeFilePath))
             {
                 doc = XDocument.Load(savedRuntimeFilePath);
+                topLevelJobs = doc.Root;
                 string query = String.Format("/Jobs/Job[Path='{0}']", jobFilename);
                 jobElement = doc.XPathSelectElement(query);
             } else
@@ -185,11 +245,10 @@ namespace ToolRackSetup
         private void JobIsRunningChangedTo(bool value)
         {
             _jobIsRunning = value;
-            Debug.WriteLine("Job Running State changed to: {0}", _jobIsRunning);
+//            Debug.WriteLine("Job Running State changed to: {0}", _jobIsRunning);
             if (_jobIsRunning)
             {
                 LoadCurrentJobDetails();
-
             }
             else
             {
@@ -200,12 +259,27 @@ namespace ToolRackSetup
                 if (GetIfLastJobRanSuccessfully())
                 {
                     // Make sure we are at the end for the UI display
-                    _percentageThrough = 1.0;
-                    _currentLineNumber = _lineCount;
+                    PercentageThroughLines = 1.0;
+                    CurrentLineNumber = LineCount;
+                    TimeLeft = TimeSpan.Zero;
                     // Save off the info for the next run of the same job
                     SaveRuntimeForJob(_jobFilename, actualRuntime);
                 }
             }
+        }
+
+        private TimeSpan _timeLeft = TimeSpan.Zero;
+        public TimeSpan TimeLeft
+        {
+            get => _timeLeft;
+            set => SetProperty(ref _timeLeft, value);
+        }
+
+        private double _percentageThroughLines = 0;
+        public double PercentageThroughLines
+        {
+            get => _percentageThroughLines;
+            set => SetProperty(ref _percentageThroughLines, value);
         }
 
         private void UpdatePercentageThroughJob()
@@ -217,13 +291,13 @@ namespace ToolRackSetup
             _pipe.state.GetCurrentStackLevelZeroLineInfo(out current_line_number, out program_number);
 
             // Only update for the main program at stack 0; otherwise, we get a line number from a different file that is running
-            _currentLineNumber = current_line_number;
+            this.CurrentLineNumber = current_line_number;
 
             if (_lineCount > 0) {
-                _percentageThrough = (double)_currentLineNumber / (double)_lineCount * 100.0;
+                PercentageThroughLines = (double)this.CurrentLineNumber / (double)_lineCount;
             } else
             {
-                _percentageThrough = 0;
+                PercentageThroughLines = 0;
             }
 
             TimeSpan timePassed = DateTime.Now - _startTime;
@@ -232,8 +306,8 @@ namespace ToolRackSetup
             if (_lastActualRuntime == TimeSpan.Zero)
             {
                 // If we haven't run this before, do an estimate for when we will end based on the time passed
-                if (_percentageThrough > 0) { 
-                    TimeSpan estimatedRuntime = timePassed / _percentageThrough; // Estimate..
+                if (PercentageThroughLines  > 0) { 
+                    TimeSpan estimatedRuntime = timePassed / _percentageThroughLines; // Estimate..
                     timeLeft = estimatedRuntime - timePassed;
                 }
             } else
@@ -245,15 +319,22 @@ namespace ToolRackSetup
                 timeLeft = TimeSpan.Zero;
             }
 
+            this.TimeLeft = timeLeft;
+
             string timeLeftStr = String.Format("{0:00}:{1:00}:{2:00}", timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds);
 
-
-            Debug.WriteLine("line {0} / {1}, percent: {2}, TimeLeft: {3}", _currentLineNumber, _lineCount, _percentageThrough, timeLeftStr);
+            Debug.WriteLine("line {0} / {1}, percent: {2}, TimeLeft: {3}", _currentLineNumber, _lineCount, PercentageThroughLines, timeLeftStr);
 
         }
 
         public void Update()
         {
+            // If the file changed, reload things...
+            if (HasCurrentJobChanged())
+            {
+                LoadCurrentJobDetails();
+            }
+
             // See if our state is changing
             bool newJobIsRunning = _pipe.IsJobRunning();
             if (newJobIsRunning != _jobIsRunning)

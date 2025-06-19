@@ -12,7 +12,7 @@ namespace ToolRackSetup.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.13.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -32,6 +32,66 @@ namespace ToolRackSetup.Properties {
             }
             set {
                 this["LockToolPocketSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public double RuntimeWindowLeft {
+            get {
+                return ((double)(this["RuntimeWindowLeft"]));
+            }
+            set {
+                this["RuntimeWindowLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("455")]
+        public double RuntimeWindowTop {
+            get {
+                return ((double)(this["RuntimeWindowTop"]));
+            }
+            set {
+                this["RuntimeWindowTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RuntimeWindowVisible {
+            get {
+                return ((bool)(this["RuntimeWindowVisible"]));
+            }
+            set {
+                this["RuntimeWindowVisible"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("210")]
+        public double RuntimeWindowWidth {
+            get {
+                return ((double)(this["RuntimeWindowWidth"]));
+            }
+            set {
+                this["RuntimeWindowWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("85")]
+        public double RuntimeWindowHeight {
+            get {
+                return ((double)(this["RuntimeWindowHeight"]));
+            }
+            set {
+                this["RuntimeWindowHeight"] = value;
             }
         }
     }
