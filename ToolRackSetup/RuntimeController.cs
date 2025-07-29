@@ -130,7 +130,7 @@ namespace ToolRackSetup
                 TimeLeft = TimeSpan.Zero;
             }
 
-            //Debug.Print("JobFileName: {0}, lineCount: {1}", _jobFilename, _lineCount);
+            Debug.Print("JobFileName: {0}, lineCount: {1}", _jobFilename, _lineCount);
 
         }
         
@@ -290,6 +290,13 @@ namespace ToolRackSetup
 
             _pipe.state.GetCurrentStackLevelZeroLineInfo(out current_line_number, out program_number);
 
+            //int stack_level = 0;
+            //int tempLine = 0;
+            //int tempProgram = 0;
+            //_pipe.state.GetCurrentLineInfo(out tempLine, out tempProgram, out stack_level); 
+            //Debug.Print("Current Line: {0}, Program Number: {1}, Stack Level: {2} tempLine: {3}, tempProgram {4}", current_line_number, program_number, stack_level, tempLine, tempProgram);  
+
+
             // Only update for the main program at stack 0; otherwise, we get a line number from a different file that is running
             this.CurrentLineNumber = current_line_number;
 
@@ -321,10 +328,8 @@ namespace ToolRackSetup
 
             this.TimeLeft = timeLeft;
 
-            string timeLeftStr = String.Format("{0:00}:{1:00}:{2:00}", timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds);
-
-            Debug.WriteLine("line {0} / {1}, percent: {2}, TimeLeft: {3}", _currentLineNumber, _lineCount, PercentageThroughLines, timeLeftStr);
-
+            //string timeLeftStr = String.Format("{0:00}:{1:00}:{2:00}", timeLeft.Hours, timeLeft.Minutes, timeLeft.Seconds);
+            //Debug.WriteLine("line {0} / {1}, percent: {2}, TimeLeft: {3}", _currentLineNumber, _lineCount, PercentageThroughLines, timeLeftStr);
         }
 
         public void Update()
@@ -337,6 +342,29 @@ namespace ToolRackSetup
 
             // See if our state is changing
             bool newJobIsRunning = _pipe.IsJobRunning();
+
+            // HACK! It is hard to tell if we are running a warmup macro or something else. so, this is a heuristic to determine that, which may not be right
+            if (newJobIsRunning && newJobIsRunning != _jobIsRunning)
+            {
+                int current_line_number = 0;
+                int program_number = 0;
+
+                _pipe.state.GetCurrentStackLevelZeroLineInfo(out current_line_number, out program_number);
+                int stack_level = 0;
+                int tempLine = 0;
+                int tempProgram = 0;
+                _pipe.state.GetCurrentLineInfo(out tempLine, out tempProgram, out stack_level);
+                // If we are on line 1 of the current main program...assume we really haven't started, assuming we are deeper in the stack.
+                // This makes a huge assumption that the first line of a program isn't something that calls a macro of some sort...which it might.
+                if (stack_level > 0)
+                {
+                    if (current_line_number == 1)
+                    {
+                        newJobIsRunning = false; // Probably a macro...but like i said, this is a guess!
+                    }
+                }
+            }
+
             if (newJobIsRunning != _jobIsRunning)
             {
                 JobIsRunningChangedTo(newJobIsRunning);

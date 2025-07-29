@@ -56,8 +56,6 @@ namespace ToolRackSetup
             {
                 return false;
             }
-
-
         }
 
         public static bool GetToolOptionValue(this CNCPipe.Parameter parameter, ATCToolOptions option)
