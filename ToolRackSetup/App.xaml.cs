@@ -150,8 +150,7 @@ namespace ToolRackSetup
                 _runtimeWindow = new RuntimeWindow();
             }
             _runtimeWindow.Show();
-            // TODO: flip topmost on/off based on the centroid window being active or not..
-            _runtimeWindow.Topmost = true;
+            //_runtimeWindow.Topmost = true;
             _runtimeWindow.Closed += _runtimeWindow_Closed;
             Settings.Default.RuntimeWindowVisible = true;
             Settings.Default.Save();

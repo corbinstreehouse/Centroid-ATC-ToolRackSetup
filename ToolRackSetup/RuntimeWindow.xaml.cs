@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using ToolRackSetup.Properties;
 
 namespace ToolRackSetup
@@ -32,10 +35,72 @@ namespace ToolRackSetup
             // _runtimeController due to bindings
             _runtimeController = new RuntimeController(ConnectionManager.Instance.Pipe);
             InitializeComponent();
+
+            _dispatchTimer = new System.Windows.Threading.DispatcherTimer();
+            _dispatchTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            _dispatchTimer.Interval = GetPollingTimeInterval(); // 1 second polling
+            _dispatchTimer.Start();
+        }
+        private static TimeSpan GetPollingTimeInterval()
+        {
+            return new TimeSpan(0, 0, 0, 0, 500); // every 1 second...
+        }
+
+        DispatcherTimer _dispatchTimer;
+
+        #region "WinAPI"
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
+
+        #endregion
+
+
+        private string getCurrentAppName()
+        {
+            IntPtr activeAppHandle = GetForegroundWindow();
+
+            IntPtr activeAppProcessId;
+            GetWindowThreadProcessId(activeAppHandle, out activeAppProcessId);
+
+            Process currentAppProcess = Process.GetProcessById((int)activeAppProcessId);
+            string currentAppName = FileVersionInfo.GetVersionInfo(currentAppProcess.MainModule.FileName).FileName;
+
+            return currentAppName;
+        }
+
+        private void dispatcherTimer_Tick(object? sender, EventArgs e)
+        {
+            // if cnc12 isn't top most...then take away our top most bit, and vice-versa
+            String appName = getCurrentAppName();
+            //Debug.Print(appName);
+            if (appName != null && (appName.EndsWith("VirtualControlPanel.exe") || appName.EndsWith("cncr.exe")))
+            {
+                if (this.Topmost == false)
+                {
+
+                    // Make sure we are topmost ..stupid ness
+                    this.Topmost = true;
+                    this.Topmost = false;
+                    this.Topmost = true;
+                }
+            }
+            else
+            {
+                if (this.Topmost == true)
+                {
+                    this.Topmost = false;
+                }
+            }
         }
 
         private void window_Closed(object sender, EventArgs e)
         {
+            _dispatchTimer.Stop();
+
             _runtimeController.Dispose();
         }
 
