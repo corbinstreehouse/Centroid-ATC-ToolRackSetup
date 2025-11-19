@@ -66,10 +66,16 @@ namespace ToolRackSetup
             IntPtr activeAppProcessId;
             GetWindowThreadProcessId(activeAppHandle, out activeAppProcessId);
 
-            Process currentAppProcess = Process.GetProcessById((int)activeAppProcessId);
-            string currentAppName = FileVersionInfo.GetVersionInfo(currentAppProcess.MainModule.FileName).FileName;
-
-            return currentAppName;
+            try
+            {
+                Process currentAppProcess = Process.GetProcessById((int)activeAppProcessId);
+                string currentAppName = FileVersionInfo.GetVersionInfo(currentAppProcess.MainModule.FileName).FileName;
+                return currentAppName;
+            }
+            catch (Exception ex)
+            {
+                return null; // Sometimes we get an exception on GetVersionInfo...not sure why...so do this!
+            }
         }
 
         private void dispatcherTimer_Tick(object? sender, EventArgs e)
