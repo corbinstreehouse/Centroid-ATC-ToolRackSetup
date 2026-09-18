@@ -78,6 +78,11 @@ namespace ToolRackSetup
             }
         }
 
+        public static void DoEvents()
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background,
+                                                  new Action(delegate { }));
+        }
         private void dispatcherTimer_Tick(object? sender, EventArgs e)
         {
             // if cnc12 isn't top most...then take away our top most bit, and vice-versa
@@ -92,13 +97,18 @@ namespace ToolRackSetup
                     this.Topmost = true;
                     this.Topmost = false;
                     this.Topmost = true;
+                    DoEvents();
                 }
             }
             else
             {
                 if (this.Topmost == true)
                 {
+                    //Debug.Print("topmosty going to false");
+//                    this.Topmost = false;
+  //                  this.Topmost = true;
                     this.Topmost = false;
+                    DoEvents();
                 }
             }
         }
