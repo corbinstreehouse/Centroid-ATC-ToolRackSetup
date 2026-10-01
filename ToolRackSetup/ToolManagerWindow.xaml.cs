@@ -121,6 +121,7 @@ namespace ToolRackSetup
 
         private double _slideDistance = 1.4; // Default value
         private double _rackAdjustment = 5.5;
+        private double _putBackDelay = 0.6;
 
         public bool EnableTestingMode { get => _enableTestingMode; 
             set {
@@ -150,6 +151,12 @@ namespace ToolRackSetup
         public double RackOffset { get => _rackAdjustment;
             set {
                 SetProperty(ref _rackAdjustment, value);
+            }
+        }
+
+        public double PutBackDelay { get => _putBackDelay;
+            set {
+                SetProperty(ref _putBackDelay, value);
             }
         }
 
