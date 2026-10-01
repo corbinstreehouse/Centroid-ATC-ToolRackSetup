@@ -484,7 +484,7 @@ namespace ToolRackSetup
                 double slideDistance = Settings.SlideDistance;
                 double zPos = item.Z;
                 double zPosBump = item.Z + Settings.ZBump;
-                double putBackDelay = 0.6; // TODO: make this customizable?  My rack needs a delay of 0.6 seconds to aviod pulling the rack up and off. But for hole style pockets that delay is too big.
+                double putBackDelay = Settings.PutBackDelay; // TODO: make this customizable?  My rack needs a delay of 0.6 seconds to aviod pulling the rack up and off. But for hole style pockets that delay is (possibly) too big.
 
                 if (item.Style == PocketStyle.XMinus || item.Style == PocketStyle.XPlus)
                 {
@@ -532,7 +532,7 @@ namespace ToolRackSetup
                 {
                     // Hole style....just go straight to it! 
                     zPosBump = item.Z; // Maybe we need it? not sure..
-                    putBackDelay = 0.4;
+                    putBackDelay = 0.4; //hardcoded put back delay for hole style pockets. 0.4 seems to work for my pockets, 0.6 is needed for my forks
                     // Well, see if the front pos can be figured out by looking at the prior/next and figuring otu the alignment... would maybe be nice to do..
                     //ToolPocketItem? adjacentItem = null;
                     //if (i > 0)

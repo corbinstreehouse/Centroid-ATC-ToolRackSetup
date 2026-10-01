@@ -58,8 +58,8 @@ M98 "\cncm\CorbinsWorkshop\check_air_pressure.cnc"
 
 M15 ; open drawbar
 
-; dwell for a brief moment, otherwise my rack will almost get pulled off
-G4 P0.6
+; optionally dwell for a brief moment, otherwise my rack will almost get pulled off
+G65 "\cncm\CorbinsWorkshop\Generated\pocket_#107_position.cnc" A6 ; Put back delay
 
 ;m225 #110 "go high"
 ; TODO: Maybe don't go to z-0 if not needed to save a litle time
